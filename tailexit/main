@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+
+# shellcheck source=lib.sh
+source "${REPO_PATH}/lib.sh"
+command_exists tailscale fzf || panic "tailexit requires tailscale and fzf to be installed first."
+install tailexit "${INSTALL_PREFIX}/tailexit"

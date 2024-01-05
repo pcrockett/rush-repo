@@ -1,0 +1,44 @@
+#!/usr/bin/env bash
+set -Eeuo pipefail
+
+# Quickly select a tailscale exit node with fzf
+#
+# Any parameters to the script are used as the initial query
+#
+# Dependencies: fzf, tailscale
+
+select_exit_ip() {
+
+    # sample output for `tailscale exit-node list`
+    #
+    #      IP                  HOSTNAME                         COUNTRY            CITY                   STATUS       
+    #      100.103.207.98      al-tia-wg-002.mullvad.ts.net     Albania            Tirana                 -            
+    #      100.126.124.92      au-syd-wg-104.mullvad.ts.net     Australia          Any                    -            
+    #      100.65.216.68       au-adl-wg-301.mullvad.ts.net     Australia          Adelaide               -            
+    #      100.70.240.117      au-bne-wg-301.mullvad.ts.net     Australia          Brisbane               -            
+    #      100.84.134.6        au-mel-wg-302.mullvad.ts.net     Australia          Melbourne              -            
+    #
+    #     # To use an exit node, use `tailscale set --exit-node=` followed by the hostname or IP
+    #
+    # yes, that comment at the end is output in the command as well as empty lines
+    # will need to handle those as we parse
+    # also... this is likely to break. tailscale makes no guarantees about stability of output
+
+    tailscale exit-node list \
+        | grep --invert-match --perl-regexp '^#' \
+        | grep --invert-match --perl-regexp '^\s*$' \
+        | fzf --header-lines 1 --query "${*}" --select-1 \
+        | awk '{ print $1 }'
+}
+
+main() {
+    local exit_node
+    exit_node="$(select_exit_ip "${@}")"
+
+    sudo tailscale set "--exit-node=${exit_node}"
+    if ! tailscale status &> /dev/null; then
+        sudo tailscale up
+    fi
+}
+
+main "${@}"
