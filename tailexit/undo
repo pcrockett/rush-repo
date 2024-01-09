@@ -2,4 +2,4 @@
 
 # shellcheck source=lib.sh
 source "${REPO_PATH}/lib.sh"
-rm -f "${INSTALL_PREFIX}/tailexit"
+rm -f "${RUSH_USER_BIN}/tailexit"
