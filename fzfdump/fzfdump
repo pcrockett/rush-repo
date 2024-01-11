@@ -11,6 +11,7 @@ set -Eeuo pipefail
 #
 # Takes no args, assumes the file is coming in through standard input.
 #
+# Dependencies: fzf, sudo
 
 panic() {
     echo "FATAL: ${*}" >&2
@@ -21,7 +22,7 @@ prompt_for_device() {
     # Display a rich fuzzy search / menu for the user to select their output device,
     # and output just the device's PATH
 
-    # HACK: assuming the user has sudo configured so you don't have, to type in a password on each
+    # HACK: assuming the user has sudo configured so you don't have to type in a password on each
     # sudo invocation, this will "unlock" sudo so fzf can invoke it without prompting for passwords.
     sudo true || panic "Need sudo access."
 
