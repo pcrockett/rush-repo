@@ -3,4 +3,4 @@
 # shellcheck source=lib.sh
 source "${REPO_PATH}/lib.sh"
 require_commands tailscale fzf sudo
-install tailexit "${RUSH_USER_BIN}/tailexit"
+install_user_bin tailexit
