@@ -1,0 +1,57 @@
+#!/usr/bin/env bash
+set -Eeuo pipefail
+
+usage() {
+    local script_name
+    script_name="$(basename "${1}")"
+    echo "Initialize a new package"
+    echo
+    echo "Usage:"
+    echo "  ${script_name} PACKAGE_NAME"
+    echo
+}
+
+panic() {
+    echo "FATAL: ${*}" >&2
+    exit 1
+}
+
+generate_info() {
+    echo "TODO: short description of package"
+}
+
+# shellcheck disable=SC2016  # don't want to expand any expressions within single-quotes
+generate_main() {
+    echo '#!/usr/bin/env bash'
+    echo ''
+    echo '# shellcheck source=lib.sh'
+    echo 'source "${REPO_PATH}/lib.sh"'
+    echo 'require_commands sudo fzf  # TODO'
+    echo 'install_user_bin some_bin  # TODO'
+}
+
+# shellcheck disable=SC2016  # don't want to expand any expressions within single-quotes
+generate_undo() {
+    echo '#!/usr/bin/env bash'
+    echo ''
+    echo '# shellcheck source=lib.sh'
+    echo 'source "${REPO_PATH}/lib.sh"'
+    echo 'rm -f "${RUSH_USER_BIN}/some_bin"  # TODO'
+}
+
+main() {
+    local PACKAGE_NAME="${1:-}"
+    if [ "${PACKAGE_NAME}" == "" ]; then
+        usage "${0}"
+        panic "Must specify package name."
+    fi
+
+    test ! -d "${PACKAGE_NAME}" || panic "${PACKAGE_NAME} already exists!"
+
+    mkdir --parent "${PACKAGE_NAME}"
+    generate_info > "${PACKAGE_NAME}/info"
+    generate_main > "${PACKAGE_NAME}/main" && chmod +x "${PACKAGE_NAME}/main"
+    generate_undo > "${PACKAGE_NAME}/undo" && chmod +x "${PACKAGE_NAME}/undo"
+}
+
+main "${@}"
