@@ -1,0 +1,49 @@
+#!/usr/bin/env bash
+
+# shellcheck source=lib.sh
+source "${REPO_PATH}/lib.sh"
+
+GITHUB_ORG="nextcloud-releases"
+GITHUB_REPO="desktop"
+NEXTCLOUD_BIN_NAME="Nextcloud.AppImage"
+
+latest_tag="$(
+    github_latest_tag "${GITHUB_ORG}" "${GITHUB_REPO}"
+)"
+
+# strip the leading `v` from the tag name
+latest_version="$(echo "${latest_tag}" | cut --characters 2-)"
+
+if command_exists "${NEXTCLOUD_BIN_NAME}"; then
+    # only download if we need to update
+
+    if ! [[ "$("${NEXTCLOUD_BIN_NAME}" --version)" =~ ^Nextcloud\ version\ ([[:digit:]]+\.[[:digit:]]+\.[[:digit:]]+) ]]; then
+        panic "Unable to determine currently installed nextcloud version!"
+        exit 1  # redundant, but useful to shellcheck
+    fi
+
+    installed_version="${BASH_REMATCH[1]}"
+    log_info "installed version: ${installed_version}"
+    log_info "latest version: ${latest_version}"
+    if [ "${installed_version}" == "${latest_version}" ]; then
+        log_attention "Nextcloud Desktop already installed and up-to-date."
+        exit 0
+    fi
+fi
+
+download_url="https://github.com/${GITHUB_ORG}/${GITHUB_REPO}/releases/download/${latest_tag}/Nextcloud-${latest_version}-x86_64.AppImage"
+
+temp_dir="$(mktemp --directory)"
+on_exit() {
+    rm -rf "${temp_dir}"
+}
+trap 'on_exit' EXIT
+
+log_info "Download ${download_url} to ${temp_dir}/${NEXTCLOUD_BIN_NAME}..."
+curl_download "${download_url}" > "${temp_dir}/${NEXTCLOUD_BIN_NAME}"
+chmod +x "${temp_dir}/${NEXTCLOUD_BIN_NAME}"
+
+log_info "Install ${temp_dir}/${NEXTCLOUD_BIN_NAME}..."
+install_user_bin "${temp_dir}/${NEXTCLOUD_BIN_NAME}"
+
+log_attention "Done."

@@ -1,6 +1,6 @@
 # shellcheck shell=bash
 
 panic() {
-    echo "FATAL: ${*}" >&2
+    log_error "${*}" >&2
     exit 1
 }
