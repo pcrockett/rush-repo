@@ -11,24 +11,30 @@ latest_tag="$(
     github_latest_tag "${GITHUB_ORG}" "${GITHUB_REPO}"
 )"
 
-# strip the leading `v` from the tag name
-latest_version="$(echo "${latest_tag}" | cut --characters 2-)"
+get_latest_version() {
+    # strip the leading `v` from the tag name
+    echo "${latest_tag}" | cut --characters 2-
+}
 
-if command_exists "${NEXTCLOUD_BIN_NAME}"; then
-    # only download if we need to update
+get_installed_version() {
+    if ! command_exists "${NEXTCLOUD_BIN_NAME}"; then
+        echo ""
+        return 0
+    fi
 
     if ! [[ "$("${NEXTCLOUD_BIN_NAME}" --version)" =~ ^Nextcloud\ version\ ([[:digit:]]+\.[[:digit:]]+\.[[:digit:]]+) ]]; then
         panic "Unable to determine currently installed nextcloud version!"
         exit 1  # redundant, but useful to shellcheck
     fi
 
-    installed_version="${BASH_REMATCH[1]}"
-    log_info "installed version: ${installed_version}"
-    log_info "latest version: ${latest_version}"
-    if [ "${installed_version}" == "${latest_version}" ]; then
-        log_attention "Nextcloud Desktop already installed and up-to-date."
-        exit 0
-    fi
+    echo "${BASH_REMATCH[1]}"
+}
+
+latest_version="$(get_latest_version)"
+
+if [ "${latest_version}" = "$(get_installed_version)" ]; then
+    log_attention "Already installed and up-to-date."
+    exit 0
 fi
 
 download_url="https://github.com/${GITHUB_ORG}/${GITHUB_REPO}/releases/download/${latest_tag}/Nextcloud-${latest_version}-x86_64.AppImage"
