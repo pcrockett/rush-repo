@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+
+# steps to uninstall are just the reverse of what we find in https://tailscale.com/install.sh
+
+# shellcheck source=lib.sh
+source "${REPO_PATH}/lib.sh"
+require_commands sudo
+sudo systemctl stop tailscaled
+sudo apt-get purge --yes tailscale tailscale-archive-keyring
+sudo rm -f /usr/share/keyrings/tailscale-archive-keyring.gpg
+sudo rm -f /etc/apt/sources.list.d/tailscale.list

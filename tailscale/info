@@ -1,0 +1,4 @@
+Tailscale VPN client; just a wrapper around "curl pipe to shell"
+official install method at https://tailscale.com/kb/1031/install-linux
+
+Uninstall script so far only supports Ubuntu-related OSes.
