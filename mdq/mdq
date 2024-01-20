@@ -1,0 +1,76 @@
+#!/usr/bin/env bash
+set -Eeuo pipefail
+
+# Markdown Query: Find Markdown files containing all search terms provided
+#
+# Usage:
+#
+#     mdq SEARCH_TERMS...
+#
+# Example: Find all files containing both terms "linux" and "security"
+#
+#     mdq linux security
+#
+# This differs from standard `grep` / `rg` searches because it only returns results for files that
+# contain ALL terms, not just some of them.
+#
+# Tips:
+#
+# * For better performance, put your most narrow search terms first.
+# * To open search results in a text editor, use `xargs` (ex: `mdq linux security | xargs nvim`).
+#
+# Dependencies:
+#
+# * ripgrep
+# * fzf
+# * bat
+#
+
+MDQUERY_DEBUG="${MDQUERY_DEBUG:-false}"
+
+log_debug() {
+    if [ "${MDQUERY_DEBUG}" = "true" ]; then
+        echo "DEBUG: ${*}"
+    fi
+}
+
+find_files_with_term() {
+    local term="${1}"
+    shift 1
+    local files=("${@}")
+    rg --files-with-matches --fixed-strings --null --ignore-case \
+        --regexp "${term}" \
+        "${files[@]}"
+}
+
+fzf_preview() {
+    SHELL="sh" \
+    fzf --ansi \
+        --preview "bat --color=always {1} --terminal-width \${FZF_PREVIEW_COLUMNS} --wrap never" \
+        --preview-window 'up,70%,border-bottom' \
+        --multi
+}
+
+find_files_with_all_terms() {
+    local terms=("${@}")
+    local files
+    readarray -d '' files < <(rg --files --null --type markdown)
+    log_debug "initial file count: ${#files[@]}"
+    for t in "${terms[@]}"; do
+        log_debug "searching for '${t}'..."
+        readarray -d '' files < <(find_files_with_term "${t}" "${files[@]}")
+        log_debug "new file count: ${#files[@]}"
+        if [ "${#files[@]}" -eq 0 ]; then
+            exit 1
+        fi
+    done
+    for f in "${files[@]}"; do
+        echo "${f}"
+    done
+}
+
+main() {
+    find_files_with_all_terms "${@}" | sort --stable | fzf_preview
+}
+
+main "${@}"
