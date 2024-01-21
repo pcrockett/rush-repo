@@ -3,9 +3,9 @@
 # shellcheck source=lib.sh
 source "${REPO_PATH}/lib.sh"
 
-GITHUB_ORG="nextcloud-releases"
-GITHUB_REPO="desktop"
-BIN_NAME="Nextcloud.AppImage"
+GITHUB_ORG="restic"
+GITHUB_REPO="restic"
+BIN_NAME="restic"
 
 latest_version() {
     # strip the leading `v` from the tag name
@@ -18,8 +18,8 @@ installed_version() {
         return 0
     fi
 
-    if ! [[ "$("${BIN_NAME}" --version 2> /dev/null)" =~ ^Nextcloud\ version\ ([[:digit:]]+\.[[:digit:]]+\.[[:digit:]]+) ]]; then
-        panic "Unable to determine currently installed nextcloud version!"
+    if ! [[ "$("${BIN_NAME}" version)" =~ ^restic\ ([[:digit:]]+\.[[:digit:]]+\.[[:digit:]]+) ]]; then
+        panic "Unable to determine currently installed restic version!"
         exit 1  # redundant, but useful to shellcheck
     fi
 
@@ -27,7 +27,7 @@ installed_version() {
 }
 
 artifact_name() {
-    echo "Nextcloud-${GITHUB_LATEST_VERSION}-x86_64.AppImage"
+    echo "restic_${GITHUB_LATEST_VERSION}_linux_amd64.bz2"
 }
 
 download_url() {
@@ -35,9 +35,10 @@ download_url() {
 }
 
 install_artifact() {
-    chmod +x "${ARTIFACT_PATH}"
-    mv "${ARTIFACT_PATH}" "${BIN_NAME}"
-    install_user_bin "${BIN_NAME}"
+    bunzip2 --decompress --keep --stdout "${ARTIFACT_PATH}" \
+        > ./restic
+    chmod +x ./restic
+    install_global_bin ./restic
 }
 
 install_from_github
