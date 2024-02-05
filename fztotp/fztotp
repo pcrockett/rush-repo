@@ -1,0 +1,45 @@
+#!/usr/bin/env bash
+set -Eeuo pipefail
+
+# get TOTP codes from your yubikey with an interactive fuzzy search UI
+#
+# usage:
+#
+#     fztotp [query]
+#
+# ex: display interactive fuzzy search UI
+#
+#     fztotp
+#
+# ex: get a specific code without a UI (assuming "github" can identify exactly 1 entry)
+#
+#     fztotp github
+#
+# dependencies:
+#
+# * `fzf`
+# * `ykman` (https://docs.yubico.com/software/yubikey/tools/ykman/intro.html)
+#    * tip: install via pipx
+# * optional: `xsel` to copy to clipboard
+#
+
+initial_query="${*}"
+
+panic() {
+    echo "${@}" >&2
+    exit 1
+}
+
+code="$(
+    ykman oath accounts code \
+        | fzf --height 10 --reverse --select-1 --query "${initial_query}" \
+        | awk '{print $2}' \
+        || panic "error getting code"
+)"
+
+# don't require xsel, but use it if you have it.
+if command -v xsel &> /dev/null; then
+    echo -n "${code}" | xsel --clipboard
+fi
+
+echo "${code}"
