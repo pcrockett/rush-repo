@@ -30,12 +30,17 @@ panic() {
     exit 1
 }
 
-code="$(
-    ykman oath accounts code \
+select_code() {
+    # prompt the user to select a code (if necessary) and write it to stdout
+
+    codes="$(ykman oath accounts code)" || exit 1
+    test "${codes}" != "" || panic "No TOTP codes found on key."
+    echo "${codes}" \
         | fzf --height 10 --reverse --select-1 --query "${initial_query}" \
-        | awk '{print $2}' \
-        || panic "error getting code"
-)"
+        | awk '{print $2}'
+}
+
+code="$(select_code)"
 
 # don't require xsel, but use it if you have it.
 if command -v xsel &> /dev/null; then
