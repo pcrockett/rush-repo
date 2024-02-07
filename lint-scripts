@@ -1,0 +1,9 @@
+**/*.sh
+**/main
+**/undo
+*.sh
+_bin/*
+fzfdump/fzfdump
+fztotp/fztotp
+mdq/mdq
+tailexit/tailexit
