@@ -1,0 +1,138 @@
+#!/usr/bin/env bash
+set -Eeuo pipefail
+
+# kbs: Knowledgebase Search
+#
+# Use Ripgrep and Unix pipelines to search a markdown knowledgebase.
+#
+# Ripgrep alone is great for searching most things. However for a knowledgebase with thousands of
+# markdown files, sometimes you want to just get a list of files that contain a certain set of key
+# words. kbs leverages Ripgrep and Unix pipes to do this in a very flexible manner.
+#
+# Usage:
+#
+#     kbs [TERMS...]
+#
+# Examples:
+#
+#     List all files that would be searched:
+#     $ kbs
+#
+#     Find all files containing the phrase "foo bar" at least once:
+#     $ kbs "foo bar"
+#
+#     Find all files containing EITHER the word "foo" OR "bar" somewhere in the file:
+#     $ kbs foo bar
+#
+#     Find all files containing BOTH the words "foo" AND "bar" somewhere in the file:
+#     $ kbs foo | kbs bar
+#
+#     Find all files containing EITHER "foo" OR "bar", but only if they ALSO contain "baz":
+#     $ kbs baz | kbs foo bar
+#     $ kbs foo bar | kbs baz
+#
+# Environment variables:
+#
+#     KBS_FILE_TYPE: Defaults to "markdown" -- Specify the types of files you want to search.
+#                    See `rg --type-list` for a list of valid values.
+#
+#     KBS_FZF: Defaults to "true" -- Specify whether you want to use `fzf` to look at search
+#              results.
+#
+# Important notes:
+#
+# * When stdin is not an interactive terminal, kbs expects it to be a stream of NULL-delimited file
+#   paths. These files will be searched for terms.
+# * When stdout is not an interactive terminal, kbs writes a stream of NULL-delimited file paths to
+#   stdout.
+#
+# Dependencies:
+#
+# * ripgrep
+# * fzf
+# * bat
+#
+
+KBS_FILE_TYPE="${KBS_FILE_TYPE:-markdown}"
+KBS_FZF="${KBS_FZF:-true}"
+
+stdin_is_terminal() {
+    test -t 0
+}
+
+stdout_is_terminal() {
+    test -t 1
+}
+
+rg_all_files() {
+    rg --files --null --type "${KBS_FILE_TYPE}"
+}
+
+rg_filter() {
+    # stdin: list of files to search, null-delimited
+    # args: list of terms to search for in above files
+    # stdout: filtered-down list of files, null-delimited, containing only those where terms were found
+    #
+    # example usage:
+    #
+    # find files that contain ANY of the terms `foo`, `bar`, `whatever`:
+    #
+    #     rg_all_files | rg_filter foo bar whatever
+    #
+    # find files that contain ALL of the terms `foo`, `bar`, `whatever`:
+    #
+    #     rg_all_files | rg_filter foo | rg_filter bar | rg_filter whatever
+    #
+    local terms=("${@}")
+    local rg_command=(rg --files-with-matches --fixed-strings --null --ignore-case)
+    for t in "${terms[@]}"; do
+        rg_command+=(--regexp "${t}")
+    done
+    xargs --null "${rg_command[@]}"
+}
+
+fzf_preview() {
+    SHELL="sh" \
+    fzf --ansi \
+        --preview "bat --color=always {1} --terminal-width \${FZF_PREVIEW_COLUMNS} --wrap never" \
+        --preview-window 'up,70%,border-bottom' \
+        --read0 \
+        --multi
+}
+
+do_search() {
+    if stdin_is_terminal; then
+        if [ "${#@}" -eq 0 ]; then
+            # user ran `kbs` with no args
+            rg_all_files
+        else
+            rg_all_files | rg_filter "${@}"
+        fi
+    elif [ "${#@}" -eq 0 ]; then
+        # no-op; do no filtering
+        cat
+    else
+        rg_filter "${@}"
+    fi
+}
+
+format_output() {
+    if stdout_is_terminal; then
+        # output isn't being piped anywhere. format output for humans!
+        if [ "${KBS_FZF}" = "true" ]; then
+            fzf_preview
+        else
+            # replace NULL characters with newlines
+            tr '\0' '\n'
+        fi
+    else
+        # output is being piped somewhere. don't format, keeping NULL characters in output.
+        cat
+    fi
+}
+
+main() {
+    do_search "${@}" | format_output
+}
+
+main "${@}"
