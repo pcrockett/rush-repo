@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+
+# shellcheck source=lib.sh
+source "${REPO_PATH}/lib.sh"
+require_commands age
+
+temp_dir="$(mktemp_dir)"
+cleanup() {
+    rm -rf "${temp_dir}"
+}
+trap 'cleanup' EXIT SIGINT SIGTERM
+
+curl_download https://github.com/pcrockett/gramps/raw/main/gramps > "${temp_dir}/gramps"
+install_user_bin "${temp_dir}/gramps"

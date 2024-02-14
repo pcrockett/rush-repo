@@ -21,7 +21,7 @@ install_from_github() {
     __download_url="$(download_url)"
     __artifact_name="$(artifact_name)"
 
-    temp_dir="$(mktemp --directory --tmpdir "pcrockett_gh_install.XXXX")"
+    temp_dir="$(mktemp_dir)"
     cleanup() {
         local exit_code="${?}"
         popd &> /dev/null || panic "unable to cd away from ${temp_dir}"
