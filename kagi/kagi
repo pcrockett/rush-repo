@@ -8,6 +8,12 @@ def main [] {
     ^$env.CURRENT_FILE --help
 }
 
+# Set your Kagi API token
+def "main set-token" [] {
+    let token = (input --suppress-output "Paste your API token here and press enter to continue.")
+    $token | save --force (token_path)
+}
+
 # Query FastGPT
 def "main gpt" [
     query: string  # Query to send to FastGPT
@@ -89,11 +95,30 @@ def "main summarize" [
 }
 
 def api_post [endpoint: string, data: record] {
+    let token_path = (token_path)
+    let token = match ($token_path | path exists) {
+        true => { open $token_path --raw | decode "utf-8" | str trim }
+        false => {
+            error make {
+                msg: "API Token has not been set yet. Run `kagi set-token`."
+            }
+        }
+    }
+
     (
         http post
             --content-type "application/json"
-            --headers ["Authorization" $"Bot ($env.KAGI_TOKEN)"]
+            --headers ["Authorization" $"Bot ($token)"]
             $"($BASE_URL)/($endpoint)"
             $data
     )
+}
+
+def token_path [] {
+    let config_home = match ($env | get --ignore-errors XDG_CONFIG_HOME) {
+        null => { $env.HOME | path join ".config/kagi-cli" }
+        $val => { $val | path join "kagi-cli" }
+    }
+    mkdir $config_home
+    $config_home | path join "token"
 }
