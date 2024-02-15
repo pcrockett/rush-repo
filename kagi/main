@@ -2,4 +2,5 @@
 
 # shellcheck source=lib.sh
 source "${REPO_PATH}/lib.sh"
-rm -f "${RUSH_USER_BIN}/kgpt"
+require_commands nu
+install_user_bin kagi
