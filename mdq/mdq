@@ -14,6 +14,11 @@ set -Eeuo pipefail
 # This differs from standard `grep` / `rg` searches because it only returns results for files that
 # contain ALL terms, not just some of them.
 #
+# Environment variables:
+#
+# * MDQUERY_FILE_TYPE: Defaults to "markdown" -- specify file type to search within. Accepts any
+#   value from `rg --type-list`
+#
 # Tips:
 #
 # * For better performance, put your most narrow search terms first.
@@ -27,6 +32,7 @@ set -Eeuo pipefail
 #
 
 MDQUERY_DEBUG="${MDQUERY_DEBUG:-false}"
+MDQUERY_FILE_TYPE="${MDQUERY_FILE_TYPE:-markdown}"
 
 log_debug() {
     if [ "${MDQUERY_DEBUG}" = "true" ]; then
@@ -54,7 +60,7 @@ fzf_preview() {
 find_files_with_all_terms() {
     local terms=("${@}")
     local files
-    readarray -d '' files < <(rg --files --null --type markdown)
+    readarray -d '' files < <(rg --files --null --type "${MDQUERY_FILE_TYPE}")
     log_debug "initial file count: ${#files[@]}"
     for t in "${terms[@]}"; do
         log_debug "searching for '${t}'..."
