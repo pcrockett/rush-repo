@@ -45,6 +45,7 @@ code="$(select_code)"
 # don't require xsel, but use it if you have it.
 if command -v xsel &> /dev/null; then
     echo -n "${code}" | xsel --clipboard
+    echo "Code copied to clipboard." >&2
 fi
 
 echo "${code}"
