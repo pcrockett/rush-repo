@@ -1,4 +1,4 @@
-#!/usr/bin/env nu
+#!/usr/bin/env -S nu --stdin
 
 const BASE_URL = "https://kagi.com/api/v0"
 
@@ -16,9 +16,15 @@ def "main set-token" [] {
 
 # Query FastGPT
 def "main gpt" [
-    query: string  # Query to send to FastGPT
+    query?: string  # Query to send to FastGPT
     --verbose(-v)  # Display meta information at the end
 ] {
+
+    let query = if $query == null {
+        $in
+    } else {
+        $query
+    }
 
     # <https://help.kagi.com/kagi/api/fastgpt.html#examples>
     let response = (
