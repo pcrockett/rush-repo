@@ -28,6 +28,7 @@ generate_main() {
     echo 'source "${REPO_PATH}/lib.sh"'
     echo 'require_commands sudo fzf  # TODO'
     echo 'install_user_bin some_bin  # TODO'
+    echo 'install_success'
 }
 
 # shellcheck disable=SC2016  # don't want to expand any expressions within single-quotes
@@ -37,6 +38,7 @@ generate_undo() {
     echo '# shellcheck source=lib.sh'
     echo 'source "${REPO_PATH}/lib.sh"'
     echo 'rm -f "${RUSH_USER_BIN}/some_bin"  # TODO'
+    echo 'uninstall_success'
 }
 
 main() {

@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+
+# shellcheck source=lib.sh
+source "${REPO_PATH}/lib.sh"
+
+installed_packages_dir="$(repo_state_dir)/installed_packages"
+
+for full_file_path in "${installed_packages_dir}"/*; do
+    package_name="$(basename "${full_file_path}")"
+    rush get "${package_name}" || panic "Unable to update ${package_name}"
+done
+
+log_attention "done"

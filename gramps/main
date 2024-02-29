@@ -12,3 +12,4 @@ trap 'cleanup' EXIT SIGINT SIGTERM
 
 curl_download https://github.com/pcrockett/gramps/raw/main/gramps > "${temp_dir}/gramps"
 install_user_bin "${temp_dir}/gramps"
+install_success

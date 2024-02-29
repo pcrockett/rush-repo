@@ -15,7 +15,7 @@ install_from_github() {
 
     if [ "${GITHUB_LATEST_VERSION}" = "${__installed_version}" ]; then
         log_attention "Already installed and up-to-date."
-        exit 0
+        return 0
     fi
 
     __download_url="$(download_url)"

@@ -4,3 +4,4 @@
 source "${REPO_PATH}/lib.sh"
 require_commands tailscale fzf sudo
 install_user_bin tailexit
+install_success

@@ -41,3 +41,4 @@ install_artifact() {
 }
 
 install_from_github
+install_success
