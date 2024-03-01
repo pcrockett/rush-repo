@@ -4,8 +4,13 @@
 source "${REPO_PATH}/lib.sh"
 
 installed_packages_dir="$(repo_state_dir)/installed_packages"
+mkdir --parent "${installed_packages_dir}"
 
-for full_file_path in "${installed_packages_dir}"/*; do
+find_packages() {
+    find "${installed_packages_dir}" -maxdepth 1 -mindepth 1
+}
+
+for full_file_path in $(find_packages); do
     package_name="$(basename "${full_file_path}")"
     rush get "${package_name}" || panic "Unable to update ${package_name}"
 done
