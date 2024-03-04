@@ -17,3 +17,7 @@ log_warning() {
 log_error() {
     printf "%-20s | %s\n" "$(cyan "${RUSH_PACKAGE_NAME}")" "$(red "ERROR: ${*}")"
 }
+
+log_done() {
+    log_attention "Done."
+}

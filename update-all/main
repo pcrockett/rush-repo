@@ -15,4 +15,4 @@ for full_file_path in $(find_packages); do
     rush get "${package_name}" || panic "Unable to update ${package_name}"
 done
 
-log_attention "done"
+log_done

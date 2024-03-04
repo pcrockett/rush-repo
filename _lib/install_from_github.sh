@@ -38,6 +38,6 @@ install_from_github() {
     ARTIFACT_PATH="${temp_dir}/${__artifact_name}" \
         install_artifact || cleanup
 
-    log_attention "Done."
+    log_done
     cleanup
 }

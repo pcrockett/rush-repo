@@ -1,0 +1,60 @@
+#!/usr/bin/env bash
+
+# shellcheck source=lib.sh
+source "${REPO_PATH}/lib.sh"
+require_commands sudo
+
+temp_dir="$(mktemp_dir)"
+cleanup() {
+    rm -rf "${temp_dir}"
+}
+trap 'cleanup' EXIT SIGINT SIGTERM
+
+install_silverblue() {
+    # https://github.com/linux-surface/linux-surface/wiki/Installation-and-Setup#Fedora-Silverblue
+    local repo_file="/etc/yum.repos.d/linux-surface.repo"
+
+    if [ ! -f "${repo_file}" ]; then
+        curl_download https://pkg.surfacelinux.com/fedora/linux-surface.repo \
+            > "${temp_dir}/linux-surface.repo"
+        sudo mv "${temp_dir}" "${repo_file}"
+    fi
+
+    local rpm_dir
+    rpm_dir="$(repo_state_dir)/surface/kernel"
+    mkdir --parent "${rpm_dir}"
+
+    local kernel_rpm="${rpm_dir}/kernel.rpm"
+
+    if [ ! -f "${kernel_rpm}" ]; then
+        local dummy_package_url="https://github.com/linux-surface/linux-surface/releases/download/silverblue-20201215-1/kernel-20201215-1.x86_64.rpm"
+        curl_download "${dummy_package_url}" > "${temp_dir}/kernel.rpm"
+        mv "${temp_dir}/kernel.rpm" "${kernel_rpm}"
+    fi
+
+    rpm-ostree override replace "${kernel_rpm}" \
+        --remove kernel-core \
+        --remove kernel-modules \
+        --remove kernel-modules-extra \
+        --remove libwacom \
+        --remove libwacom-data \
+        --install kernel-surface \
+        --install iptsd \
+        --install libwacom-surface \
+        --install libwacom-surface-data
+}
+
+get_os_flavor() {
+    (
+        source /etc/os-release
+        echo "${NAME} ${VARIANT}"
+    )
+}
+
+if [ "$(get_os_flavor)" = "Fedora Linux Silverblue" ]; then
+    install_silverblue
+else
+    panic "Sadly, this is only implemented for Fedora Silverblue at the moment."
+fi
+
+log_done
