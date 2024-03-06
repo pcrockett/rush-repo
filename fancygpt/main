@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+
+# shellcheck source=lib.sh
+source "${REPO_PATH}/lib.sh"
+require_commands kagi gum bat
+install_user_bin fancygpt
+install_success

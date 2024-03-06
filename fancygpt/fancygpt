@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+set -Eeuo pipefail
+
+query="$(gum write --placeholder "Question to ask FastGPT (CTRL+D to finish)")"
+
+output_width=90
+term_width="$(tput cols)"
+if [ ${output_width} -gt "${term_width}" ]; then
+    output_width="${term_width}"
+fi
+
+echo "${query}" \
+    | kagi gpt \
+    | gum format \
+    | bat --wrap auto --terminal-width "${output_width}" --style grid
