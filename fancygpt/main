@@ -2,6 +2,6 @@
 
 # shellcheck source=lib.sh
 source "${REPO_PATH}/lib.sh"
-require_commands kagi gum bat
+require_commands kagi gum glow
 install_user_bin fancygpt
 install_success
