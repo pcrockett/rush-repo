@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+
+# shellcheck source=lib.sh
+source "${REPO_PATH}/lib.sh"
+
+dest_file="${USER_CWD}/.editorconfig"
+
+if [ ! -f "${dest_file}" ] || force_please; then
+    cp editorconfig_template.ini "${dest_file}"
+else
+    panic ".editorconfig already exists in this directory. Use --force to overwrite."
+fi
