@@ -5,6 +5,11 @@ export GUM_WRITE_CURSOR_MODE="${GUM_WRITE_CURSOR_MODE:-static}"
 export GUM_WRITE_HEIGHT="${GUM_WRITE_HEIGHT:-20}"
 export GUM_WRITE_WIDTH="${GUM_WRITE_WIDTH:-90}"
 
+term_width="$(tput cols)"
+if [ "${term_width}" -lt "${GUM_WRITE_WIDTH}" ]; then
+    GUM_WRITE_WIDTH="${term_width}"
+fi
+
 query="$(
     gum write --placeholder "Write something here... (CTRL+D to finish)" \
         --char-limit 0
