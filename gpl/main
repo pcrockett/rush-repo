@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+
+# shellcheck source=lib.sh
+source "${REPO_PATH}/lib.sh"
+dest_file="${USER_CWD}/LICENSE"
+
+if [ ! -f "${dest_file}" ] || force_please; then
+    cp LICENSE_template.txt "${dest_file}"
+else
+    panic "LICENSE already exists in this directory. Use --force to overwrite."
+fi
