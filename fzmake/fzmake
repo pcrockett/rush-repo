@@ -1,0 +1,70 @@
+#!/usr/bin/env bash
+set -Eeuo pipefail
+
+panic() {
+    echo "${*}" >&2
+    exit 1
+}
+
+find_makefile() {
+    # find a Makefile in the current directory.
+    #
+    # will write file path of the first Makefile found to stdout
+    # if no makefile found, will panic
+
+    # https://www.gnu.org/software/make/manual/html_node/Makefile-Names.html
+    # order matters
+    makefile_names=(
+        GNUmakefile
+        makefile
+        Makefile
+    )
+
+    for f in "${makefile_names[@]}"; do
+        if [ -f "${f}" ]; then
+            echo "${f}"
+            return 0
+        fi
+    done
+    panic "No Makefile found in this directory."
+}
+
+get_target_list() {
+    local makefile_path
+    makefile_path="$(printf %q "${1}")"
+    # return list of makefile targets in `##:target_name` format, where ## is the line number
+    # shellcheck disable=SC2086  # makefile_path has been escaped, no need to quote
+    grep --line-number \
+        --color=never \
+        --ignore-case \
+        --perl-regexp '^\S+:' \
+        --only-matching \
+        ${makefile_path} \
+        | awk -F ':' '$2 != ".PHONY" { print $1 ":" $2 }'
+}
+
+exec_fzf() {
+    SHELL="sh" fzf "${@}"
+}
+
+main() {
+    local initial_query="${*:-}"
+
+    export FZMAKE_MAKEFILE_PATH="${FZMAKE_MAKEFILE_PATH:-"$(find_makefile)"}"
+    local makefile_dir
+    makefile_dir="$(dirname "${FZMAKE_MAKEFILE_PATH}")"
+
+    get_target_list "${FZMAKE_MAKEFILE_PATH}" \
+        | exec_fzf --ansi \
+            --query "${initial_query}" \
+            --delimiter : \
+            --with-nth 2 \
+            --preview "bat --color=always --highlight-line {1} --terminal-width \${FZF_PREVIEW_COLUMNS} --wrap never \"\${FZMAKE_MAKEFILE_PATH}\"" \
+            --preview-window 'up,70%,border-bottom,+{1}+3/3,~3' \
+            --select-1 \
+            --multi \
+        | awk -F ':' '{print $2}' \
+        | xargs --no-run-if-empty make --directory "${makefile_dir}" --file "${FZMAKE_MAKEFILE_PATH}"
+}
+
+main "${@}"

@@ -4,6 +4,7 @@
 *.sh
 _bin/*
 fzfdump/fzfdump
+fzmake/fzmake
 fztotp/fztotp
 mdq/mdq
 tailexit/tailexit
