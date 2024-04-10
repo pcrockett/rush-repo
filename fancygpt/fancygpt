@@ -14,6 +14,10 @@ query="$(
     gum write --placeholder "Write something here... (CTRL+D to finish)" \
         --char-limit 0
 )"
+
+# let the user see what they wrote after the prompt goes away
+printf "%s\n\n" "${query}"
+
 gpt_command=(kagi gpt "${query}")
 gum spin --title "Waiting for response..." --show-output "${gpt_command[@]}" \
     | glow
