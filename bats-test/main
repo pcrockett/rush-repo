@@ -1,0 +1,43 @@
+#!/usr/bin/env bash
+
+# shellcheck source=lib.sh
+source "${REPO_PATH}/lib.sh"
+
+template_repo="template_repo"
+
+src_tests="${template_repo}/tests"
+dst_tests="${USER_CWD}/tests"
+if [ -d "${dst_tests}" ]; then
+    panic "${dst_tests} already exists."
+else
+    cp --recursive "${src_tests}" "${USER_CWD}"
+fi
+
+src_tool_versions="${template_repo}/.tool-versions"
+dst_tool_versions="${USER_CWD}/.tool-versions"
+if [ ! -f "${dst_tool_versions}" ]; then
+    cp "${src_tool_versions}" "${dst_tool_versions}"
+    log_attention "Created new .tool-versions file"
+elif ! grep --quiet --fixed-strings --word-regexp "bats" "${dst_tool_versions}"; then
+    cat "${src_tool_versions}" >> "${dst_tool_versions}"
+    log_attention "Added bats to .tool-versions file"
+else
+    log_info "bats already detected in .tool-versions"
+fi
+
+src_shellcheckrc="${template_repo}/.shellcheckrc"
+dst_shellcheckrc="${USER_CWD}/.shellcheckrc"
+if [ ! -f "${dst_shellcheckrc}" ]; then
+    cp "${src_shellcheckrc}" "${dst_shellcheckrc}"
+    log_attention "Created new .shellcheckrc file"
+fi
+
+src_makefile="${template_repo}/Makefile"
+dst_makefile="${USER_CWD}/Makefile"
+if [ -f "${dst_makefile}" ]; then
+    log_attention "Tip: Add the following to Makefile:"
+    cat "${src_makefile}"
+else
+    cp "${src_makefile}" "${dst_makefile}"
+    log_attention "Created new Makefile"
+fi
