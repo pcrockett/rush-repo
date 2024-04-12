@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+
+# shellcheck source=lib.sh
+source "${REPO_PATH}/lib.sh"
+
+src_dir="template_dir"
+dst_dir="${USER_CWD}/.github"
+
+if [ -d "${dst_dir}" ]; then
+    panic "Already exists: ${dst_dir}"
+else
+    cp --recursive "${src_dir}" "${dst_dir}"
+    log_attention "Created ${dst_dir}"
+fi
