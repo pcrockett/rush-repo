@@ -2,5 +2,8 @@
 
 # shellcheck source=lib.sh
 source "${REPO_PATH}/lib.sh"
+
+docker container stop earthly-buildkitd
 rm -f "${RUSH_USER_BIN}/earthly"
+
 uninstall_success
