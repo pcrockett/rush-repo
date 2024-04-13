@@ -2,14 +2,42 @@
 
 # shellcheck source=lib.sh
 source "${REPO_PATH}/lib.sh"
-require_commands age
 
-temp_dir="$(mktemp_dir)"
-cleanup() {
-    rm -rf "${temp_dir}"
+GITHUB_ORG="pcrockett"
+GITHUB_REPO="gramps"
+BIN_NAME="gramps"
+
+latest_version() {
+    # strip the leading `v` from the tag name
+    echo "${GITHUB_LATEST_TAG}" | cut --characters 2-
 }
-trap 'cleanup' EXIT SIGINT SIGTERM
 
-curl_download https://github.com/pcrockett/gramps/raw/main/gramps > "${temp_dir}/gramps"
-install_user_bin "${temp_dir}/gramps"
+installed_version() {
+    if ! command_exists "${BIN_NAME}"; then
+        echo ""
+        return 0
+    fi
+
+    if ! [[ "$("${BIN_NAME}" --version)" =~ ^([[:digit:]]+\.[[:digit:]]+\.[[:digit:]]+) ]]; then
+        panic "Unable to determine currently installed version!"
+        exit 1  # redundant, but useful to shellcheck
+    fi
+
+    echo "${BASH_REMATCH[1]}"
+}
+
+artifact_name() {
+    echo "gramps"
+}
+
+download_url() {
+    echo "https://github.com/${GITHUB_ORG}/${GITHUB_REPO}/releases/download/${GITHUB_LATEST_TAG}/$(artifact_name)"
+}
+
+install_artifact() {
+    chmod +x "${BIN_NAME}"
+    install_user_bin "${BIN_NAME}"
+}
+
+install_from_github
 install_success
