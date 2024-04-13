@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+
+# shellcheck source=lib.sh
+source "${REPO_PATH}/lib.sh"
+log_attention "Hello there!"
