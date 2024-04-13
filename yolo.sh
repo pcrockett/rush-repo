@@ -4,7 +4,7 @@ set -Eeuo pipefail
 # curl-pipe-to-bash! if you don't want to install the rush CLI, but you DO want some of the packages
 # in this repo:
 #
-#     curl https://raw.githubusercontent.com/pcrockett/rush-repo/main/yolo.sh \
+#     curl -SsfL https://raw.githubusercontent.com/pcrockett/rush-repo/main/yolo.sh \
 #         | bash -s -- <PACKAGE_NAMES...>
 #
 # this is basically the same thing as running `rush snatch ...`, but it supports multiple packages
