@@ -1,0 +1,10 @@
+*.sublime-*
+.dockerignore
+.earthlyignore
+.envrc*
+.git/
+.github/
+.gitignore
+Earthfile
+LICENSE
+README.md

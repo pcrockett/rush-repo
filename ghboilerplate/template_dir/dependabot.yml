@@ -1,4 +1,4 @@
-# Lovingly copy / paste / modified from <https://github.com/actions/starter-workflows/blob/main/.github/dependabot.yml>
+# Copy / paste / modified from <https://github.com/actions/starter-workflows/blob/main/.github/dependabot.yml>
 # MIT license
 # Dependabot docs: <https://docs.github.com/github/administering-a-repository/configuration-options-for-dependency-updates>
 

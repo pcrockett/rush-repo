@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+
+# shellcheck source=lib.sh
+source "${REPO_PATH}/lib.sh"
+
+src_earthfile="template.Earthfile"
+dst_earthfile="${USER_CWD}/Earthfile"
+test ! -f "${dst_earthfile}" || panic "Already exists: ${dst_earthfile}"
+cp "${src_earthfile}" "${dst_earthfile}"
+log_attention "Created ${dst_earthfile}"
+
+src_ignorefile=".earthlyignore_template"
+dst_ignorefile="${USER_CWD}/.earthlyignore"
+if [ ! -f "${dst_ignorefile}" ]; then
+    cp "${src_ignorefile}" "${dst_ignorefile}"
+    log_attention "Created ${dst_ignorefile}"
+fi
