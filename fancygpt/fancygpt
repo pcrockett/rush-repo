@@ -16,8 +16,8 @@ query="$(
 )"
 
 # let the user see what they wrote after the prompt goes away
-printf "%s\n\n" "${query}"
+printf "> %s\n\n---\n\n" "${query}"
 
 gpt_command=(kagi gpt "${query}")
 gum spin --title "Waiting for response..." --show-output "${gpt_command[@]}" \
-    | glow
+    | bat --style plain --wrap auto --language md --terminal-width "${GUM_WRITE_WIDTH}" --paging never
