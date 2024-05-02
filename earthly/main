@@ -42,5 +42,4 @@ install_artifact() {
 }
 
 install_from_github
-earthly bootstrap
 install_success
