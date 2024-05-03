@@ -1,0 +1,78 @@
+#!/usr/bin/env bash
+
+# shellcheck source=lib.sh
+source "${REPO_PATH}/lib.sh"
+
+get_latest_version() {
+    github_latest_tag heroku cli | cut --characters 2-
+}
+
+if command_exists heroku; then
+    latest_version="$(get_latest_version)"
+    if [[ "$(heroku --version)" == "heroku/${latest_version} "* ]]; then
+        log_attention "Already installed and up-to-date."
+        exit 0
+    fi
+fi
+
+require_commands tar
+
+XDG_DATA_HOME="${XDG_DATA_HOME:-${HOME}/.local/share}"
+
+# [tag:heroku-install-dir]
+HEROKU_INSTALL_DIR="${XDG_DATA_HOME}/rush/pcrockett"
+
+dest_dirs=(
+    "${HEROKU_INSTALL_DIR}"
+    "${RUSH_USER_BIN}"
+)
+
+for d in "${dest_dirs[@]}"; do
+    mkdir --parent "${d}"
+done
+
+# inspired by the script at https://cli-assets.heroku.com/install.sh
+
+temp_dir="$(mktemp_dir)"
+pushd "${temp_dir}" &> /dev/null || panic "unable to cd to ${temp_dir}"
+cleanup() {
+    popd &> /dev/null || panic "unable to cd away from ${temp_dir}"
+    rm -rf "${temp_dir}"
+}
+trap 'cleanup' EXIT SIGINT SIGKILL
+
+ARCH="$(uname -m)"
+if [ "${ARCH}" == "x86_64" ]; then
+    ARCH=x64
+elif [[ "${ARCH}" == aarch* ]]; then
+    ARCH=arm
+else
+    panic "unsupported arch: ${ARCH}"
+fi
+
+if command_exists xz; then
+    URL=https://cli-assets.heroku.com/channels/stable/heroku-linux-${ARCH}.tar.xz
+    TAR_ARGS="xJ"
+else
+    URL=https://cli-assets.heroku.com/channels/stable/heroku-linux-${ARCH}.tar.gz
+    TAR_ARGS="xz"
+fi
+
+curl_download "${URL}" | tar "${TAR_ARGS}"
+rm -rf "${HEROKU_INSTALL_DIR}/heroku"
+mv heroku "${HEROKU_INSTALL_DIR}"
+
+rm -f "${RUSH_USER_BIN}/heroku"
+ln --symbolic "${HEROKU_INSTALL_DIR}/heroku/bin/heroku" "${RUSH_USER_BIN}/heroku"
+
+# on alpine (and maybe others) the basic node binary does not work
+# remove our node binary and fall back to whatever node is on the PATH
+"${HEROKU_INSTALL_DIR}/heroku/bin/node" -v &> /dev/null || rm "${HEROKU_INSTALL_DIR}/heroku/bin/node"
+
+# test the CLI
+LOCATION="$(command -v heroku)"
+log_info "heroku installed to $LOCATION"
+log_info "$(heroku version)"
+
+rm -rf ~/.local/share/heroku/client
+install_success
