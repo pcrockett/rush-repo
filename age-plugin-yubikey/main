@@ -1,0 +1,48 @@
+#!/usr/bin/env bash
+
+# shellcheck source=lib.sh
+source "${REPO_PATH}/lib.sh"
+require_commands age
+
+# https://github.com/str4d/age-plugin-yubikey
+
+GITHUB_ORG="str4d"
+GITHUB_REPO="age-plugin-yubikey"
+BIN_NAME="age-plugin-yubikey"
+
+latest_version() {
+    # strip the leading `v` from the tag name
+    echo "${GITHUB_LATEST_TAG}" | cut --characters 2-
+}
+
+installed_version() {
+    if ! command_exists "${BIN_NAME}"; then
+        echo ""
+        return 0
+    fi
+
+    if ! [[ "$("${BIN_NAME}" --version)" =~ ^age-plugin-yubikey\ ([[:digit:]]+\.[[:digit:]]+\.[[:digit:]]+)$ ]]; then
+        panic "Unable to determine currently installed version!"
+        exit 1  # redundant, but useful to shellcheck
+    fi
+
+    echo "${BASH_REMATCH[1]}"
+}
+
+artifact_name() {
+    echo "age-plugin-yubikey-${GITHUB_LATEST_TAG}-x86_64-linux.tar.gz"
+}
+
+download_url() {
+    echo "https://github.com/${GITHUB_ORG}/${GITHUB_REPO}/releases/download/${GITHUB_LATEST_TAG}/$(artifact_name)"
+}
+
+install_artifact() {
+    tar --extract --gzip --to-stdout --file "${ARTIFACT_PATH}" \
+        "age-plugin-yubikey/age-plugin-yubikey" > "${BIN_NAME}"
+    chmod +x "${BIN_NAME}"
+    install_user_bin "${BIN_NAME}"
+}
+
+install_from_github
+install_success
