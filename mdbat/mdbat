@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+set -Eeuo pipefail
+
+MDBAT_MAX_WIDTH="${MDBAT_MAX_WIDTH:-90}"
+
+term_width="$(tput cols)"
+if [ "${term_width}" -lt "${MDBAT_MAX_WIDTH}" ]; then
+    MDBAT_MAX_WIDTH="${term_width}"
+fi
+
+bat --style rule \
+    --wrap auto \
+    --language md \
+    --terminal-width "${MDBAT_MAX_WIDTH}" \
+    "${@}"
