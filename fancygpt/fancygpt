@@ -18,6 +18,19 @@ query="$(
 # let the user see what they wrote after the prompt goes away
 printf "> %s\n\n---\n\n" "${query}"
 
+# Kagi FastGPT has started using fancy unicode to denote references, and I don't like how they render at all.
+#
+# 【1】
+#
+# replacing those with a couple `sed` commands, so they render like this instead:
+#
+# \[1]
+#
+# ...which is proper lint-free markdown
+#
+
 gpt_command=(kagi gpt "${query}")
 gum spin --title "Waiting for response..." --show-output "${gpt_command[@]}" \
+    | sed 's|【|\\[|g' \
+    | sed 's|】|]|g' \
     | bat --style rule --wrap never --language md --paging never
