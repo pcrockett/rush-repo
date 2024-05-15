@@ -20,4 +20,4 @@ printf "> %s\n\n---\n\n" "${query}"
 
 gpt_command=(kagi gpt "${query}")
 gum spin --title "Waiting for response..." --show-output "${gpt_command[@]}" \
-    | bat --style rule --wrap auto --language md --terminal-width "${GUM_WRITE_WIDTH}" --paging never
+    | bat --style rule --wrap never --language md --paging never
