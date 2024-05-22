@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+
+# shellcheck source=lib.sh
+source "${REPO_PATH}/lib.sh"
+require_commands docker
+
+create_config_home() {
+    local config_home="${XDG_CONFIG_HOME:-"${HOME}/.config"}"
+    mkdir --parent "${config_home}/gcloud"
+}
+
+create_config_home
+docker build --pull --tag localhost/gcloud \
+    --build-arg "UID=$(id --user)" \
+    --build-arg "GID=$(id --group)" \
+    .
+
+install_user_bin gcloud
+install_success

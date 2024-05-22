@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+set -Eeuo pipefail
+
+# https://cloud.google.com/sdk/docs/downloads-docker
+#
+# a wrapper script for the gcloud docker container. makes the container behave as if you have the
+# CLI installed traditionally.
+#
+# usage:
+#
+#     gcloud help
+#
+
+config_home="${XDG_CONFIG_HOME:-"${HOME}/.config"}"
+
+docker run --rm --interactive --tty \
+    --user "$(id --user):$(id --group)" \
+    --volume "${config_home}/gcloud:/home/cloudsdk/.config/gcloud" \
+    --env TERM="${TERM}" \
+    --env CLOUDSDK_CORE_PROJECT="${CLOUDSDK_CORE_PROJECT:-}" \
+    --env CLOUDSDK_COMPUTE_ZONE="${CLOUDSDK_COMPUTE_ZONE:-}" \
+    localhost/gcloud gcloud "${@}"
