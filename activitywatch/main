@@ -1,0 +1,69 @@
+#!/usr/bin/env bash
+
+# shellcheck source=lib.sh
+source "${REPO_PATH}/lib.sh"
+
+require_commands pkill pgrep
+require_packages libxcb-cursor0
+
+GITHUB_ORG="ActivityWatch"
+GITHUB_REPO="activitywatch"
+BIN_NAME="aw-server"
+INSTALL_DIR="${HOME}/.local/share/rush/pcrockett"
+
+safe_kill() {
+    for proc_name in "${@}"; do
+        if pgrep "${proc_name}"; then
+            pkill "${proc_name}"
+        fi
+    done
+}
+
+latest_version() {
+    echo "${GITHUB_LATEST_TAG}"
+}
+
+installed_version() {
+    if ! command_exists "${BIN_NAME}"; then
+        echo ""
+        return 0
+    fi
+
+    if ! [[ "$("${BIN_NAME}" --version)" =~ ^(v[[:digit:]]+\.[[:digit:]]+\.[[:digit:]]+) ]]; then
+        panic "Unable to determine currently installed version!"
+        exit 1  # redundant, but useful to shellcheck
+    fi
+
+    echo "${BASH_REMATCH[1]}"
+}
+
+artifact_name() {
+    echo "activitywatch-${GITHUB_LATEST_TAG}-linux-x86_64.zip"
+}
+
+download_url() {
+    echo "https://github.com/${GITHUB_ORG}/${GITHUB_REPO}/releases/download/${GITHUB_LATEST_TAG}/$(artifact_name)"
+}
+
+install_artifact() {
+    mkdir --parent "${INSTALL_DIR}"
+    safe_kill aw-qt aw-server aw-watcher
+
+    if [ -d "${INSTALL_DIR}/activitywatch" ]; then
+        rm -f "${RUSH_USER_BIN}/aw-qt" "${RUSH_USER_BIN}/${BIN_NAME}"
+        rm -rf "${INSTALL_DIR}/activitywatch.old"
+        mv "${INSTALL_DIR}/activitywatch" "${INSTALL_DIR}/activitywatch.old"
+    fi
+
+    unzip "${ARTIFACT_PATH}"
+    mv "activitywatch" "${INSTALL_DIR}"
+    ln --symbolic "${INSTALL_DIR}/activitywatch/aw-qt" "${RUSH_USER_BIN}/aw-qt"
+    ln --symbolic "${INSTALL_DIR}/activitywatch/aw-server/aw-server" "${RUSH_USER_BIN}/aw-server"
+
+    mkdir --parent "${HOME}/.config/autostart"
+    cp "${INSTALL_DIR}/activitywatch/aw-qt.desktop" "${HOME}/.config/autostart"
+    cp "${INSTALL_DIR}/activitywatch/aw-qt.desktop" "${HOME}/.local/share/applications"
+}
+
+install_from_github
+install_success
