@@ -1,0 +1,31 @@
+#!/usr/bin/env bash
+set -Eeuo pipefail
+
+# Send stdin to slack
+#
+# https://api.slack.com/tutorials/tracks/posting-messages-with-curl
+#
+# expects following env variables to be set:
+#
+# * SLACK_AUTH_TOKEN
+# * SLACK_CHANNEL
+#
+# example usage:
+#
+#     echo "foobar" | send-slack
+#
+#     send-slack < foobar.txt
+#
+#     send-slack <<EOF
+#     foobar
+#     EOF
+#
+
+MESSAGE_BODY="$(cat)"
+
+curl --silent --fail --show-error \
+    --data "text=${MESSAGE_BODY}" \
+    --data "channel=${SLACK_CHANNEL}" \
+    --header "Authorization: Bearer ${SLACK_AUTH_TOKEN}" \
+    --request POST \
+    --location "https://slack.com/api/chat.postMessage"
