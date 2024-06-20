@@ -20,16 +20,10 @@ docker_cmd=(
         --env TERM="${TERM}"
 )
 
-vars_to_set=(
-    CLOUDSDK_CORE_PROJECT
-    CLOUDSDK_COMPUTE_ZONE
-)
-
-for var_name in "${vars_to_set[@]}"; do
-    if [ "${!var_name:-}" != "" ]; then
-        docker_cmd+=(--env "${var_name}=${var_name}")
-    fi
-done
+# get all CLOUDSDK_* environment variables and feed them into the docker command
+while IFS= read -r var_setting || [ -n "${var_setting}" ]; do
+    docker_cmd+=(--env "${var_setting}")
+done < <(env | grep --perl-regexp "^CLOUDSDK_")
 
 docker_cmd+=(
     localhost/gcloud gcloud "${@}"
