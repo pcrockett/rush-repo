@@ -13,10 +13,26 @@ set -Eeuo pipefail
 
 config_home="${XDG_CONFIG_HOME:-"${HOME}/.config"}"
 
-docker run --rm --interactive --tty \
-    --user "$(id --user):$(id --group)" \
-    --volume "${config_home}/gcloud:/home/cloudsdk/.config/gcloud" \
-    --env TERM="${TERM}" \
-    --env CLOUDSDK_CORE_PROJECT="${CLOUDSDK_CORE_PROJECT:-}" \
-    --env CLOUDSDK_COMPUTE_ZONE="${CLOUDSDK_COMPUTE_ZONE:-}" \
+docker_cmd=(
+    docker run --rm --interactive --tty
+        --user "$(id --user):$(id --group)"
+        --volume "${config_home}/gcloud:/home/cloudsdk/.config/gcloud"
+        --env TERM="${TERM}"
+)
+
+vars_to_set=(
+    CLOUDSDK_CORE_PROJECT
+    CLOUDSDK_COMPUTE_ZONE
+)
+
+for var_name in "${vars_to_set[@]}"; do
+    if [ "${!var_name:-}" != "" ]; then
+        docker_cmd+=(--env "${var_name}=${var_name}")
+    fi
+done
+
+docker_cmd+=(
     localhost/gcloud gcloud "${@}"
+)
+
+"${docker_cmd[@]}"
