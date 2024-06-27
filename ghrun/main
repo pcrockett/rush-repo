@@ -2,5 +2,6 @@
 
 # shellcheck source=lib.sh
 source "${REPO_PATH}/lib.sh"
-rm -f "${RUSH_USER_BIN}/gh-run-notify"
-uninstall_success
+require_commands fzf gh bat
+install_user_bin ghrun
+install_success

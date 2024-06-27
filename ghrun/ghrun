@@ -1,0 +1,50 @@
+#!/usr/bin/env bash
+set -Eeuo pipefail
+
+# fuzzy-find a github run, wait for it to finish, then view in web browser
+
+filter_out_empty_lines() {
+    grep --invert-match --perl-regexp '^\s*$'
+}
+
+get_run_id() {
+    grep --only-matching --perl-regexp '(?<=\s)\d+$'
+}
+
+# shellcheck disable=SC2016
+select_run() {
+
+    template=$(cat <<EOF
+{{range .}}
+    {{tablerow
+        (.status)
+        (printf "started %s" (timeago .startedAt))
+        (.displayTitle | autocolor "green")
+        (.databaseId)
+    }}
+{{end}}
+EOF
+)
+
+    preview_cmd=$(cat <<EOF
+$(declare -f get_run_id)
+run_id="\$(echo {} | get_run_id)"
+gh run view "\${run_id}" 2>&1 | bat --wrap auto --terminal-width "\${FZF_PREVIEW_COLUMNS}"
+EOF
+)
+
+    export GH_PROMPT_DISABLED=1
+    export CLICOLOR_FORCE=1
+    gh run list --limit 50 --json status,displayTitle,startedAt,databaseId --template "${template}" \
+        | filter_out_empty_lines \
+        | SHELL="sh" fzf --ansi --preview "${preview_cmd}" --preview-window "right,40%" \
+        | get_run_id
+}
+
+main() {
+    run_id="$(select_run)"
+    gh run watch "${run_id}"
+    gh run view --web "${run_id}"
+}
+
+main
