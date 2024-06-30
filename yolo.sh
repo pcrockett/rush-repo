@@ -13,6 +13,7 @@ set -Eeuo pipefail
 # especially handy for Dockerfiles.
 
 RUSH_REPO_OWNER=${RUSH_REPO_OWNER:-"pcrockett"}
+ARGS=("${@}")
 
 init() {
     TEMP_DIR="$(mktemp -d)"
@@ -20,7 +21,7 @@ init() {
     trap 'cleanup' EXIT SIGINT SIGTERM
 
     mkdir bin
-    PATH="${PWD}/bin:${PATH}"
+    PATH="${TEMP_DIR}/bin:${PATH}"
 
     mkdir rush-repos
     export RUSH_ROOT="${PWD}/rush-repos"
@@ -33,7 +34,7 @@ cleanup() {
 }
 
 curl_download() {
-    curl --proto '=https' --tlsv1.2 \
+    curl --proto '=https' --tlsv1.3 \
         --silent \
         --show-error \
         --fail \
@@ -56,7 +57,7 @@ main() {
     init
     install_rush
     rush clone --shallow "${RUSH_REPO_OWNER}"
-    get_packages "${@}"
+    get_packages "${ARGS[@]}"
 }
 
-main "${@}"
+main
