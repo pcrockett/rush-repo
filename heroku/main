@@ -39,7 +39,7 @@ cleanup() {
     popd &> /dev/null || panic "unable to cd away from ${temp_dir}"
     rm -rf "${temp_dir}"
 }
-trap 'cleanup' EXIT SIGINT SIGKILL
+trap 'cleanup' EXIT SIGINT SIGTERM
 
 ARCH="$(uname -m)"
 if [ "${ARCH}" == "x86_64" ]; then
