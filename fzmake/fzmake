@@ -54,7 +54,9 @@ main() {
     local makefile_dir
     makefile_dir="$(dirname "${FZMAKE_MAKEFILE_PATH}")"
 
-    get_target_list "${FZMAKE_MAKEFILE_PATH}" \
+    local targets_to_run
+    readarray -t targets_to_run < <(
+        get_target_list "${FZMAKE_MAKEFILE_PATH}" \
         | exec_fzf --ansi \
             --query "${initial_query}" \
             --delimiter : \
@@ -64,7 +66,8 @@ main() {
             --select-1 \
             --multi \
         | awk -F ':' '{print $2}' \
-        | xargs --no-run-if-empty make --directory "${makefile_dir}" --file "${FZMAKE_MAKEFILE_PATH}"
+    )
+    make --directory "${makefile_dir}" --file "${FZMAKE_MAKEFILE_PATH}" "${targets_to_run[@]}"
 }
 
 main "${@}"

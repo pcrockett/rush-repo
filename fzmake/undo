@@ -2,5 +2,5 @@
 
 # shellcheck source=lib.sh
 source "${REPO_PATH}/lib.sh"
-rm -f "${RUSH_USER_BIN}/fzmake"
+rm -f "${RUSH_USER_BIN}/fzmake" "${RUSH_USER_BIN}/fzm"
 uninstall_success
