@@ -5,16 +5,19 @@ def main [
     --template(-t) = "pull_request_template.md" # Use specific template file
 ] {
 
+    # i would use the `find` command instead of `parse` however that produces highlighting
+    # in the results and i haven't figured out (yet) how to disable that.
     let template_file = (
         ^git ls-files
-            | find $template
-            | first_or_null
+        | parse --regex '\.github/(PULL_REQUEST_TEMPLATE\.md$)'
+        | get capture0
+        | first_or_null
     )
 
     let args = (
-        ["--assignee" "@me" "--web"]
+        ["--assignee" "@me"]
             | if ($template_file == null) { append "--fill" } else { append ["--template" $template_file] }
-            | if $draft { append "--draft" } else { $in }
+            | if $draft { append "--draft" } else { append "--web" }
     )
 
     ^gh pr create ...$args
