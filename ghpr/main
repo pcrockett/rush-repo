@@ -2,5 +2,6 @@
 
 # shellcheck source=lib.sh
 source "${REPO_PATH}/lib.sh"
-rm -f "${RUSH_USER_BIN}/pr"
-uninstall_success
+require_commands nu git gh
+install_user_bin ghpr
+install_success
