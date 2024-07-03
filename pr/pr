@@ -17,7 +17,7 @@ def main [
             | if $draft { append "--draft" } else { $in }
     )
 
-    ^gh pr create $args
+    ^gh pr create ...$args
 }
 
 def first_or_null [] {
