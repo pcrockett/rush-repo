@@ -1,0 +1,29 @@
+#!/usr/bin/env nu
+
+def main [
+    --draft                                     # Mark pull request as a draft
+    --template(-t) = "pull_request_template.md" # Use specific template file
+] {
+
+    let template_file = (
+        ^git ls-files
+            | find $template
+            | first_or_null
+    )
+
+    let args = (
+        ["--assignee" "@me" "--web"]
+            | if ($template_file == null) { append "--fill" } else { append ["--template" $template_file] }
+            | if $draft { append "--draft" } else { $in }
+    )
+
+    ^gh pr create $args
+}
+
+def first_or_null [] {
+    try {
+        first
+    } catch {
+        null
+    }
+}
