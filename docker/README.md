@@ -1,8 +1,8 @@
 # Docker packages
 
-Packages useful for building Docker images. Tip: [yolo](../yolo.sh).
+Packages useful for building Docker images. Tip: [YOLO](https://philcrockett.com/yolo/v1.sh).
 
 ```bash
-RUN curl https://raw.githubusercontent.com/pcrockett/rush-repo/main/yolo.sh \
+RUN curl https://philcrockett.com/yolo/v1.sh \
   | bash -s -- <PACKAGE_NAMES...>
 ```
