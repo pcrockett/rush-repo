@@ -18,7 +18,7 @@ jobs:
 
     # - name: Install fx
     #   run: |
-    #     curl -SsfL https://raw.githubusercontent.com/pcrockett/rush-repo/main/yolo.sh \
+    #     curl -SsfL https://philcrockett.com/yolo/v1.sh \
     #       | bash -s -- fx
 
     # - name: Release

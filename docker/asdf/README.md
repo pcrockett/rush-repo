@@ -6,7 +6,7 @@ example Dockerfile snippet that uses this package:
 ENV ASDF_DIR="${HOME}/.asdf"
 ENV PATH="${ASDF_DIR}/bin:${ASDF_DIR}/shims:${PATH}"
 
-RUN curl -SsfL https://raw.githubusercontent.com/pcrockett/rush-repo/main/yolo.sh \
+RUN curl -SsfL https://philcrockett.com/yolo/v1.sh \
     | bash -s -- docker/asdf && \
 asdf plugin add age && \
 asdf plugin add shellcheck && \
