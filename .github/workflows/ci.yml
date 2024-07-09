@@ -14,5 +14,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
+    - name: Install tagref
+      run: |
+        curl -SsfL http://philcrockett.com/yolo/v1.sh \
+          | bash -s -- tagref
     - name: Lint
-      run: make lint
+      run: make all
