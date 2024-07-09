@@ -1,0 +1,29 @@
+#!/usr/bin/env bash
+
+# shellcheck source=lib.sh
+source "${REPO_PATH}/lib.sh"
+require_commands sudo apt-get
+
+# Thanks to:
+#
+#    https://stackoverflow.com/a/42265926
+#
+# and
+#
+#    https://docs.docker.com/engine/install/ubuntu/#uninstall-docker-engine
+#
+
+packages=(
+    docker-ce
+    docker-ce-cli
+    containerd.io
+    docker-buildx-plugin
+    docker-compose-plugin
+    docker-ce-rootless-extras
+)
+
+sudo apt-get purge "${packages[@]}"
+sudo apt-get autoremove --purge
+sudo rm -rf /var/lib/docker
+sudo rm -rf /var/lib/containerd
+sudo rm -rf /usr/local/lib/docker
