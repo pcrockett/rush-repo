@@ -11,6 +11,6 @@ If you...
 ... then you can use [my YOLO script](https://philcrockett.com/yolo/v1.sh):
 
 ```bash
-curl -SsfL http://philcrockett.com/yolo/v1.sh \
+curl -SsfL https://philcrockett.com/yolo/v1.sh \
     | bash -s -- <PACKAGE_NAMES...>
 ```
