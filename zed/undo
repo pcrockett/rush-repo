@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+
+# shellcheck source=lib.sh
+source "${REPO_PATH}/lib.sh"
+rm -f "${RUSH_USER_BIN}/zed"
+rm -f "${XDG_DATA_HOME}/applications/dev.zed.Zed.desktop"
+rm -rf "${XDG_DATA_HOME}/zed"
+uninstall_success
