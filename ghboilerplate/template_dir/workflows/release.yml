@@ -1,27 +1,18 @@
 name: Release
 
-on: workflow_dispatch
+on:
+  push:
+    branches:
+      - main
 
 permissions:
-  packages: write
   contents: write
+  pull-requests: write
 
 jobs:
-  release:
+  release-please:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
-
-    # - uses: earthly/actions-setup@v1
-    #   with:
-    #     version: ^0.8.0
-
-    # - name: Install fx
-    #   run: |
-    #     curl -SsfL https://philcrockett.com/yolo/v1.sh \
-    #       | bash -s -- fx
-
-    # - name: Release
-    #   env:
-    #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    #   run: ./scripts/release.sh
+      - uses: googleapis/release-please-action@7987652d64b4581673a76e33ad5e98e3dd56832f
+        with:
+          release-type: simple
