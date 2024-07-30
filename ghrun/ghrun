@@ -18,8 +18,9 @@ select_run() {
 {{range .}}
     {{tablerow
         (.status)
-        (printf "started %s" (timeago .startedAt))
-        (.displayTitle | autocolor "green")
+        ((printf "started %s" (timeago .startedAt)) | autocolor "blue")
+        (truncate 50 .headBranch | autocolor "green")
+        (.workflowName)
         (.databaseId)
     }}
 {{end}}
@@ -35,9 +36,29 @@ EOF
 
     export GH_PROMPT_DISABLED=1
     export CLICOLOR_FORCE=1
-    gh run list --limit 50 --json status,displayTitle,startedAt,databaseId --template "${template}" \
+
+    # valid json field names:
+    #
+    #     attempt
+    #     conclusion
+    #     createdAt
+    #     databaseId
+    #     displayTitle
+    #     event
+    #     headBranch
+    #     headSha
+    #     name
+    #     number
+    #     startedAt
+    #     status
+    #     updatedAt
+    #     url
+    #     workflowDatabaseId
+    #     workflowName
+
+    gh run list --limit 50 --json status,headBranch,workflowName,startedAt,databaseId --template "${template}" \
         | filter_out_empty_lines \
-        | SHELL="sh" fzf --ansi --preview "${preview_cmd}" --preview-window "right,40%" \
+        | SHELL="sh" fzf --ansi --preview "${preview_cmd}" --preview-window "top,60%" \
         | get_run_id
 }
 
