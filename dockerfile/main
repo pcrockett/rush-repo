@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+
+# shellcheck source=lib.sh
+source "${REPO_PATH}/lib.sh"
+
+dest="${USER_CWD}/Dockerfile"
+
+if [ ! -e "${dest}" ] || force_please; then
+    cp template.Dockerfile "${dest}"
+else
+    panic "Dockerfile already exists in this directory. Use --force to overwrite."
+fi
