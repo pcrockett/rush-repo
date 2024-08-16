@@ -1,14 +1,18 @@
 #!/usr/bin/env bash
 set -Eeuo pipefail
 
+# Fuzzy-find pueue jobs and run pueue commands against them
 #
 # Example usage:
 #
-#     # run `pueue follow <job_id>`
+#     # run `pueue follow <selected_job_id>`
 #     fzpu follow
 #
-#     # run `pueue log --full <job_id...>`
+#     # run `pueue log --full <selected_job_ids...>`
 #     fzpu log --full
+#
+#     # run `pueue remove <selected_job_ids...>`
+#     fzpu remove
 #
 
 CLI_ARGS=("${@}")
@@ -17,7 +21,10 @@ select_job_ids() {
     pueue status \
         | grep --perl-regexp '^─+$' --invert-match \
         | grep --perl-regexp '^═+$' --invert-match \
-        | fzf --header-lines 2 --multi --tac --height 10 \
+        | grep --perl-regexp '^Group "\w+" .+' --invert-match \
+        | grep --perl-regexp '^\s*$' --invert-match \
+        | grep --perl-regexp '\s*Id\s+Status\s+Command\s+Path' --invert-match \
+        | fzf --multi --tac --height 10 \
         | awk '{print $1}'
 }
 
