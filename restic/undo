@@ -2,5 +2,5 @@
 
 # shellcheck source=lib.sh
 source "${REPO_PATH}/lib.sh"
-rm -f "${RUSH_GLOBAL_BIN}/restic"
+as_root rm -f "${RUSH_GLOBAL_BIN}/restic"
 uninstall_success
