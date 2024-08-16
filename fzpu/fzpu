@@ -4,7 +4,10 @@ set -Eeuo pipefail
 #
 # Example usage:
 #
+#     # run `pueue follow <job_id>`
 #     fzpu follow
+#
+#     # run `pueue log --full <job_id...>`
 #     fzpu log --full
 #
 
