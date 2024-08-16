@@ -1,0 +1,31 @@
+#!/usr/bin/env bash
+set -Eeuo pipefail
+
+#
+# Example usage:
+#
+#     fzpu follow
+#     fzpu log --full
+#
+
+CLI_ARGS=("${@}")
+
+select_job_ids() {
+    pueue status \
+        | grep --perl-regexp '^─+$' --invert-match \
+        | grep --perl-regexp '^═+$' --invert-match \
+        | fzf --header-lines 2 --multi --tac \
+        | awk '{print $1}'
+}
+
+main() {
+    if [ "${#CLI_ARGS[@]}" -eq 0 ]; then
+        # user just wants to see `pueue status`
+        pueue status
+        exit 0
+    fi
+
+    select_job_ids | xargs pueue "${CLI_ARGS[@]}"
+}
+
+main
