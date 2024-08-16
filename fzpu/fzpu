@@ -14,7 +14,7 @@ select_job_ids() {
     pueue status \
         | grep --perl-regexp '^─+$' --invert-match \
         | grep --perl-regexp '^═+$' --invert-match \
-        | fzf --header-lines 2 --multi --tac \
+        | fzf --header-lines 2 --multi --tac --height 10 \
         | awk '{print $1}'
 }
 
