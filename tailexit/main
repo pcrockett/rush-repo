@@ -2,6 +2,6 @@
 
 # shellcheck source=lib.sh
 source "${REPO_PATH}/lib.sh"
-require_commands tailscale fzf sudo
+require_commands tailscale fzf
 install_user_bin tailexit
 install_success

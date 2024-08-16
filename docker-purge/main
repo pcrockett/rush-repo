@@ -2,7 +2,7 @@
 
 # shellcheck source=lib.sh
 source "${REPO_PATH}/lib.sh"
-require_commands sudo apt-get
+require_commands apt-get
 
 # Thanks to:
 #
@@ -22,8 +22,8 @@ packages=(
     docker-ce-rootless-extras
 )
 
-sudo apt-get purge "${packages[@]}"
-sudo apt-get autoremove --purge
-sudo rm -rf /var/lib/docker
-sudo rm -rf /var/lib/containerd
-sudo rm -rf /usr/local/lib/docker
+as_root apt-get purge "${packages[@]}"
+as_root apt-get autoremove --purge
+as_root rm -rf /var/lib/docker
+as_root rm -rf /var/lib/containerd
+as_root rm -rf /usr/local/lib/docker
