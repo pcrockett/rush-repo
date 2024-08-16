@@ -25,7 +25,11 @@ main() {
         exit 0
     fi
 
-    select_job_ids | xargs pueue "${CLI_ARGS[@]}"
+    local jobs
+    jobs="$(select_job_ids)"
+    test "${jobs}" != "" || exit 1  # user probably hit ctrl+c in fzf interface
+
+    echo "${jobs}" | xargs pueue "${CLI_ARGS[@]}"
 }
 
 main
