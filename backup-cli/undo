@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+
+# shellcheck source=lib.sh
+source "${REPO_PATH}/lib.sh"
+as_root rm -f "${RUSH_GLOBAL_BIN}/backup"
+uninstall_success
