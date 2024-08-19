@@ -18,13 +18,23 @@ set -Eeuo pipefail
 CLI_ARGS=("${@}")
 
 select_job_ids() {
-    pueue status \
-        | grep --perl-regexp '^─+$' --invert-match \
-        | grep --perl-regexp '^═+$' --invert-match \
-        | grep --perl-regexp '^Group "\w+" .+' --invert-match \
-        | grep --perl-regexp '^\s*$' --invert-match \
-        | grep --perl-regexp '\s*Id\s+Status\s+Command\s+Path' --invert-match \
-        | fzf --multi --tac --height 10 \
+
+    local js_query
+    js_query="$(cat <<EOF
+status => Object.values(status.tasks)
+    .map(task => {
+        return \`\${task.id}\\\\\${task.status}\\\\\${task.command}\\\\\${task.path}\\\\\${task.group}\`
+    })
+    .join("\n")
+EOF
+)"
+
+    # TODO: Fix status output. When running, it's just a string. When done, it's an object with "Done" key. 😦
+    # shellcheck disable=SC1003  # double-backslash is not meant for escaping.
+    pueue status --json \
+        | fx "${js_query}" \
+        | column --table --separator '\\' --table-columns ID,Status,Command,Path,Group \
+        | fzf --multi --tac --height 10 --header-lines 1 \
         | awk '{print $1}'
 }
 
