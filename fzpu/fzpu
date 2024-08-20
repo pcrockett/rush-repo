@@ -20,16 +20,32 @@ CLI_ARGS=("${@}")
 select_job_ids() {
 
     local js_query
+
+    # construct an `fx` query that returns the following lines from `pueue status --json`:
+    #
+    #     TASK_ID\\STATUS\\COMMAND\\PATH\\GROUP
+    #
+    # we will use `\\` as the delimiter later when running the `column` command, to give
+    # us a nice table output.
+    #
     js_query="$(cat <<EOF
 status => Object.values(status.tasks)
     .map(task => {
-        return \`\${task.id}\\\\\${task.status}\\\\\${task.command}\\\\\${task.path}\\\\\${task.group}\`
+        // task.status can be one of the following:
+        //
+        // * "Running"
+        // * { "Done": "Success" }
+        // * { "Done": { "Failed": <exit_code> } }
+        //
+        // gross, but we can work with it.
+        let status = typeof task.status === "string" ? task.status : task.status.Done;
+        status = typeof status === "string" ? status : \`Failed (\${status.Failed})\`;
+        return \`\${task.id}\\\\\${status}\\\\\${task.command}\\\\\${task.path}\\\\\${task.group}\`;
     })
     .join("\n")
 EOF
 )"
 
-    # TODO: Fix status output. When running, it's just a string. When done, it's an object with "Done" key. 😦
     # shellcheck disable=SC1003  # double-backslash is not meant for escaping.
     pueue status --json \
         | fx "${js_query}" \
