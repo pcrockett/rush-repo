@@ -3,6 +3,8 @@
 # shellcheck source=lib.sh
 source "${REPO_PATH}/lib.sh"
 
+require_commands bunzip2
+
 GITHUB_ORG="restic"
 GITHUB_REPO="restic"
 BIN_NAME="restic"
