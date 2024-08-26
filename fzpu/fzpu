@@ -40,7 +40,10 @@ status => Object.values(status.tasks)
         // gross, but we can work with it.
         let status = typeof task.status === "string" ? task.status : task.status.Done;
         status = typeof status === "string" ? status : \`Failed (\${status.Failed})\`;
-        return \`\${task.id}\\\\\${status}\\\\\${task.command}\\\\\${task.path}\\\\\${task.group}\`;
+
+        let command = task.command.length < 70 ? task.command : \`\${task.command.substr(0, 70)}...\`;
+        command = command.replaceAll("\n", " ").trim();
+        return \`\${task.id}\\\\\${status}\\\\\${command}\\\\\${task.path}\\\\\${task.group}\`;
     })
     .join("\n")
 EOF
@@ -49,7 +52,13 @@ EOF
     # shellcheck disable=SC1003  # double-backslash is not meant for escaping.
     pueue status --json \
         | fx "${js_query}" \
-        | column --table --separator '\\' --table-columns ID,Status,Command,Path,Group \
+        | column \
+            --table \
+            --separator '\' \
+            --table-columns ID,Status,Command,Path,Group \
+            --table-truncate Command,Path \
+            --table-noextreme Command,Path \
+            --output-width "${OUTPUT_WIDTH}" \
         | fzf --multi --tac --height 10 --header-lines 1 \
         | awk '{print $1}'
 }
@@ -59,6 +68,14 @@ main() {
         # user just wants to see `pueue status`
         pueue status
         exit 0
+    fi
+
+    OUTPUT_WIDTH="$(tput cols)"
+    OUTPUT_WIDTH=$((OUTPUT_WIDTH-3))
+
+    if [ "${OUTPUT_WIDTH}" -le 0 ]; then
+        echo "Error: output width \"${OUTPUT_WIDTH}\"?"
+        exit 1
     fi
 
     local jobs
