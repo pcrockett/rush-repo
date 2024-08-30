@@ -2,6 +2,6 @@
 
 # shellcheck source=lib.sh
 source "${REPO_PATH}/lib.sh"
-exclude_file="${USER_CWD}/.git/info/exclude"
-test -f "${exclude_file}" || panic "Unable to find ${exclude_file}"
-sed --in-place '/^compose.yaml$/d' "${exclude_file}"
+require_commands git-include
+cd "${USER_CWD}"
+git include compose.yaml docker-compose.yaml compose.yml docker-compose.yml

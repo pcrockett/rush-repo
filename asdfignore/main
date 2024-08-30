@@ -2,6 +2,6 @@
 
 # shellcheck source=lib.sh
 source "${REPO_PATH}/lib.sh"
-exclude_file="${USER_CWD}/.git/info/exclude"
-test -f "${exclude_file}" || panic "Unable to find ${exclude_file}"
-echo ".tool-versions" >> "${exclude_file}"
+require_commands git-exclude
+cd "${USER_CWD}"
+git-exclude .tool-versions
