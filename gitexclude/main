@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+
+# shellcheck source=lib.sh
+source "${REPO_PATH}/lib.sh"
+require_commands grep
+install_user_bin git-exclude
+install_user_bin git-include
+install_success
