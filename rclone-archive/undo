@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+
+# shellcheck source=lib.sh
+source "${REPO_PATH}/lib.sh"
+
+systemctl disable --now --user rclone-archive.service
+rm -f "${XDG_CONFIG_HOME}/systemd/user/rclone-archive.service"
+systemctl daemon-reload --user
+
+rm -f "${XDG_CONFIG_HOME}/rclone/rclone.conf"

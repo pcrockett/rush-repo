@@ -1,0 +1,13 @@
+[b2-archive-plaintext]
+description = The unencrypted B2 backend for the ${ARCHIVE_BUCKET_NAME} bucket
+type = b2
+account = ${ARCHIVE_APPLICATION_KEY_ID}
+key = ${ARCHIVE_APPLICATION_KEY_SECRET}
+hard_delete = true
+
+[b2-archive-encrypted]
+description = Client-side encryption wrapper for the b2-archive-plaintext remote
+type = crypt
+remote = b2-archive-plaintext:${ARCHIVE_BUCKET_NAME}
+password = ${ARCHIVE_ENCRYPTION_KEY}
+strict_names = true

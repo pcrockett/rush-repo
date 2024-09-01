@@ -1,0 +1,15 @@
+# should go in ~/.config/systemd/user/
+
+[Unit]
+Description=rclone archive
+Wants=network.target
+After=network-online.target
+
+[Service]
+Type=notify
+ExecStart=${RCLONE_PATH} mount b2-archive-encrypted: ${MOUNTPOINT_PATH}
+Restart=always
+RestartSec=60
+
+[Install]
+WantedBy=default.target
