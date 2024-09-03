@@ -18,7 +18,7 @@ installed_version() {
         return 0
     fi
 
-    if ! [[ "$("${BIN_NAME}" --version 2> /dev/null)" =~ ^Nextcloud\ version\ ([[:digit:]]+\.[[:digit:]]+\.[[:digit:]]+) ]]; then
+    if ! [[ "$("${BIN_NAME}" --version 2> /dev/null)" =~ ^Nextcloud\ version\ ([[:digit:]]+\.[[:digit:]]+\.[[:digit:]]) ]]; then
         panic "Unable to determine currently installed nextcloud version!"
         exit 1  # redundant, but useful to shellcheck
     fi
