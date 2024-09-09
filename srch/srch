@@ -53,8 +53,8 @@ FZF_DEFAULT_COMMAND="${SRCH_RG_PREFIX} $(printf %q "${INITIAL_QUERY}")" \
         --bind "change:reload(${SRCH_RG_PREFIX} {q} || true;)" \
         --bind "ctrl-r:reload(${SRCH_RG_PREFIX} {q} || true;)" \
         --delimiter : \
-        --preview "bat --color=always {1} --highlight-line {2} --terminal-width \${FZF_PREVIEW_COLUMNS} --wrap never" \
-        --preview-window 'up,70%,border-bottom,+{2}+3/3,~3' \
+        --preview "bat --color=always {1} --highlight-line {2} --terminal-width \${FZF_PREVIEW_COLUMNS} --wrap never --decorations always --style numbers" \
+        --preview-window 'up,70%,border-bottom,+{2}/2' \
         --history "${STATE_DIR}/history" \
         --history-size 50 \
         --bind ctrl-j:previous-history \
