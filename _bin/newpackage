@@ -20,25 +20,67 @@ generate_info() {
     echo "TODO: short description of package"
 }
 
-# shellcheck disable=SC2016  # don't want to expand any expressions within single-quotes
 generate_main() {
-    echo '#!/usr/bin/env bash'
-    echo ''
-    echo '# shellcheck source=lib.sh'
-    echo 'source "${REPO_PATH}/lib.sh"'
-    echo 'require_commands sudo fzf  # TODO'
-    echo 'install_user_bin some_bin  # TODO'
-    echo 'install_success'
+    cat << EOF
+#!/usr/bin/env bash
+
+# shellcheck source=lib.sh
+source "\${REPO_PATH}/lib.sh"
+
+# require_commands TODO
+
+GITHUB_ORG="TODO"
+GITHUB_REPO="TODO"
+BIN_NAME="TODO"
+
+latest_version() {
+    # strip the leading \`v\` from the tag name
+    echo "\${GITHUB_LATEST_TAG}" | cut --characters 2-
+}
+
+installed_version() {
+    if ! command_exists "\${BIN_NAME}"; then
+        echo ""
+        return 0
+    fi
+
+    if ! [[ "\$("\${BIN_NAME}" --version)" =~ ^([[:digit:]]+\.[[:digit:]]+\.[[:digit:]]+) ]]; then
+        panic "Unable to determine currently installed version!"
+        exit 1  # redundant, but useful to shellcheck
+    fi
+
+    echo "\${BASH_REMATCH[1]}"
+}
+
+artifact_name() {
+    echo "TODO"
+}
+
+download_url() {
+    echo "https://github.com/\${GITHUB_ORG}/\${GITHUB_REPO}/releases/download/\${GITHUB_LATEST_TAG}/\$(artifact_name)"
+}
+
+install_artifact() {
+    chmod +x "\${ARTIFACT_PATH}"
+    mv "\${ARTIFACT_PATH}" "\${BIN_NAME}"
+    install_user_bin "\${BIN_NAME}"
+}
+
+install_from_github
+install_success
+EOF
 }
 
 # shellcheck disable=SC2016  # don't want to expand any expressions within single-quotes
 generate_undo() {
-    echo '#!/usr/bin/env bash'
-    echo ''
-    echo '# shellcheck source=lib.sh'
-    echo 'source "${REPO_PATH}/lib.sh"'
-    echo 'rm -f "${RUSH_USER_BIN}/some_bin"  # TODO'
-    echo 'uninstall_success'
+    cat <<EOF
+#!/usr/bin/env bash
+
+# shellcheck source=lib.sh
+source "\${REPO_PATH}/lib.sh"
+rm -f "\${RUSH_USER_BIN}/some_bin"  # TODO
+uninstall_success
+EOF
 }
 
 main() {
