@@ -41,7 +41,9 @@ main() {
         dest_uid="$(id --user "${NOTIFY_SEND_USER}")"
         dbus_address="/run/user/${dest_uid}/bus"
         test -e "${dbus_address}" || panic "Unable to find ${dbus_address}"
-        DISPLAY=:0 DBUS_SESSION_BUS_ADDRESS="unix:path=${dbus_address}"\
+
+        # Thanks https://stackoverflow.com/a/49426970/138757
+        DISPLAY=:0 DBUS_SESSION_BUS_ADDRESS="unix:path=${dbus_address}" \
             notify-send "${@}"
     else
         sudo --user "${NOTIFY_SEND_USER}" -- "${THIS_SCRIPT}" "${@}"
