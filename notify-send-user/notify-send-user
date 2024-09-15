@@ -1,0 +1,52 @@
+#!/usr/bin/env bash
+set -Eeuo pipefail
+
+# Send notifications to any user with `notify-send`.
+#
+# Usage: Just like `notify-send`. See `man notify-send` for details.
+#
+# The only difference is it looks at the NOTIFY_SEND_USER env variable
+# to determine who to send the notification to. If that variable is
+# not defined, it assumes the current user.
+#
+# Examples:
+#
+#     # Send a notification to yourself
+#     notify-send-user --urgency normal "Greetings!" "Hello, world!"
+#
+#     # Send a notification to another user
+#     NOTIFY_SEND_USER=phil notify-send-user --urgency normal "Greetings!" "Hello, world!"
+#
+# Dependencies:
+#
+# * `sudo`
+# * on Ubuntu, install `libnotify-bin`
+#
+
+panic() {
+    echo "FATAL: ${*}" >&2
+    exit 1
+}
+
+init() {
+    THIS_SCRIPT="$(readlink -f "${0}")"
+    THIS_USER_NAME="$(id --user --name)"
+    NOTIFY_SEND_USER="${NOTIFY_SEND_USER:-"${THIS_USER_NAME}"}"
+}
+
+main() {
+    init
+    if [ "${NOTIFY_SEND_USER}" == "${THIS_USER_NAME}" ]; then
+        local dest_uid dbus_address
+        dest_uid="$(id --user "${NOTIFY_SEND_USER}")"
+        dbus_address="/run/user/${dest_uid}/bus"
+        test -e "${dbus_address}" || panic "Unable to find ${dbus_address}"
+        DISPLAY=:0 DBUS_SESSION_BUS_ADDRESS="unix:path=${dbus_address}"\
+            notify-send "${@}"
+    else
+        sudo --user "${NOTIFY_SEND_USER}" -- "${THIS_SCRIPT}" "${@}"
+    fi
+
+}
+
+main "${@}"

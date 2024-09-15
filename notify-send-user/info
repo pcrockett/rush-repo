@@ -1,0 +1,3 @@
+Wrapper around notify-send that makes it easy to notify _another user_.
+
+Useful for allowing processes running as `root` to send notifications to regular logged-in users.
