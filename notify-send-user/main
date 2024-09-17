@@ -4,5 +4,16 @@
 source "${REPO_PATH}/lib.sh"
 
 require_commands notify-send sudo
-install_global_bin notify-send-user
-install_success
+
+file_hash() {
+    sha256sum < "${1}"
+}
+
+installed_path="${RUSH_GLOBAL_BIN}/notify-send-user"
+
+if [ -f "${installed_path}" ] && [ "$(file_hash "${installed_path}")" == "$(file_hash notify-send-user)" ]; then
+    log_attention "Already installed and up-to-date."
+else
+    install_global_bin notify-send-user
+    install_success
+fi
