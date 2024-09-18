@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+
+# shellcheck source=lib.sh
+source "${REPO_PATH}/lib.sh"
+
+if command -v bw &> /dev/null; then
+    bw update
+    exit $?
+fi
+
+temp_dir="$(mktemp_dir)"
+on_exit() {
+    rm -rf "${temp_dir}"
+}
+trap 'on_exit' EXIT
+
+cd "${temp_dir}"
+curl_download "https://vault.bitwarden.com/download/?app=cli&platform=linux" > bw.zip
+unzip bw.zip
+install_user_bin bw
+install_success
