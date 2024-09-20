@@ -1,0 +1,56 @@
+#!/usr/bin/env bash
+set -Eeuo pipefail
+
+OPENMOJI_VERSION="15.0.0"
+DATA_URL="https://github.com/hfg-gmuend/openmoji/raw/refs/tags/${OPENMOJI_VERSION}/data/openmoji.json"
+XDG_CACHE_HOME="${XDG_CACHE_HOME:-"${HOME}/.cache"}"
+CACHE_DIR="${XDG_CACHE_HOME}/fzmoji"
+CACHE_DATA_FILE="${CACHE_DIR}/openmoji-${OPENMOJI_VERSION}.json"
+
+curl_download() {
+    local url="${1}"
+    curl --proto '=https' --tlsv1.2 \
+        --silent \
+        --show-error \
+        --fail \
+        --location "${url}"
+}
+
+init() {
+    if [ ! -f "${CACHE_DATA_FILE}" ]; then
+        mkdir --parent "${CACHE_DIR}"
+        curl_download "${DATA_URL}" > "${CACHE_DATA_FILE}.tmp"
+        mv "${CACHE_DATA_FILE}.tmp" "${CACHE_DATA_FILE}"
+    fi
+}
+
+render_emoji_data() {
+    local js_query
+    js_query="$(cat <<EOF
+.map(x => {
+    return \`\${x.emoji} \${x.annotation} \${x.tags} \${x.openmoji_tags} \${x.skintone}\`;
+})
+.join("\\n")
+EOF
+)"
+    fx "${CACHE_DATA_FILE}" "${js_query}"
+}
+
+select_emoji() {
+    render_emoji_data \
+        | fzf --multi --height 20 --layout reverse \
+        | awk '{print $1}'
+}
+
+main() {
+    init
+    local emoji
+    emoji="$(select_emoji)"
+    if command -v xsel &> /dev/null; then
+        echo -n "${emoji}" | xsel --clipboard
+        echo "Copied to clipboard." >&2
+    fi
+    echo "${emoji}"
+}
+
+main "${@}"
