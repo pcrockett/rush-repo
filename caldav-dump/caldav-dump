@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+set -Eeuo pipefail
+
+# expects following env variables to be set:
+#
+# * CALDAV_USERNAME
+# * CALDAV_PASSWORD
+# * CALDAV_URL
+#
+# example usage:
+#
+#     CALDAV_USERNAME="example" \
+#       CALDAV_PASSWORD="passw0rd" \
+#       CALDAV_URL="https://caldav.example.com/dav/calendars/user/example/blah-blah-blah" \
+#       caldav-dump > calendar.ical
+#
+
+CALDAV_BASIC_TOKEN="$(echo "${CALDAV_USERNAME}:${CALDAV_PASSWORD}" | base64)"
+
+curl -SsfL "${CALDAV_URL}" \
+    --header "Authorization: Basic ${CALDAV_BASIC_TOKEN}"
