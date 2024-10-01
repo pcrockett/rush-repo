@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+set -Eeuo pipefail
+
+branches_to_try=(
+    main
+    master
+)
+
+for b in "${branches_to_try[@]}";
+do
+    if git show-ref --verify --quiet "refs/heads/${b}"; then
+        git checkout "${b}"
+        exit 0
+    fi
+done
+
+echo "No ${branches_to_try[*]} branches found." >&2
+exit 1
