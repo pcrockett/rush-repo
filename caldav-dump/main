@@ -5,14 +5,9 @@ source "${REPO_PATH}/lib.sh"
 
 require_commands curl base64
 bin_name="caldav-dump"
-
-file_hash() {
-    sha256sum < "${1}"
-}
-
 installed_path="${RUSH_GLOBAL_BIN}/${bin_name}"
 
-if [ -f "${installed_path}" ] && [ "$(file_hash "${installed_path}")" == "$(file_hash ${bin_name})" ]; then
+if files_are_same "${installed_path}" "${bin_name}"; then
     log_attention "Already installed and up-to-date."
 else
     install_global_bin "${bin_name}"

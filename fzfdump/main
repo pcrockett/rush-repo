@@ -2,6 +2,14 @@
 
 # shellcheck source=lib.sh
 source "${REPO_PATH}/lib.sh"
-require_commands fzf sudo
-install_user_bin fzfdump
-install_success
+require_commands fzf
+
+# remove old fzfdump installed in user bin
+rm -f "${RUSH_USER_BIN}/fzfdump"
+
+if files_are_same "${RUSH_GLOBAL_BIN}/fzfdump" fzfdump; then
+    log_attention "Already installed and up-to-date."
+else
+    install_global_bin fzfdump
+    install_success
+fi
