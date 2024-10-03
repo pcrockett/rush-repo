@@ -11,7 +11,7 @@ set -Eeuo pipefail
 #
 # Takes no args, assumes the file is coming in through standard input.
 #
-# Dependencies: fzf, sudo
+# Dependencies: fzf
 
 panic() {
     echo "FATAL: ${*}" >&2
@@ -22,26 +22,26 @@ prompt_for_device() {
     # Display a rich fuzzy search / menu for the user to select their output device,
     # and output just the device's PATH
 
-    # HACK: assuming the user has sudo configured so you don't have to type in a password on each
-    # sudo invocation, this will "unlock" sudo so fzf can invoke it without prompting for passwords.
-    sudo true || panic "Need sudo access."
-
     # shellcheck disable=SC2016  # Not trying to expand expressions in single-quotes
     lsblk --list --nodeps --output PATH,SIZE \
         | fzf \
             --header-lines 1 \
             --layout reverse \
             --prompt "Select your output device: " \
-            --preview 'sudo fdisk --list "$(echo {} | cut --fields 1 --delimiter " ")"' \
+            --preview 'fdisk --list "$(echo {} | cut --fields 1 --delimiter " ")"' \
             --preview-window down \
         | cut --fields 1 --delimiter " "
 }
 
 main() {
+    if [ "$(id --user)" -ne 0 ]; then
+        panic "Must run as root."
+    fi
+
     local device
     device="$(prompt_for_device)"
     test "${device}" != "" || panic "no device selected."
-    sudo dd "of=${device}" \
+    dd "of=${device}" \
         bs=4M \
         oflag=direct \
         status=progress
