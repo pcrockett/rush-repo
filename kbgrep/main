@@ -37,8 +37,7 @@ download_url() {
 
 install_artifact() {
     chmod +x "${ARTIFACT_PATH}"
-    mv "${ARTIFACT_PATH}" "${BIN_NAME}"
-    install_user_bin "${BIN_NAME}"
+    install_user_bin "${ARTIFACT_PATH}"
 }
 
 install_from_github
