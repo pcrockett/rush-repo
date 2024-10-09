@@ -5,6 +5,7 @@
 _bin/*
 fzfdump/fzfdump
 fzmake/fzmake
+fzman/fzman
 fztotp/fztotp
 gitexclude/git-exclude
 gitexclude/git-include
