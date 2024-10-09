@@ -12,6 +12,7 @@ set -Eeuo pipefail
 # Dependencies:
 #
 # * fzf
+# * man
 #
 
 CLI_ARGS=("$@")
@@ -25,6 +26,7 @@ main() {
         --query "${INITIAL_QUERY}" \
         --bind "change:reload(man -k {q} || true;)" \
         --preview "man {1}{2}" \
+        --preview-window "top,70%" \
         --bind "enter:become(man {1}{2})"
 }
 
