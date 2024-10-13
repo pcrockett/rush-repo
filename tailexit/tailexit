@@ -31,13 +31,20 @@ select_exit_ip() {
         | awk '{ print $1 }'
 }
 
+exec_tailscale() {
+    # https://xkcd.com/149/
+    if ! tailscale "${@}"; then
+        sudo tailscale "${@}"
+    fi
+}
+
 main() {
     local exit_node
     exit_node="$(select_exit_ip "${@}")"
 
-    sudo tailscale set "--exit-node=${exit_node}"
+    exec_tailscale set "--exit-node=${exit_node}"
     if ! tailscale status &> /dev/null; then
-        sudo tailscale up
+        exec_tailscale up
     fi
 }
 
