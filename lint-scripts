@@ -11,4 +11,5 @@ gitexclude/git-exclude
 gitexclude/git-include
 git-main/git-main
 mdq/mdq
+pubip/pubip
 tailexit/tailexit

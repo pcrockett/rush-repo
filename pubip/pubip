@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+set -Eeuo pipefail
+
+curl_download() {
+    local url="${1}"
+    local curl_cmd=(
+        curl --silent --show-error --fail
+        --location "${url}"
+    )
+    gum spin --title "" --show-output -- "${curl_cmd[@]}"
+}
+
+# shellcheck disable=2016  # don't want expressions to expand in single quotes
+curl_download "https://am.i.mullvad.net/json" \
+    | fx 'x => `
+ip:          ${x.ip}
+city:        ${x.city}, ${x.country}
+coords:      ${x.latitude}, ${x.longitude}
+isp:         ${x.organization}
+is_mullvad:  ${x.mullvad_exit_ip}
+blacklisted: ${x.blacklisted?.blacklisted}
+`'
