@@ -3,16 +3,50 @@
 # shellcheck source=lib.sh
 source "${REPO_PATH}/lib.sh"
 
-installed_packages_dir="$(repo_state_dir)/installed_packages"
-mkdir --parent "${installed_packages_dir}"
-
-find_packages() {
-    find "${installed_packages_dir}" -maxdepth 1 -mindepth 1
+run_if() {
+    if command_exists "${1}"; then
+        "${@}"
+    fi
 }
 
-for full_file_path in $(find_packages); do
-    package_name="$(basename "${full_file_path}")"
-    rush get "${package_name}" || panic "Unable to update ${package_name}"
-done
+root_run_if() {
+    if command_exists "${1}"; then
+        as_root "${@}"
+    fi
+}
 
-log_attention "done"
+rush_packages() {
+    local installed_packages_dir
+    installed_packages_dir="$(repo_state_dir)/installed_packages"
+    mkdir --parent "${installed_packages_dir}"
+
+    find_packages() {
+        find "${installed_packages_dir}" -maxdepth 1 -mindepth 1
+    }
+
+    for full_file_path in $(find_packages); do
+        package_name="$(basename "${full_file_path}")"
+        rush get "${package_name}" || panic "Unable to update ${package_name}"
+    done
+}
+
+main() {
+    rush_packages
+    run_if flatpak uninstall --unused --assumeyes
+    run_if flatpak update --assumeyes
+    run_if pipx upgrade-all --include-injected
+    run_if gh extension upgrade --all
+    run_if heroku plugins:update
+    run_if brew update --quiet
+    run_if brew upgrade
+    run_if devbox version update
+    run_if asdf update
+    run_if asdf plugin update --all
+    run_if rustup update
+    root_run_if apt-get update
+    root_run_if apt-get upgrade --yes --with-new-pkgs
+    root_run_if pacman -Syu --noconfirm
+    log_attention "done"
+}
+
+main
