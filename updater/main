@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+
+# shellcheck source=lib.sh
+source "${REPO_PATH}/lib.sh"
+
+install_user_bin software-update
+install_success

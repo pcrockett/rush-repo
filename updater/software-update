@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+set -Eeuo pipefail
+
+# Update All The Things
+
+main() {
+    rush pull
+    rush update-all
+
+    # This script is intentionally structured so that it can be updated in-place WHILE the script
+    # is running. The key to this is the `exit` call at the end of `main()`. Without this call, the
+    # Bash interpreter may continue reading instructions from the new updated script at a totally
+    # unpredictable starting point.
+    exit $?
+}
+
+main
