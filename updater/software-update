@@ -1,9 +1,76 @@
 #!/usr/bin/env bash
 set -Eeuo pipefail
 
-# Update All The Things
+# Update All The Things, including the Rush package manager itself.
+
+init() {
+    RUSH_GITHUB_ORG="DannyBen"
+    RUSH_GITHUB_REPO="rush"
+    SCRIPT_TEMP_DIR="$(mktemp --directory --tmpdir "pcrockett_software_update.XXXX")"
+    trap 'on_exit' EXIT
+}
+
+on_exit() {
+    rm -r "${SCRIPT_TEMP_DIR}"
+}
+
+panic() {
+    log_error "${*}" >&2
+    exit 1
+}
+
+curl_download() {
+    local url="${1}"
+    curl --proto '=https' --tlsv1.3 \
+        --silent \
+        --show-error \
+        --fail \
+        --location "${url}"
+}
+
+github_latest_tag() {
+    local owner="${1}"
+    local repo="${2}"
+    curl_download "https://api.github.com/repos/${owner}/${repo}/releases/latest" \
+        | grep --perl-regexp --only-matching '(?<="tag_name":)\s*"\S+"' \
+        | tr --delete '" '
+}
+
+installed_rush_version() {
+    if ! [[ "$(rush --version)" =~ ^([[:digit:]]+\.[[:digit:]]+\.[[:digit:]]+) ]]; then
+        panic "Unable to determine currently installed version of rush!"
+        exit 1  # redundant, but useful to shellcheck
+    fi
+
+    echo "${BASH_REMATCH[1]}"
+}
+
+update_rush() {
+    github_latest_tag="$(github_latest_tag "${RUSH_GITHUB_ORG}" "${RUSH_GITHUB_REPO}")"
+    # strip the leading `v` from the tag name to get version number
+    github_latest_version="$(echo "${github_latest_tag}" | cut --characters 2-)"
+    installed_version="$(installed_rush_version)"
+
+    if [ "${github_latest_version}" = "${installed_version}" ]; then
+        echo "Rush is already installed and up-to-date."
+        return 0
+    fi
+
+    echo "New version of Rush detected. Updating Rush..."
+    dl_url="$(echo "https://github.com/${RUSH_GITHUB_ORG}/${RUSH_GITHUB_REPO}/releases/download/${github_latest_tag}/rush")"
+
+    curl_download "${dl_url}" > "${SCRIPT_TEMP_DIR}/rush"
+    chmod +x "${SCRIPT_TEMP_DIR}/rush"
+
+    current_rush_location="$(command -v rush)"
+    mv "${SCRIPT_TEMP_DIR}/rush" "${current_rush_location}"
+
+    echo "Rush successfully updated to ${github_latest_version}."
+}
 
 main() {
+    init
+    update_rush
     rush pull
     rush update-all
 
