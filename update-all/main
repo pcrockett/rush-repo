@@ -31,6 +31,9 @@ rush_packages() {
 }
 
 main() {
+    root_run_if apt-get update
+    root_run_if apt-get upgrade --yes --with-new-pkgs
+    root_run_if pacman -Syu --noconfirm
     rush_packages
     run_if flatpak uninstall --unused --assumeyes
     run_if flatpak update --assumeyes
@@ -43,9 +46,6 @@ main() {
     run_if asdf update
     run_if asdf plugin update --all
     run_if rustup update
-    root_run_if apt-get update
-    root_run_if apt-get upgrade --yes --with-new-pkgs
-    root_run_if pacman -Syu --noconfirm
     log_attention "done"
 }
 
