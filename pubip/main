@@ -3,6 +3,6 @@
 # shellcheck source=lib.sh
 source "${REPO_PATH}/lib.sh"
 
-require_commands fx gum curl
+require_commands fx gum curl node
 install_user_bin pubip
 install_success
