@@ -1,12 +1,26 @@
 #!/usr/bin/env bash
 
+# get, set, increment, and decrement speaker volume level with pactl
+#
+# `pactl set-sink-volume +10%` command has a few undesired / unexpected effects, such as the
+# ability to increase volume WAY over 100%. this script is a simplified wrapper around pactl that:
+#
+# * assumes there's just "volume". no left channel, right channel, balance, etc.
+# * adjusts volume based on percentages. no dB, now arbitrary integer values, etc.
+# * ensures volume stays strictly between 0% and 100%
+# * defaults to the @DEFAULT_SINK@ (though you can change what sink you want to adjust)
+#
+# especially useful when you need to manually rig up a volume up / down / mute button on your
+# keyboard
+# 
+
 usage() {
     local command_name
     command_name="$(basename "${0}")"
     cat <<EOF
 ${command_name}: Dumbed-down pactl volume interface
 
-usage: ${command_name} [get|set|up|down]
+usage: ${command_name} [get|set|up|down|help]
 
 examples:
 
