@@ -1,0 +1,112 @@
+#!/usr/bin/env bash
+
+usage() {
+    local command_name
+    command_name="$(basename "${0}")"
+    cat <<EOF
+${command_name}: Dumbed-down pactl volume interface
+
+usage: ${command_name} [get|set|up|down]
+
+examples:
+
+    # get current volume:
+    ${command_name}
+    ${command_name} get
+
+    # set new volume:
+    ${command_name} set 0
+    ${command_name} set 50
+    ${command_name} set 100
+
+    # adjust volume relatively:
+    ${command_name} up
+    ${command_name} down
+    PACTL_VOLUME_INCREMENT=15 ${command_name} up
+
+    # set volume for specific sink:
+    PACTL_VOLUME_SINK=whatever ${command_name} set 75
+
+EOF
+}
+
+panic() {
+    echo "${*}" >&2
+    exit 1
+}
+
+init() {
+    PACTL_VOLUME_SINK="${PACTL_VOLUME_SINK:-@DEFAULT_SINK@}"
+    PACTL_VOLUME_INCREMENT="${PACTL_VOLUME_INCREMENT:-10}"
+}
+
+subcommand:get() {
+    pactl get-sink-volume "${PACTL_VOLUME_SINK}" \
+        | awk '$1 == "Volume:" {print $0}' \
+        | grep --perl-regexp --only-matching "[\d\.]+(?=%)" \
+        | head -n 1
+}
+
+subcommand:set() {
+    local new_level="${1}"
+    test "${new_level}" -ge 0 || panic "volume must be greater than or equal to 0"
+    test "${new_level}" -le 100 || panic "volume must be less than or equal to 100"
+    pactl set-sink-volume "${PACTL_VOLUME_SINK}" "${new_level}%"
+}
+
+subcommand:up() {
+    local current_vol new_vol
+    current_vol="$(subcommand:get)"
+    new_vol=$((current_vol + PACTL_VOLUME_INCREMENT))
+    if [ "${new_vol}" -ge 100 ]; then
+        subcommand:set 100
+    elif [ "${new_vol}" -le 0 ]; then
+        subcommand:set 0
+    else
+        subcommand:set "${new_vol}"
+    fi
+
+    subcommand:get
+}
+
+subcommand:down() {
+    local current_vol new_vol
+    current_vol="$(subcommand:get)"
+    new_vol=$((current_vol - PACTL_VOLUME_INCREMENT))
+    if [ "${new_vol}" -ge 100 ]; then
+        subcommand:set 100
+    elif [ "${new_vol}" -le 0 ]; then
+        subcommand:set 0
+    else
+        subcommand:set "${new_vol}"
+    fi
+
+    subcommand:get
+}
+
+main() {
+    init
+    case "${1:-}" in
+        up)
+            subcommand:up
+        ;;
+        down)
+            subcommand:down
+        ;;
+        get|"")
+            subcommand:get
+        ;;
+        set)
+            subcommand:set "${2}"
+        ;;
+        help|-h|--help|/?)
+            usage
+        ;;
+        *)
+            usage
+            panic "unrecognized command: ${1}"
+        ;;
+    esac
+}
+
+main "$@"

@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+
+# shellcheck source=lib.sh
+source "${REPO_PATH}/lib.sh"
+
+require_commands pactl
+install_user_bin pactl_volume
+install_success
