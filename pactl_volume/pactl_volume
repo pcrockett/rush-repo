@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+set -Eeuo pipefail
+
 # get, set, increment, and decrement speaker volume level with pactl
 #
 # `pactl set-sink-volume +10%` command has a few undesired / unexpected effects, such as the
