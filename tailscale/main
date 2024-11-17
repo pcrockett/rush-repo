@@ -2,4 +2,47 @@
 
 # shellcheck source=lib.sh
 source "${REPO_PATH}/lib.sh"
-curl_download https://tailscale.com/install.sh | sh
+
+os_id() {
+    (
+        source /etc/os-release
+        echo "${ID:-unknown}_${VARIANT_ID:-unknown}"
+    )
+}
+
+install_silverblue() {
+    # figured this out by looking at two things:
+    #
+    # * <https://tailscale.com/install.sh>
+    # * <https://discussion.fedoraproject.org/t/how-to-add-an-additional-repo-file-on-silverblue/35641>
+    #
+    repo_url="https://pkgs.tailscale.com/stable/fedora/tailscale.repo"
+    repo_file="/etc/yum.repos.d/tailscale.repo"
+    if [ ! -f "${repo_file}" ]; then
+        temp_dir="$(mktemp_dir)"
+        curl_download "${repo_url}" > "${temp_dir}/tailscale.repo"
+        as_root cp "${temp_dir}/tailscale.repo" "${repo_file}"
+        rm -rf "${temp_dir}"
+    fi
+    rpm-ostree install tailscale
+}
+
+main() {
+    if command -v tailscale &> /dev/null; then
+        log_attention "Already installed. Use system package manager to update."
+        exit 0
+    fi
+
+    OS_ID="$(os_id)"
+    log_info "Detected OS: ${OS_ID}"
+    case "${OS_ID}" in
+        fedora_silverblue)
+            install_silverblue
+        ;;
+        *)
+            curl_download https://tailscale.com/install.sh | sh
+        ;;
+    esac
+}
+
+main
