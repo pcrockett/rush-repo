@@ -3,6 +3,6 @@
 # shellcheck source=lib.sh
 source "${REPO_PATH}/lib.sh"
 
-require_commands fx gum curl node
+require_commands curl  # fx, jq, gum are all optional deps
 install_user_bin pubip
 install_success
