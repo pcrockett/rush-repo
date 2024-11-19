@@ -44,6 +44,8 @@ isp:         ${x.organization}
 is_mullvad:  ${x.mullvad_exit_ip}
 blacklisted: ${x.blacklisted?.blacklisted}
 `'
+    elif is_installed bat; then
+        bat --language json --style snip
     else
         cat
     fi
