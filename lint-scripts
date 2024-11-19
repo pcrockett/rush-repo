@@ -3,6 +3,7 @@
 **/undo
 *.sh
 _bin/*
+fzd/fzd
 fzfdump/fzfdump
 fzmake/fzmake
 fzman/fzman

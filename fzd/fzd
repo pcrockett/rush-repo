@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+#
+# `fzd` is `fzf` + `dict`
+#
+# Usage: fzd [word]
+#
+# Uses `fzf` and `dict` / `dictd` to interactively look up words in any number of dictionaries as
+# you type.
+#
+set -Eeuo pipefail
+
+INITIAL_QUERY="${*:-}"
+FZD_DICT_PREFIX="${FZD_DICT_PREFIX:-dict --match --formatted --strategy substring }"
+SUFFIX=" | cut --fields 4- | sort | uniq || true"
+
+FZF_DEFAULT_COMMAND="${FZD_DICT_PREFIX} $(printf %q "${INITIAL_QUERY}") ${SUFFIX}" \
+    SHELL="sh" fzf \
+        --query "${INITIAL_QUERY}" \
+        -i \
+        --bind "change:reload(${FZD_DICT_PREFIX} {q} ${SUFFIX};)" \
+        --bind "ctrl-r:reload(${FZD_DICT_PREFIX} {q} ${SUFFIX};)" \
+        --preview "dict {}" \
+        --preview-window 'right,70%' \
+        --bind "enter:become(dict {})"
+
