@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+
+# shellcheck source=lib.sh
+source "${REPO_PATH}/lib.sh"
+as_root pacman -Rus yay-bin yay-bin-debug

@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+
+# shellcheck source=lib.sh
+source "${REPO_PATH}/lib.sh"
+
+require_commands pacman git makepkg
+
+if command_exists yay; then
+    log_attention "Yay already installed. Use it to self-update instead of rush."
+    exit 0
+fi
+
+temp_dir="$(mktemp_dir)"
+on_exit() {
+    rm -rf "${temp_dir}"
+}
+trap 'on_exit' EXIT
+
+cd "${temp_dir}"
+git clone https://aur.archlinux.org/yay-bin.git
+cd yay-bin
+makepkg --syncdeps --install
