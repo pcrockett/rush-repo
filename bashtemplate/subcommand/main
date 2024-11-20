@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+
+# example usage:
+#
+#     rush bashtemplate 2> my-bash-script.sh
+#     chmod +x my-bash-script.sh
+#
+
+cat template.bash >&2
