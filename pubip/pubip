@@ -5,9 +5,31 @@ is_installed() {
     command -v "${1}" &> /dev/null
 }
 
+kill_exact_command() {
+    pkill --full "${*}" || true &> /dev/null
+}
+
 spinner() {
     if is_installed gum; then
-        gum spin --title "" --show-output -- "${@}"
+        if gum spin --title "" --show-output -- "${@}"; then
+            gum_result=0
+        else
+            gum_result=$?
+        fi
+
+        # if user hits Ctrl+C (AKA "sends SIGINT to gum"), gum will exit but the child process
+        # will continue running. Since this is in a subshell, all that does is cause the spinner to
+        # disappear and the script will just hang until curl exits naturally.
+        #
+        # this workaround actively kills gum's child process if it's still hanging around after
+        # gum exits.
+        #
+        # this workaround may become unnecessary if this github issue is ever addressed:
+        #
+        # <https://github.com/charmbracelet/gum/issues/730>
+        #
+        kill_exact_command "${@}"
+        return ${gum_result}
     else
         "${@}"
     fi
@@ -52,8 +74,12 @@ blacklisted: ${x.blacklisted?.blacklisted}
 }
 
 main() {
-    curl_download "https://am.i.mullvad.net/json" \
-        | format_output
+    raw_output="$(curl_download "https://am.i.mullvad.net/json")"
+    if [ "${raw_output}" == "" ]; then
+        exit 1  # either network issue or user cancelled with Ctrl+C
+    else
+        echo "${raw_output}" | format_output
+    fi
 }
 
 main
