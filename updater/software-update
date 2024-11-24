@@ -10,6 +10,7 @@ init() {
     trap 'on_exit' EXIT
 }
 
+# shellcheck disable=SC2317  # shellcheck has a hard time with traps
 on_exit() {
     rm -r "${SCRIPT_TEMP_DIR}"
 }
@@ -39,7 +40,6 @@ github_latest_tag() {
 installed_rush_version() {
     if ! [[ "$(rush --version)" =~ ^([[:digit:]]+\.[[:digit:]]+\.[[:digit:]]+) ]]; then
         panic "Unable to determine currently installed version of rush!"
-        exit 1  # redundant, but useful to shellcheck
     fi
 
     echo "${BASH_REMATCH[1]}"
@@ -57,7 +57,7 @@ update_rush() {
     fi
 
     echo "New version of Rush detected. Updating Rush..."
-    dl_url="$(echo "https://github.com/${RUSH_GITHUB_ORG}/${RUSH_GITHUB_REPO}/releases/download/${github_latest_tag}/rush")"
+    dl_url="https://github.com/${RUSH_GITHUB_ORG}/${RUSH_GITHUB_REPO}/releases/download/${github_latest_tag}/rush"
 
     curl_download "${dl_url}" > "${SCRIPT_TEMP_DIR}/rush"
     chmod +x "${SCRIPT_TEMP_DIR}/rush"
