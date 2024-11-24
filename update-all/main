@@ -34,6 +34,7 @@ main() {
     root_run_if apt-get update
     root_run_if apt-get upgrade --yes --with-new-pkgs
     root_run_if pacman -Syu --noconfirm
+    run_if yay -Syu --noconfirm --aur
     rush_packages
     run_if flatpak uninstall --unused --assumeyes
     run_if flatpak update --assumeyes
