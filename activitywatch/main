@@ -3,7 +3,7 @@
 # shellcheck source=lib.sh
 source "${REPO_PATH}/lib.sh"
 
-require_commands pkill pgrep
+require_commands pkill pgrep unzip
 require_packages libxcb-cursor0
 
 GITHUB_ORG="ActivityWatch"
