@@ -1,0 +1,36 @@
+#!/usr/bin/env bash
+
+# shellcheck source=lib.sh
+source "${REPO_PATH}/lib.sh"
+
+# inspired by https://fly.io/install.sh but heavily modified for my preferences
+
+main() {
+    if command_exists flyctl; then
+        log_attention "Already installed. See \`flyctl settings autoupdate\` for details."
+        exit 0
+    fi
+
+    os=$(uname -s)
+    arch=$(uname -m)
+    version="latest"
+
+    flyctl_uri="$(curl_download "https://api.fly.io/app/flyctl_releases/${os}/${arch}/${version}")"
+    if [ ! "$flyctl_uri" ]; then
+        panic "Unable to find a flyctl release for ${os}/${arch}/${version} - see https://github.com/superfly/flyctl/releases for all versions" 1>&2
+    fi
+
+    tmp_dir="$(mktemp_dir)"
+
+    curl_download "${flyctl_uri}" > "${tmp_dir}/flyctl.tar.gz"
+    tar -C "${tmp_dir}" -xzf "${tmp_dir}/flyctl.tar.gz"
+    chmod +x "${tmp_dir}/flyctl"
+    install_user_bin "${tmp_dir}/flyctl"
+
+    # set update channel to stable / "shell"
+    flyctl version -s "shell"
+
+    install_success
+}
+
+main
