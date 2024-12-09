@@ -33,7 +33,18 @@ rush_packages() {
 main() {
     root_run_if apt-get update
     root_run_if apt-get upgrade --yes --with-new-pkgs
+
+    if command_exists arch-news-check && ! arch-news-check; then
+        if command_exists w3m; then
+            w3m "https://archlinux.org/news/"
+            log_attention "If you want to continue, run this script again."
+        else
+            log_attention "Check arch news first! <https://archlinux.org/news/>"
+        fi
+        exit 1
+    fi
     root_run_if pacman -Syu --noconfirm
+
     run_if yay -Syu --noconfirm --aur
     rush_packages
     run_if flatpak uninstall --unused --assumeyes
