@@ -1,0 +1,51 @@
+#!/usr/bin/env bash
+set -Eeuo pipefail
+
+# Check for updates to Arch News <https://archlinux.org/news/>
+#
+# If an entry has been added since the last time this script was run, will exit with code 1.
+# Otherwise, exits with code 0.
+#
+# Handy for interrupting processes that you really shouldn't run without checking news first.
+#
+
+init() {
+    XDG_STATE_HOME="${XDG_STATE_HOME:-"${HOME}/.local/state"}"
+    STATE_DIR="${XDG_STATE_HOME}/archcheck"
+    LATEST_NEWS_FILE="${STATE_DIR}/latest.json"
+    mkdir --parent "${STATE_DIR}"
+}
+
+curl_download() {
+    local url="${1}"
+    curl --proto '=https' --tlsv1.2 \
+        --silent \
+        --show-error \
+        --fail \
+        --location "${url}"
+}
+
+latest_news() {
+    curl_download "https://archlinux.org/feeds/news/" \
+        | qq --input xml '.rss.channel.item | map({title, link, pubDate})[0]'
+}
+
+main() {
+    init
+
+    if ! [ -f "${LATEST_NEWS_FILE}" ]; then
+        latest_news > "${LATEST_NEWS_FILE}"
+        exit 1
+    fi
+
+    news_today="$(latest_news)"
+    news_last_time="$(cat "${LATEST_NEWS_FILE}")"
+    if [ "${news_today}" != "${news_last_time}" ]; then
+        echo "${news_today}" > "${LATEST_NEWS_FILE}"
+        exit 1
+    fi
+
+    exit 0
+}
+
+main
