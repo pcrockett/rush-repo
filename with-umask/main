@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+
+# shellcheck source=lib.sh
+source "${REPO_PATH}/lib.sh"
+
+if files_are_same "${RUSH_GLOBAL_BIN}/with-umask" with-umask; then
+    log_attention "Already installed and up-to-date."
+else
+    install_global_bin with-umask
+    install_success
+fi

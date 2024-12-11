@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+set -Eeuo pipefail
+
+# Execute a single command with a particular umask.
+#
+# Example usage:
+#
+#     with-umask 0022 touch foo
+#     with-umask u=rw,g=,o= touch foo
+#
+
+umask "${1}"
+shift
+"${@}"
