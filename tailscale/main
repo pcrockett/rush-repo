@@ -39,6 +39,9 @@ main() {
         fedora_silverblue)
             install_silverblue
         ;;
+        arch_*)
+            as_root pacman -Syu tailscale
+        ;;
         *)
             curl_download https://tailscale.com/install.sh | sh
         ;;
