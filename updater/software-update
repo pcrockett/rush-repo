@@ -46,6 +46,7 @@ installed_rush_version() {
 }
 
 update_rush() {
+    echo "Checking for Rush update..."
     github_latest_tag="$(github_latest_tag "${RUSH_GITHUB_ORG}" "${RUSH_GITHUB_REPO}")"
     # strip the leading `v` from the tag name to get version number
     github_latest_version="$(echo "${github_latest_tag}" | cut --characters 2-)"
