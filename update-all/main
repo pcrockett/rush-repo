@@ -31,7 +31,6 @@ rush_packages() {
 }
 
 main() {
-    root_run_if timeshift --create --scripted --comments "rush update-all snapshot"
     root_run_if apt-get update
     root_run_if apt-get upgrade --yes --with-new-pkgs
 
