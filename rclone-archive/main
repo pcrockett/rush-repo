@@ -2,7 +2,7 @@
 
 # shellcheck source=lib.sh
 source "${REPO_PATH}/lib.sh"
-require_commands rclone envsubst
+require_commands rclone envsubst fusermount3
 
 rclone_config_file="${XDG_CONFIG_HOME}/rclone/rclone.conf"
 systemd_unit_file="${XDG_CONFIG_HOME}/systemd/user/rclone-archive.service"
