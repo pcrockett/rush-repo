@@ -55,7 +55,14 @@ main() {
     run_if brew update --quiet
     run_if brew upgrade
     run_if devbox version update
-    run_if asdf update
+
+    if command_exists asdf; then
+        log_info "Updating asdf..."
+        pushd "${ASDF_DIR:-"${HOME}/.asdf"}" &> /dev/null
+        git pull
+        popd &> /dev/null
+    fi
+
     run_if asdf plugin update --all
     run_if rustup update
     log_attention "done"
