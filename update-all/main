@@ -31,7 +31,9 @@ rush_packages() {
 }
 
 check_arch_news() {
-    if command_exists arch-news-check && arch-news-check; then
+    if ! command_exists arch-news-check; then
+        return 0
+    elif arch-news-check; then
         return 0
     else
         if command_exists w3m; then
