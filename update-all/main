@@ -51,10 +51,10 @@ main() {
     root_run_if apt-get update
     root_run_if apt-get upgrade --yes --with-new-pkgs
     if check_arch_news; then
+        log_info "No new Arch news."
         root_run_if pacman -Syu --noconfirm
         run_if yay -Syu --noconfirm --aur
     else
-        log_info "No new Arch news."
         exit 1
     fi
     rush_packages
