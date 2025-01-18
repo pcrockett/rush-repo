@@ -34,6 +34,7 @@ check_arch_news() {
     if ! command_exists arch-news-check; then
         return 0
     elif arch-news-check; then
+        log_info "No new Arch news."
         return 0
     else
         if command_exists w3m; then
@@ -51,7 +52,6 @@ main() {
     root_run_if apt-get update
     root_run_if apt-get upgrade --yes --with-new-pkgs
     if check_arch_news; then
-        log_info "No new Arch news."
         root_run_if pacman -Syu --noconfirm
         run_if yay -Syu --noconfirm --aur
     else
@@ -76,7 +76,7 @@ main() {
 
     run_if asdf plugin update --all
     run_if rustup update
-    log_attention "done"
+    log_attention "Done"
     exit 0
 }
 
