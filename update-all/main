@@ -57,6 +57,10 @@ main() {
     else
         exit 1
     fi
+
+    run_if rpm-ostree update &
+    local job_ostree_update=$!
+
     rush_packages
     run_if flatpak uninstall --unused --assumeyes
     run_if flatpak update --assumeyes
@@ -76,6 +80,9 @@ main() {
 
     run_if asdf plugin update --all
     run_if rustup update
+
+    wait "${job_ostree_update}"
+
     log_attention "Done"
     exit 0
 }
