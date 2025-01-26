@@ -3,8 +3,19 @@ set -Eeuo pipefail
 
 init() {
     ARCH_WIKI_DIR="/usr/share/doc/arch-wiki/html/en"
+
+    # use `declare -f` to get the source code of functions below so they can
+    # be passed to fzf.
     SEARCH_COMMAND="$(declare -f search_wiki)
 search_wiki"
+    PREVIEW_ARTICLE_COMMAND="$(declare -f preview_article)
+preview_article"
+    OPEN_ARTICLE_COMMAND="$(declare -f open_article)
+open_article"
+}
+
+exec_fzf() {
+    SHELL="sh" FZF_DEFAULT_COMMAND="${SEARCH_COMMAND} ''" fzf "${@}"
 }
 
 search_wiki() {
@@ -19,8 +30,18 @@ search_wiki() {
     rg --hidden --files-with-matches --color=always --smart-case "$@"
 }
 
-exec_fzf() {
-    SHELL="sh" FZF_DEFAULT_COMMAND="${SEARCH_COMMAND} ''" fzf "${@}"
+preview_article() {
+    # shellcheck shell=sh
+    # this function isn't executed here in this script directly
+    # it's actually a shell function that is dumped into fzf
+    w3m -cols "${FZF_PREVIEW_COLUMNS}" "$(readlink -e "$1")"
+}
+
+open_article() {
+    # shellcheck shell=sh
+    # this function isn't executed here in this script directly
+    # it's actually a shell function that is dumped into fzf
+    w3m "$(readlink -e "$1")"
 }
 
 main() {
@@ -29,9 +50,9 @@ main() {
     exec_fzf --ansi \
         --disabled \
         --query "" \
-        --preview "w3m -cols \$FZF_PREVIEW_COLUMNS {}" \
-        --preview-window "up,70%" \
-        --bind "enter:become(w3m {})" \
+        --preview "${PREVIEW_ARTICLE_COMMAND} {}" \
+        --preview-window "right,70%" \
+        --bind "enter:execute(${OPEN_ARTICLE_COMMAND} {})" \
         --bind "change:reload(${SEARCH_COMMAND} {q} || true;)"
 }
 
