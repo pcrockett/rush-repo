@@ -16,13 +16,44 @@ select_run() {
 
     template=$(cat <<EOF
 {{range .}}
-    {{tablerow
-        (.status)
-        ((printf "started %s" (timeago .startedAt)) | autocolor "blue")
-        (truncate 50 .headBranch | autocolor "green")
-        (.workflowName)
-        (.databaseId)
-    }}
+    {{if (eq .conclusion "success")}}
+        {{tablerow
+            (autocolor "green" "✓")
+            (.status)
+            ((printf "started %s" (timeago .startedAt)) | autocolor "blue")
+            (truncate 50 .headBranch | autocolor "green")
+            (.workflowName)
+            (.databaseId)
+        }}
+    {{else if or (eq .conclusion "failure") (eq .conclusion "startup_failure")}}
+        {{tablerow
+            (autocolor "red" "X")
+            (.status)
+            ((printf "started %s" (timeago .startedAt)) | autocolor "blue")
+            (truncate 50 .headBranch | autocolor "green")
+            (.workflowName)
+            (.databaseId)
+        }}
+    {{else if (eq .conclusion "cancelled")}}
+        {{tablerow
+            (autocolor "gray" "X")
+            (.status)
+            ((printf "started %s" (timeago .startedAt)) | autocolor "blue")
+            (truncate 50 .headBranch | autocolor "green")
+            (.workflowName)
+            (.databaseId)
+        }}
+    {{else}}
+        {{tablerow
+            (.conclusion)
+            (.status)
+            ((printf "started %s" (timeago .startedAt)) | autocolor "blue")
+            (truncate 50 .headBranch | autocolor "green")
+            (.workflowName)
+            (.databaseId)
+        }}
+    {{end}}
+
 {{end}}
 EOF
 )
@@ -56,7 +87,7 @@ EOF
     #     workflowDatabaseId
     #     workflowName
 
-    gh run list --limit 50 --json status,headBranch,workflowName,startedAt,databaseId --template "${template}" \
+    gh run list --limit 50 --json conclusion,status,headBranch,workflowName,startedAt,databaseId --template "${template}" \
         | filter_out_empty_lines \
         | SHELL="sh" fzf --ansi --preview "${preview_cmd}" --preview-window "top,60%" \
         | get_run_id
