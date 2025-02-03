@@ -1,0 +1,46 @@
+#!/usr/bin/env bash
+set -Eeuo pipefail
+
+# wipbr: "Work-in-progress" branch
+#
+# Create a randomly- (yet memorably-) named Git branch in your current repo
+#
+# Credits to EFF word lists:
+#
+#     https://www.eff.org/deeplinks/2016/07/new-wordlists-random-passphrases
+#
+# Example usage:
+#
+#     git wipbr
+#     # Switched to a new branch 'phil/wip/varied-cognitive'
+#
+
+
+GIT_WIPBR_MY_NAME="${GIT_WIPBR_MY_NAME:-phil}"
+XDG_CACHE_HOME="${XDG_CACHE_HOME:-${HOME}/.cache}"
+CACHE_DIR="${XDG_CACHE_HOME}/phil/wordlists"
+WORD_LIST_FILE="${CACHE_DIR}/eff_short_wordlist_2_0.txt"
+WORD_LIST_URL="https://www.eff.org/files/2016/09/08/eff_short_wordlist_2_0.txt"
+
+curl_download() {
+    local url="${1}"
+    curl --proto '=https' --tlsv1.2 \
+        --silent \
+        --show-error \
+        --fail \
+        --location "${url}"
+}
+
+main() {
+    if [ ! -f "${WORD_LIST_FILE}" ]; then
+        mkdir -p "${CACHE_DIR}"
+        echo "Downloading ${WORD_LIST_URL} to ${WORD_LIST_FILE}..."
+        curl_download "${WORD_LIST_URL}" | awk '{print $2}' > "${WORD_LIST_FILE}"
+    fi
+
+    words="$(shuf --head-count 2 "${WORD_LIST_FILE}")"
+    branch_name="${GIT_WIPBR_MY_NAME}/wip/$(echo -n "${words}" | tr '\n' '-')"
+    git checkout -b "${branch_name}"
+}
+
+main
