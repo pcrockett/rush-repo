@@ -17,6 +17,8 @@ docker_cmd=(
     docker run --rm
         --user "$(id --user):$(id --group)"
         --volume "${config_home}/gcloud:/home/cloudsdk/.config/gcloud"
+        --volume "${PWD}:/tmp/workdir"
+        --workdir "/tmp/workdir"
         --env TERM="${TERM}"
 )
 
