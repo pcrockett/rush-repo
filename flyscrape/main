@@ -1,0 +1,46 @@
+#!/usr/bin/env bash
+
+# shellcheck source=lib.sh
+source "${REPO_PATH}/lib.sh"
+
+require_commands tar
+
+GITHUB_ORG="philippta"
+GITHUB_REPO="flyscrape"
+BIN_NAME="flyscrape"
+
+latest_version() {
+    # strip the leading `v` from the tag name
+    echo "${GITHUB_LATEST_TAG}" | cut --characters 2-
+}
+
+installed_version() {
+    if ! command_exists "${BIN_NAME}"; then
+        echo ""
+        return 0
+    fi
+
+    # flyscrape v0.9.0 linux/amd64
+    if ! [[ "$("${BIN_NAME}" version)" =~ ^flyscrape\ v([[:digit:]]+\.[[:digit:]]+\.[[:digit:]]+) ]]; then
+        panic "Unable to determine currently installed version!"
+        exit 1  # redundant, but useful to shellcheck
+    fi
+
+    echo "${BASH_REMATCH[1]}"
+}
+
+artifact_name() {
+    echo "flyscrape_$(latest_version)_linux_amd64.tar.gz"
+}
+
+download_url() {
+    echo "https://github.com/${GITHUB_ORG}/${GITHUB_REPO}/releases/download/${GITHUB_LATEST_TAG}/$(artifact_name)"
+}
+
+install_artifact() {
+    tar -xzf "${ARTIFACT_PATH}"
+    install_user_bin "${BIN_NAME}"
+}
+
+install_from_github
+install_success
