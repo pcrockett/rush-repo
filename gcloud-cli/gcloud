@@ -22,6 +22,10 @@ docker_cmd=(
         --env TERM="${TERM}"
 )
 
+if [ -d "${HOME}/.docker" ]; then
+    docker_cmd+=(--volume "${HOME}/.docker:/home/cloudsdk/.docker")
+fi
+
 if tty --quiet; then
     docker_cmd+=(--interactive --tty)
 fi
