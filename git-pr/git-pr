@@ -1,0 +1,38 @@
+#!/usr/bin/env nu
+
+# Create a draft pull request into the default branch
+def main [
+    --fast(-f)              # Don't open your editor, just fire-and-forget
+    --template(-t): string  # Use specific template filename under .github/
+    --dry-run               # preview what would happen
+    --assignee = "@me"      # set pull request assignee
+] {
+    # i would use the `find` command instead of `parse` however that produces highlighting
+    # in the results and i haven't figured out (yet) how to disable that.
+    let template_file = match $template {
+        null => {
+            ^git ls-files
+            | parse --regex '\.github/(PULL_REQUEST_TEMPLATE\.md$)'
+            | get capture0
+            | first_or_null
+        }
+        $x => { $x }
+    }
+
+    let args = (
+        ["--assignee" $assignee "--draft"]
+        | if (not $fast) { append "--editor" }
+        | if ($template_file == null) { append "--fill" } else { append ["--template" $template_file] }
+        | if ($dry_run) { append "--dry-run" }
+    )
+
+    ^gh pr create ...$args
+}
+
+def first_or_null [] {
+    try {
+        first
+    } catch {
+        null
+    }
+}
