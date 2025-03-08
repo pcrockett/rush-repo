@@ -19,14 +19,14 @@ def main [
         $x => { $x }
     }
 
-    let args = (
+    let gh_args = (
         ["--assignee" $assignee "--draft"]
-        | if (not $fast) { append "--editor" }
+        | if ($fast) { $in } else { append "--editor" }
         | if ($template_file == null) { append "--fill" } else { append ["--template" $template_file] }
-        | if ($dry_run) { append "--dry-run" }
+        | if ($dry_run) { append "--dry-run" } else { $in }
     )
 
-    ^gh pr create ...$args
+    ^gh pr create ...$gh_args
 }
 
 def first_or_null [] {
