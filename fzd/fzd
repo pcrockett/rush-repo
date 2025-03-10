@@ -4,8 +4,8 @@
 #
 # Usage: fzd [word]
 #
-# Uses `fzf` and `dict` / `dictd` to interactively look up words in any number of dictionaries as
-# you type.
+# Uses `fzf` and `dict` / `dictd` to interactively look up words in any number of
+# dictionaries as you type.
 #
 set -Eeuo pipefail
 
