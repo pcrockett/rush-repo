@@ -1,0 +1,99 @@
+#!/usr/bin/env bash
+#
+# Export a bitwarden vault to stdout. Will prompt for credentials if you are not logged
+# in or your vault is unlocked. Also supports exporting an organization's vault.
+#
+# Example:
+#
+#   # export a vault and save it to a gramps repo
+#   ./bw-export.sh | gramps encrypt --filename my-vault.json
+#
+# Dependencies:
+#
+# * bitwarden CLI
+# * jq
+# * charmbracelet's `gum`
+#
+set -Eeuo pipefail
+
+panic() {
+  echo "ERROR: ${*}" >&2
+  exit 1
+}
+
+step() {
+  # it's important we keep only JSON data on stdout. all output here should be stderr.
+  echo "--> ${*}" >&2
+}
+
+refresh_status() {
+  BW_STATUS_JSON="$(bw status)"
+  BW_STATUS="$(echo "${BW_STATUS_JSON}" | jq --raw-output '.status')"
+  BW_USER="$(echo "${BW_STATUS_JSON}" | jq --raw-output '.userEmail')"
+}
+
+refresh_orgs() {
+  BW_ORGS_JSON="$(bw list organizations)"
+  BW_ORG_COUNT="$(echo "${BW_ORGS_JSON}" | jq --raw-output 'length')"
+}
+
+unlock() {
+  if [ "${BW_STATUS}" == "unauthenticated" ]; then
+    BW_SESSION="$(bw login --raw)"
+    export BW_SESSION
+    refresh_status
+  elif [ "${BW_STATUS}" == "locked" ]; then
+    BW_SESSION="$(bw unlock --raw)"
+    export BW_SESSION
+    refresh_status
+  fi
+}
+
+get_vaults() {
+  local jq_script
+  jq_script="$(cat <<EOF
+map(.name) | join("\\n")
+EOF
+)"
+
+  echo "${BW_USER}"
+  echo "${BW_ORGS_JSON}" | jq --raw-output "${jq_script}"
+}
+
+select_vault() {
+  get_vaults | gum choose --header "Select a vault:"
+}
+
+main() {
+  local selected_vault org_id jq_script
+
+  step "Unlocking vault..."
+  refresh_status
+  unlock
+
+  step "Querying organizations..."
+  refresh_orgs
+
+  if [ "${BW_ORG_COUNT}" -eq 0 ]; then
+    selected_vault="${BW_USER}"
+  else
+    selected_vault="$(select_vault)"
+  fi
+
+  export_cmd=(bw export --format json --raw)
+
+  if [ "${selected_vault}" == "${BW_USER}" ]; then
+    "${export_cmd[@]}"
+  elif [ "${selected_vault}" == "" ]; then
+    panic "No vault selected."
+  else
+    jq_script="$(cat <<EOF
+map(select(.name == "${selected_vault}").id).[0]
+EOF
+)"
+    org_id="$(echo "${BW_ORGS_JSON}" | jq --raw-output "${jq_script}")"
+    "${export_cmd[@]}" --organizationid "${org_id}"
+  fi
+}
+
+main
