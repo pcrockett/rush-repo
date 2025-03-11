@@ -80,6 +80,9 @@ main() {
     selected_vault="$(select_vault)"
   fi
 
+  step "Syncing..."
+  bw sync
+
   export_cmd=(bw export --format json --raw)
 
   if [ "${selected_vault}" == "${BW_USER}" ]; then
