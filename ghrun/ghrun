@@ -43,6 +43,24 @@ select_run() {
             (.workflowName)
             (.databaseId)
         }}
+    {{else if (eq .status "pending")}}
+        {{tablerow
+            (autocolor "gray" "⏳️")
+            (.status)
+            ((printf "started %s" (timeago .startedAt)) | autocolor "blue")
+            (truncate 50 .headBranch | autocolor "green")
+            (.workflowName)
+            (.databaseId)
+        }}
+    {{else if (eq .status "in_progress")}}
+        {{tablerow
+            (autocolor "green" "🏃")
+            (.status)
+            ((printf "started %s" (timeago .startedAt)) | autocolor "blue")
+            (truncate 50 .headBranch | autocolor "green")
+            (.workflowName)
+            (.databaseId)
+        }}
     {{else}}
         {{tablerow
             (.conclusion)
