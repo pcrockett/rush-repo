@@ -43,7 +43,7 @@ select_run() {
             (.workflowName)
             (.databaseId)
         }}
-    {{else if (eq .status "pending")}}
+    {{else if (or (eq .status "pending") (eq .status "queued"))}}
         {{tablerow
             (autocolor "gray" "⏳️")
             (.status)
