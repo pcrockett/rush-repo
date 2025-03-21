@@ -1,0 +1,1 @@
+Git plugin that wraps git blame, using a .git-blame-ignore-revs file to ignore specific commits

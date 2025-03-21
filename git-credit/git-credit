@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+set -Eeuo pipefail
+
+# wrap `git blame` so that it will automatically run with the parameters:
+#
+#     --ignore-revs-file .git-blame-ignore-revs
+#
+# but ONLY if the `.git-blame-ignore-revs` file actually exists.
+
+DEFAULT_IGNORE_REVS_FILE=".git-blame-ignore-revs"
+
+main() {
+    local command=(git blame)
+    if [ -f "${DEFAULT_IGNORE_REVS_FILE}" ]; then
+        command+=(--ignore-revs-file "${DEFAULT_IGNORE_REVS_FILE}")
+    fi
+    command+=("${@}")
+    "${command[@]}"
+}
+
+main "${@}"
