@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+set -Eeuo pipefail
+
+# Open a web browser to a predefined URL and copy the URL to the clipboard
+#
+# Useful, for example, for Google Meet or Jitsi where meeting IDs can be reused. Reduces
+# how many steps are involved in creating a meeting and sharing the URL with others.
+
+init() {
+    XDG_CONFIG_HOME="${XDG_CONFIG_HOME:-"${HOME}/.config"}"
+    local config_dir="${XDG_CONFIG_HOME}/meetme"
+    mkdir --parent "${config_dir}"
+    local url_file="${config_dir}/url"
+    if [ -f "${url_file}" ]; then
+        MEET_URL="$(cat "${url_file}")"
+    else
+        read -r -p "Enter a valid meet URL: " MEET_URL
+        echo "${MEET_URL}" > "${url_file}"
+    fi
+}
+
+main() {
+    init
+    echo -n "${MEET_URL}" | xsel --clipboard
+    xdg-open "${MEET_URL}"
+}
+
+main
