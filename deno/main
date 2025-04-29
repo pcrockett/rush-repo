@@ -1,0 +1,37 @@
+#!/usr/bin/env bash
+
+# shellcheck source=lib.sh
+source "${REPO_PATH}/lib.sh"
+
+require_commands unzip curl
+
+if [ "${DENO_INSTALL:-}" == "" ]; then
+    log_error "DENO_INSTALL env variable hasn't been set. It should be permanently set."
+    log_error "Consider setting it to ${XDG_DATA_HOME}/deno"
+    exit 1
+fi
+
+latest_version="$(
+    curl_download https://dl.deno.land/release-latest.txt
+)"
+
+if command -v deno &>/dev/null; then
+    installed_version="$(
+        deno --version \
+        | grep --perl-regexp --only-matching '(?<=^deno )\d+\.\d+\.\d+'
+    )"
+    if [ "v${installed_version}" == "${latest_version}" ]; then
+        log_attention "Already installed and up-to-date."
+        exit 0
+    fi
+fi
+
+old_dir="${DENO_INSTALL}.old"
+rm -rf "${old_dir}"
+test ! -d "${DENO_INSTALL}" || mv "${DENO_INSTALL}" "${old_dir}"
+
+CI=1 ./install.sh "${latest_version}"
+test -h "${RUSH_USER_BIN}/deno" \
+    || ln --symbolic "${DENO_INSTALL}/bin/deno" "${RUSH_USER_BIN}/deno"
+
+install_success
