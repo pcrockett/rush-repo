@@ -1,0 +1,68 @@
+#!/usr/bin/env bash
+set -Eeuo pipefail
+
+# https://theprivacygroup.com/articles/gdpr-countries/
+EXIT_COUNTRIES=(
+    Austria
+    Belgium
+    Bulgaria
+    Croatia
+    Cyprus
+    Czech
+    Denmark
+    Estonia
+    Finland
+    France
+    Germany
+    Greece
+    Hungary
+    Ireland
+    Italy
+    Latvia
+    Lithuania
+    Luxembourg
+    Malta
+    Netherlands
+    Poland
+    Portugal
+    Romania
+    Slovakia
+    Slovenia
+    Spain
+    Sweden
+    Switzerland
+    Iceland
+    Lichtenstein
+    Norway
+)
+
+# shellcheck disable=SC2016  # intentionally not expanding $ in single-quoted strings
+get_awk_program() {
+    # prints IP addresses for all nodes within the selected countries
+    echo "BEGIN {"
+    for country in "${EXIT_COUNTRIES[@]}"; do
+        echo "countries[\"${country}\"] = 1;"
+    done
+    echo "}"
+    echo '$3 in countries { print $1 }'
+}
+
+random_exit_ip() {
+    tailscale exit-node list \
+        | grep --invert-match --perl-regexp '^#' \
+        | grep --invert-match --perl-regexp '^\s*$' \
+        | tail --lines +2 \
+        | awk "$(get_awk_program)" \
+        | shuf --head-count 1
+}
+
+main() {
+    local exit_node
+    exit_node="$(random_exit_ip)"
+    if [ "${exit_node}" == "" ]; then
+        exit 1 # `tailscale` has already printed a good error to stderr, no need to repeat it
+    fi
+    tailscale set --exit-node "${exit_node}"
+}
+
+main
