@@ -1,0 +1,44 @@
+#!/usr/bin/env bash
+
+# shellcheck source=lib.sh
+source "${REPO_PATH}/lib.sh"
+
+require_commands tar
+
+GITHUB_ORG="dandavison"
+GITHUB_REPO="delta"
+BIN_NAME="delta"
+
+latest_version() {
+    echo "${GITHUB_LATEST_TAG}"
+}
+
+installed_version() {
+    if ! command_exists "${BIN_NAME}"; then
+        echo ""
+        return 0
+    fi
+
+    if ! [[ "$("${BIN_NAME}" --version)" =~ ^delta\ ([[:digit:]]+\.[[:digit:]]+\.[[:digit:]]+) ]]; then
+        panic "Unable to determine currently installed version!"
+        exit 1  # redundant, but useful to shellcheck
+    fi
+
+    echo "${BASH_REMATCH[1]}"
+}
+
+artifact_name() {
+    echo "delta-${GITHUB_LATEST_TAG}-x86_64-unknown-linux-gnu.tar.gz"
+}
+
+download_url() {
+    echo "https://github.com/${GITHUB_ORG}/${GITHUB_REPO}/releases/download/${GITHUB_LATEST_TAG}/$(artifact_name)"
+}
+
+install_artifact() {
+    tar xzf "$(artifact_name)"
+    install_user_bin "delta-${GITHUB_LATEST_TAG}-x86_64-unknown-linux-gnu/${BIN_NAME}"
+}
+
+install_from_github
+install_success
