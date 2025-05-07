@@ -1,0 +1,44 @@
+#!/usr/bin/env bash
+
+# shellcheck source=lib.sh
+source "${REPO_PATH}/lib.sh"
+
+require_commands rg tar
+
+GITHUB_ORG="acheronfail"
+GITHUB_REPO="repgrep"
+BIN_NAME="rgr"
+
+latest_version() {
+    echo "${GITHUB_LATEST_TAG}"
+}
+
+installed_version() {
+    if ! command_exists "${BIN_NAME}"; then
+        echo ""
+        return 0
+    fi
+
+    if ! [[ "$("${BIN_NAME}" --version)" =~ ^repgrep\ ([[:digit:]]+\.[[:digit:]]+\.[[:digit:]]+) ]]; then
+        panic "Unable to determine currently installed version!"
+        exit 1  # redundant, but useful to shellcheck
+    fi
+
+    echo "${BASH_REMATCH[1]}"
+}
+
+artifact_name() {
+    echo "repgrep-${GITHUB_LATEST_TAG}-x86_64-unknown-linux-gnu.tar.gz"
+}
+
+download_url() {
+    echo "https://github.com/${GITHUB_ORG}/${GITHUB_REPO}/releases/download/${GITHUB_LATEST_TAG}/$(artifact_name)"
+}
+
+install_artifact() {
+    tar xzf "${ARTIFACT_PATH}"
+    install_user_bin "repgrep-${GITHUB_LATEST_TAG}-x86_64-unknown-linux-gnu/${BIN_NAME}"
+}
+
+install_from_github
+install_success
