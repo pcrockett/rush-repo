@@ -48,6 +48,12 @@ check_arch_news() {
     fi
 }
 
+github_token() {
+    if command -v gh &>/dev/null; then
+        gh auth token
+    fi
+}
+
 main() {
     root_run_if apt-get update
     root_run_if apt-get upgrade --yes --with-new-pkgs
@@ -61,7 +67,8 @@ main() {
     run_if rpm-ostree update &
     local job_ostree_update=$!
 
-    rush_packages
+    GITHUB_TOKEN="$(github_token)" rush_packages
+
     run_if flatpak uninstall --unused --assumeyes
     run_if flatpak update --assumeyes
     run_if pipx upgrade-all --include-injected
