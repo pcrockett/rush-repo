@@ -3,7 +3,7 @@
 # shellcheck source=lib.sh
 source "${REPO_PATH}/lib.sh"
 
-GITHUB_ORG="nytopop"
+GITHUB_ORG="pcrockett"
 GITHUB_REPO="askii"
 BIN_NAME="askii"
 
