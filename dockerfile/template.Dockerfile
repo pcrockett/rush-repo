@@ -1,4 +1,4 @@
-FROM docker.io/library/debian:12-slim
+FROM docker.io/library/debian:trixie-slim
 ARG DEBIAN_FRONTEND=noninteractive
 
 # don't need to pin apt package versions
