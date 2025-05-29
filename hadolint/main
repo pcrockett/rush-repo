@@ -1,0 +1,44 @@
+#!/usr/bin/env bash
+
+# shellcheck source=lib.sh
+source "${REPO_PATH}/lib.sh"
+
+GITHUB_ORG="hadolint"
+GITHUB_REPO="hadolint"
+BIN_NAME="hadolint"
+
+latest_version() {
+    # strip the leading `v` from the tag name
+    echo "${GITHUB_LATEST_TAG}" | cut --characters 2-
+}
+
+installed_version() {
+    if ! command_exists "${BIN_NAME}"; then
+        echo ""
+        return 0
+    fi
+
+    if ! [[ "$("${BIN_NAME}" --version)" =~ ^Haskell\ Dockerfile\ Linter\ ([[:digit:]]+\.[[:digit:]]+\.[[:digit:]]+) ]]; then
+        panic "Unable to determine currently installed version!"
+        exit 1  # redundant, but useful to shellcheck
+    fi
+
+    echo "${BASH_REMATCH[1]}"
+}
+
+artifact_name() {
+    echo "hadolint-Linux-x86_64"
+}
+
+download_url() {
+    echo "https://github.com/${GITHUB_ORG}/${GITHUB_REPO}/releases/download/${GITHUB_LATEST_TAG}/$(artifact_name)"
+}
+
+install_artifact() {
+    chmod +x "${ARTIFACT_PATH}"
+    mv "${ARTIFACT_PATH}" "${BIN_NAME}"
+    install_user_bin "${BIN_NAME}"
+}
+
+install_from_github
+install_success
