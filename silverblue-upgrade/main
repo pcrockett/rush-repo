@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
+# shellcheck source=lib.sh
+source "${REPO_PATH}/lib.sh"
+
 main() {
     CURRENT_OS_VERSION="$(source /etc/os-release; echo "${VERSION_ID}";)"
     NEXT_OS_VERSION=$((CURRENT_OS_VERSION + 1))
