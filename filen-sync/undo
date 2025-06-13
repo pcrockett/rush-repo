@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+
+# shellcheck source=lib.sh
+source "${REPO_PATH}/lib.sh"
+
+systemctl disable --now --user filen-sync.service
+rm -f "${XDG_CONFIG_HOME}/systemd/user/filen-sync.service"
+systemctl daemon-reload --user

@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+
+# shellcheck source=lib.sh
+source "${REPO_PATH}/lib.sh"
+require_commands filen envsubst
+
+filen whoami
+
+systemd_unit_file="${XDG_CONFIG_HOME}/systemd/user/filen-sync.service"
+mkdir --parent "$(dirname "${systemd_unit_file}")"
+if [ -e "${systemd_unit_file}" ]; then
+    if ! force_please; then
+        panic "Already exists: ${systemd_unit_file}. Use --force to overwrite."
+    fi
+fi
+
+FILEN_PATH="$(printf '%q' "$(command -v filen)")"
+export FILEN_PATH
+export MOUNTPOINT_PATH=~/Filen/Sync
+mkdir --parent "${MOUNTPOINT_PATH}"
+MOUNTPOINT_PATH="$(printf '%q' "${MOUNTPOINT_PATH}")"
+
+envsubst < filen-sync.service.template > "${systemd_unit_file}"
+systemctl daemon-reload --user
+systemctl start --user filen-sync.service

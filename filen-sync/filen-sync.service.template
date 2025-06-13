@@ -1,0 +1,15 @@
+# should go in ~/.config/systemd/user/
+
+[Unit]
+Description=Filen Sync
+Wants=network.target
+After=network-online.target
+
+[Service]
+Type=exec
+ExecStart=${FILEN_PATH} sync ${MOUNTPOINT_PATH}:/Sync --continuous
+Restart=always
+RestartSec=60
+
+[Install]
+WantedBy=default.target
