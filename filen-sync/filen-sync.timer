@@ -1,0 +1,9 @@
+[Unit]
+Description=Run Filen Sync
+
+[Timer]
+OnStartupSec=1min
+OnUnitInactiveSec=5min
+
+[Install]
+WantedBy=timers.target

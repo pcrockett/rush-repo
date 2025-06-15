@@ -4,5 +4,7 @@
 source "${REPO_PATH}/lib.sh"
 
 systemctl disable --now --user filen-sync.service
-rm -f "${XDG_CONFIG_HOME}/systemd/user/filen-sync.service"
+
+config_dir="${XDG_CONFIG_HOME}/systemd/user"
+rm -f "${config_dir}/filen-sync.service" "${config_dir}/filen-sync.timer"
 systemctl daemon-reload --user

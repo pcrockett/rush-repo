@@ -7,9 +7,7 @@ After=network-online.target
 
 [Service]
 Type=exec
-ExecStart=${FILEN_PATH} sync ${MOUNTPOINT_PATH}:/Sync --continuous
-Restart=always
-RestartSec=60
+ExecStart=${FILEN_PATH} sync ${MOUNTPOINT_PATH}:/Sync
 
 [Install]
 WantedBy=default.target
