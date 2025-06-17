@@ -30,4 +30,4 @@ envsubst < filen-sync.service.template > "${systemd_service_file}"
 cp filen-sync.timer "${systemd_config_dir}"
 
 systemctl daemon-reload --user
-systemctl start --user filen-sync.timer
+systemctl enable --now --user filen-sync.timer
