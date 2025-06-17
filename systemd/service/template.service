@@ -1,0 +1,31 @@
+# should go in one of these two directories:
+#
+# * ~/.config/systemd/user/  (for user service)
+# * /etc/systemd/system/     (for system service)
+#
+# for more details: `man systemd.service` and `man systemd.unit`
+#
+
+[Unit]
+Description=Run a task
+# Wants=network.target
+# After=network-online.target
+
+[Service]
+# Type=simple  # Default for long-running services that start and run indefinitely, e.g., web servers
+# Type=oneshot  # For services that perform a single task and exit immediately; systemd waits for completion, e.g., scripts or one-time commands
+# Type=forking  # For services that daemonize by forking a child process; systemd tracks the child, e.g., traditional daemons like Apache
+# Type=notify  # For services that notify systemd when ready via sd_notify; useful for services needing to signal startup completion, e.g., modern applications
+# Type=dbus  # For services activated via D-Bus and waiting for a specific bus name; ideal for D-Bus-based applications
+# Type=idle  # Similar to simple, but the service starts only after all other jobs are dispatched; useful for tasks that should run last, e.g., cleanup scripts
+Type=oneshot
+ExecStart=/bin/echo howdy
+# Restart=always
+# Restart=on-failure
+# RestartSec=60
+# Environment="PATH=/sbin:/bin:/usr/sbin:/usr/bin"
+# EnvironmentFile=/etc/default/some-config
+
+[Install]
+WantedBy=default.target
+

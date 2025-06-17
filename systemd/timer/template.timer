@@ -1,0 +1,33 @@
+# should go in one of these two directories:
+#
+# * ~/.config/systemd/user/  (for user service)
+# * /etc/systemd/system/     (for system service)
+#
+# for more details: `man systemd.timer` and `man systemd.unit`
+#
+
+[Unit]
+Description=Run my task daily
+
+[Timer]
+OnCalendar=*-*-* 02:00:00  # Runs every day at 02:00
+# OnCalendar=Mon *-*-* 02:00:00
+# OnCalendar=Mon..Fri *-*-* 02:00:00
+# OnCalendar=*:00:00
+# OnCalendar=*-*-01 00:00:00
+# OnCalendar=*-*-01-01 00:00:00
+# OnCalendar=2025-06-15 14:30:00
+# OnCalendar=*-*-* 02:00..02:59
+Persistent=true
+
+# Or alternatively, for a monotonic task:
+#
+# OnActiveSec=24h  # Executes 24 hours after the timer starts
+# OnActiveSec=1h
+# OnActiveSec=30min
+# OnBootSec=2h  # Run 2 hours after system boot
+# OnStartupSec=5min  # Run 5 minutes after systemd startup
+# OnUnitActiveSec=5min  # Run 5 minutes after the corresponding unit was activated
+# OnUnitInactiveSec=5min  # Run 5 minutes after the corresponding unit was deactivated
+[Install]
+WantedBy=timers.target
