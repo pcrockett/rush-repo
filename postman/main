@@ -3,7 +3,7 @@
 # shellcheck source=lib.sh
 source "${REPO_PATH}/lib.sh"
 
-require_commands tar
+require_commands tar envsubst xdg-settings
 
 if command_exists Postman && ! force_please; then
     log_attention "Postman is already installed. Use \`--force\` to reinstall / update."
@@ -23,4 +23,9 @@ tar --extract --gzip --strip-components 1 \
     --file "${archive}"
 chmod -R go-w "${INSTALL_DIR}"
 
+mkdir --parent "${XDG_DATA_HOME}/applications"
+envsubst < postman.desktop.template > "${XDG_DATA_HOME}/applications/postman.desktop"
+xdg-settings set default-url-scheme-handler postman postman.desktop
+
+rm -f "${RUSH_USER_BIN}/Postman"
 ln --symbolic "${INSTALL_DIR}/Postman" "${RUSH_USER_BIN}/Postman"

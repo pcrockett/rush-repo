@@ -1,0 +1,10 @@
+# https://blog.postman.com/run-in-postman-is-now-available-for-linux/
+
+[Desktop Entry]
+Encoding=UTF-8
+Name=Postman
+Exec=${XDG_DATA_HOME}/Postman/app/Postman %U
+Icon=${XDG_DATA_HOME}/Postman/app/resources/app/assets/icon.png
+Terminal=false
+Type=Application
+Categories=Development
