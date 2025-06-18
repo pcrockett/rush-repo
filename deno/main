@@ -11,27 +11,16 @@ if [ "${DENO_INSTALL:-}" == "" ]; then
     exit 1
 fi
 
-latest_version="$(
-    curl_download https://dl.deno.land/release-latest.txt
-)"
-
 if command -v deno &>/dev/null; then
-    installed_version="$(
-        deno --version \
-        | grep --perl-regexp --only-matching '(?<=^deno )\d+\.\d+\.\d+'
-    )"
-    if [ "v${installed_version}" == "${latest_version}" ]; then
-        log_attention "Already installed and up-to-date."
-        exit 0
-    fi
+    deno upgrade
+else
+    old_dir="${DENO_INSTALL}.old"
+    rm -rf "${old_dir}"
+    test ! -d "${DENO_INSTALL}" || mv "${DENO_INSTALL}" "${old_dir}"
+
+    CI=1 ./install.sh
+    test -h "${RUSH_USER_BIN}/deno" \
+        || ln --symbolic "${DENO_INSTALL}/bin/deno" "${RUSH_USER_BIN}/deno"
 fi
-
-old_dir="${DENO_INSTALL}.old"
-rm -rf "${old_dir}"
-test ! -d "${DENO_INSTALL}" || mv "${DENO_INSTALL}" "${old_dir}"
-
-CI=1 ./install.sh "${latest_version}"
-test -h "${RUSH_USER_BIN}/deno" \
-    || ln --symbolic "${DENO_INSTALL}/bin/deno" "${RUSH_USER_BIN}/deno"
 
 install_success
