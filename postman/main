@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+
+# shellcheck source=lib.sh
+source "${REPO_PATH}/lib.sh"
+
+require_commands tar
+
+if command_exists Postman && ! force_please; then
+    log_attention "Postman is already installed. Use \`--force\` to reinstall / update."
+    exit 0
+fi
+
+INSTALL_DIR="${XDG_DATA_HOME}/Postman"
+rm -rf "${INSTALL_DIR}"
+mkdir --parent "${INSTALL_DIR}"
+
+temp_dir="$(mktemp_dir)"
+archive="${temp_dir}/postman-linux-x64.tar.gz"
+curl_download "https://dl.pstmn.io/download/latest/linux64" > "${archive}.tmp"
+mv "${archive}.tmp" "${archive}"
+tar --extract --gzip --strip-components 1 \
+    --directory "${INSTALL_DIR}" \
+    --file "${archive}"
+chmod -R go-w "${INSTALL_DIR}"
+
+ln --symbolic "${INSTALL_DIR}/Postman" "${RUSH_USER_BIN}/Postman"
