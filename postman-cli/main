@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+
+# shellcheck source=lib.sh
+source "${REPO_PATH}/lib.sh"
+
+require_commands tar
+
+if command_exists postman && ! force_please; then
+    log_attention "postman is already installed. Use \`--force\` to reinstall / update."
+    exit 0
+fi
+
+temp_dir="$(mktemp_dir)"
+pushd "${temp_dir}" &> /dev/null
+on_exit() {
+    popd &> /dev/null
+    rm -rf "${temp_dir}"
+}
+trap 'on_exit' EXIT
+
+archive="postman-cli.tar.gz"
+curl_download "https://dl-cli.pstmn.io/download/latest/linux64" > "${archive}.tmp"
+mv "${archive}.tmp" "${archive}"
+tar --extract --gzip --file "${archive}"
+mv postman-cli postman
+install_user_bin postman
