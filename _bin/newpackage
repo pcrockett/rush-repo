@@ -29,8 +29,11 @@ source "\${REPO_PATH}/lib.sh"
 
 # require_commands TODO
 
-GITHUB_ORG="TODO"
-GITHUB_REPO="TODO"
+# shellcheck disable=SC2034  # variables used in \`install_from_github()\`
+{
+    GITHUB_ORG="TODO"
+    GITHUB_REPO="TODO"
+}
 BIN_NAME="TODO"
 
 latest_version() {
