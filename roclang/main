@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+
+# shellcheck source=lib.sh
+source "${REPO_PATH}/lib.sh"
+
+# roc is a young project, and currently uses nightly releases without any version
+# numbers. later when roc grows up, we can create a proper github package with
+# `install_success`. until that day, we update roc manually by running `rush roclang`.
+
+temp_dir="$(mktemp_dir)"
+pushd "${temp_dir}" &>/dev/null
+
+on_exit() {
+    popd &>/dev/null
+    rm -rf "${temp_dir}"
+}
+trap 'on_exit' EXIT
+
+curl_download "https://github.com/roc-lang/roc/releases/download/nightly/roc_nightly-linux_x86_64-latest.tar.gz" \
+    > roc.tar.gz
+
+tar xzf roc.tar.gz
+mv roc_nightly-linux_x86_64-*/roc .
+mv roc_nightly-linux_x86_64-*/roc_language_server .
+install_user_bin roc
+install_user_bin roc_language_server
