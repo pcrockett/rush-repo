@@ -16,11 +16,11 @@ on_exit() {
 }
 trap 'on_exit' EXIT
 
-curl_download "https://github.com/roc-lang/roc/releases/download/nightly/roc_nightly-linux_x86_64-latest.tar.gz" \
-    > roc.tar.gz
+install_dir="${XDG_DATA_HOME}/roc"
+extract_tar_gz_url \
+    "https://github.com/roc-lang/roc/releases/download/nightly/roc_nightly-linux_x86_64-latest.tar.gz" \
+    "${install_dir}" \
+    --strip-components 1
 
-tar xzf roc.tar.gz
-mv roc_nightly-linux_x86_64-*/roc .
-mv roc_nightly-linux_x86_64-*/roc_language_server .
-install_user_bin roc
-install_user_bin roc_language_server
+ln --symbolic --force "${install_dir}/roc" "${RUSH_USER_BIN}"
+ln --symbolic --force "${install_dir}/roc_language_server" "${RUSH_USER_BIN}"
