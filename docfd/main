@@ -1,0 +1,39 @@
+#!/usr/bin/env bash
+
+# shellcheck source=lib.sh
+source "${REPO_PATH}/lib.sh"
+
+# require_commands TODO
+
+GITHUB_ORG="darrenldl"
+GITHUB_REPO="docfd"
+BIN_NAME="docfd"
+
+latest_version() {
+    echo "${GITHUB_LATEST_TAG}"
+}
+
+installed_version() {
+    if ! command_exists "${BIN_NAME}"; then
+        echo ""
+        return 0
+    fi
+
+    "${BIN_NAME}" --version
+}
+
+artifact_name() {
+    echo "docfd-${GITHUB_LATEST_TAG}-linux.tar.gz"
+}
+
+download_url() {
+    echo "https://github.com/${GITHUB_ORG}/${GITHUB_REPO}/releases/download/${GITHUB_LATEST_TAG}/$(artifact_name)"
+}
+
+install_artifact() {
+    tar xzf "${ARTIFACT_PATH}"
+    install_user_bin "${BIN_NAME}"
+}
+
+install_from_github
+install_success
