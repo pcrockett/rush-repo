@@ -7,7 +7,7 @@ After=network-online.target
 
 [Service]
 Type=notify
-ExecStart=${RCLONE_PATH} mount b2-archive-encrypted: "${MOUNTPOINT_PATH}"
+ExecStart=${RCLONE_PATH} mount --vfs-cache-mode full b2-archive-encrypted: "${MOUNTPOINT_PATH}"
 ExecStop=/usr/bin/umount "${MOUNTPOINT_PATH}"
 Restart=always
 RestartSec=60
