@@ -8,7 +8,7 @@ extract_tar_gz_url() {
     local tar_args=("$@")
     local temp_dir
     temp_dir="$(mktemp_dir)"
-    cleanup() {
+    __extract_tar_gz_url_cleanup() {
         local exit_code=$?
         rm -rf "${temp_dir}"
         return $exit_code
@@ -17,8 +17,8 @@ extract_tar_gz_url() {
     {
         curl_download "${src_url}" > "${temp_dir}/archive"
         extract_tar_gz "${temp_dir}/archive" "${dest}" "${tar_args[@]}"
-    } || cleanup
-    cleanup
+    } || __extract_tar_gz_url_cleanup
+    __extract_tar_gz_url_cleanup
 }
 
 extract_tar_gz() {
