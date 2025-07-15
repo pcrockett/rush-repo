@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
 #
 # Export a bitwarden vault to stdout. Will prompt for credentials if you are not logged
-# in or your vault is unlocked. Also supports exporting an organization's vault.
+# in or your vault is locked. Also supports exporting an organization's vault.
 #
 # Example:
 #
 #   # export a vault and save it to a gramps repo
-#   ./bw-export.sh | gramps encrypt --filename my-vault.json
+#   bw-export | gramps encrypt --filename my-vault.json
 #
 # Dependencies:
 #
@@ -81,7 +81,7 @@ main() {
   fi
 
   step "Syncing..."
-  bw sync
+  bw sync >&2
 
   export_cmd=(bw export --format json --raw)
 
