@@ -5,7 +5,7 @@ source "${REPO_PATH}/lib.sh"
 
 require_commands tar
 
-GITHUB_ORG="boxdot"
+GITHUB_ORG="pcrockett"
 GITHUB_REPO="gurk-rs"
 BIN_NAME="gurk"
 
@@ -20,7 +20,7 @@ installed_version() {
         return 0
     fi
 
-    if ! [[ "$("${BIN_NAME}" --version)" =~ ^gurk\ ([[:digit:]]+\.[[:digit:]]+\.[[:digit:]]+) ]]; then
+    if ! [[ "$("${BIN_NAME}" --version)" =~ ^gurk\ ([[:digit:]]+\.[[:digit:]]+\.[[:digit:]]+(-.*)*) ]]; then
         panic "Unable to determine currently installed version!"
         exit 1  # redundant, but useful to shellcheck
     fi
