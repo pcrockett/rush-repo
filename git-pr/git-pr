@@ -6,6 +6,7 @@ def main [
     --template(-t): string  # Use specific template filename under .github/
     --dry-run               # preview what would happen
     --assignee = "@me"      # set pull request assignee
+    --repo: string          # set destination github repo
 ] {
     # i would use the `find` command instead of `parse` however that produces highlighting
     # in the results and i haven't figured out (yet) how to disable that.
@@ -20,10 +21,12 @@ def main [
     }
 
     let gh_args = (
-        ["--assignee" $assignee "--draft"]
+        ["--draft"]
+        | if ($assignee != "") { append ["--assignee" $assignee] } else { $in }
         | if ($fast) { $in } else { append "--editor" }
         | if ($template_file == null) { append "--fill" } else { append ["--template" $template_file] }
         | if ($dry_run) { append "--dry-run" } else { $in }
+        | if ($repo != null) { append ["--repo" $repo] } else { $in }
     )
 
     ^gh pr create ...$gh_args
