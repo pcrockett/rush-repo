@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+
+# shellcheck source=lib.sh
+source "${REPO_PATH}/lib.sh"
+rm -rf "${RUSH_USER_BIN}/hx" "${XDG_DATA_HOME}/helix" "${XDG_DATA_HOME}/helix.old"
+uninstall_success
