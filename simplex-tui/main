@@ -25,7 +25,7 @@ installed_version() {
 }
 
 artifact_name() {
-    echo "simplex-chat-ubuntu-22_04-x86-64"
+    echo "simplex-chat-ubuntu-22_04-x86_64"
 }
 
 download_url() {
