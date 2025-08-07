@@ -18,7 +18,7 @@ installed_version() {
         return 0
     fi
 
-    if ! [[ "$("${BIN_NAME}" --version)" =~ ^v([[:digit:]]+\.[[:digit:]]+\.[[:digit:]]+) ]]; then
+    if ! [[ "$("${BIN_NAME}" --version)" =~ ^Filen\ CLI\ v([[:digit:]]+\.[[:digit:]]+\.[[:digit:]]+) ]]; then
         panic "Unable to determine currently installed version!"
         exit 1  # redundant, but useful to shellcheck
     fi
