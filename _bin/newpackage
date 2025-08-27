@@ -47,12 +47,7 @@ installed_version() {
         return 0
     fi
 
-    if ! [[ "\$("\${BIN_NAME}" --version)" =~ ^([[:digit:]]+\.[[:digit:]]+\.[[:digit:]]+) ]]; then
-        panic "Unable to determine currently installed version!"
-        exit 1  # redundant, but useful to shellcheck
-    fi
-
-    echo "\${BASH_REMATCH[1]}"
+    installed_package_version
 }
 
 artifact_name() {
@@ -67,10 +62,13 @@ install_artifact() {
     chmod +x "\${ARTIFACT_PATH}"
     mv "\${ARTIFACT_PATH}" "\${BIN_NAME}"
     install_user_bin "\${BIN_NAME}"
+
+    # tar -xzf "\${ARTIFACT_PATH}"
+    # install_user_bin "bin/\${BIN_NAME}"
 }
 
 install_from_github
-install_success
+install_success "\$(latest_version)"
 EOF
 }
 
