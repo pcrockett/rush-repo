@@ -2,7 +2,7 @@
 
 services:
   db:
-    image: docker.io/library/postgres:16-alpine
+    image: docker.io/library/postgres:17-alpine
     ports:
       - "127.0.0.1:${PGPORT:-5432}:5432"
     environment:
@@ -13,7 +13,7 @@ services:
       - data_db:/var/lib/postgresql/data
 
   cache:
-    image: redis:7-alpine
+    image: docker.io/valkey/valkey:8-alpine
     ports:
       - "127.0.0.1:${REDIS_PORT:-6379}:6379"
 
