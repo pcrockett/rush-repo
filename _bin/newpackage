@@ -16,75 +16,9 @@ panic() {
     exit 1
 }
 
-generate_info() {
-    echo "TODO: short description of package"
-}
-
-generate_main() {
-    cat << EOF
-#!/usr/bin/env bash
-
-# shellcheck source=lib.sh
-source "\${REPO_PATH}/lib.sh"
-
-# require_commands TODO
-
-# shellcheck disable=SC2034  # variables used in \`install_from_github()\`
-{
-    GITHUB_ORG="TODO"
-    GITHUB_REPO="TODO"
-}
-BIN_NAME="TODO"
-
-latest_version() {
-    # strip the leading \`v\` from the tag name
-    echo "\${GITHUB_LATEST_TAG}" | cut --characters 2-
-}
-
-installed_version() {
-    if ! command_exists "\${BIN_NAME}"; then
-        echo ""
-        return 0
-    fi
-
-    installed_package_version
-}
-
-artifact_name() {
-    echo "TODO"
-}
-
-download_url() {
-    echo "https://github.com/\${GITHUB_ORG}/\${GITHUB_REPO}/releases/download/\${GITHUB_LATEST_TAG}/\$(artifact_name)"
-}
-
-install_artifact() {
-    chmod +x "\${ARTIFACT_PATH}"
-    mv "\${ARTIFACT_PATH}" "\${BIN_NAME}"
-    install_user_bin "\${BIN_NAME}"
-
-    # tar -xzf "\${ARTIFACT_PATH}"
-    # install_user_bin "bin/\${BIN_NAME}"
-}
-
-install_from_github
-install_success "\$(latest_version)"
-EOF
-}
-
-# shellcheck disable=SC2016  # don't want to expand any expressions within single-quotes
-generate_undo() {
-    cat <<EOF
-#!/usr/bin/env bash
-
-# shellcheck source=lib.sh
-source "\${REPO_PATH}/lib.sh"
-rm -f "\${RUSH_USER_BIN}/some_bin"  # TODO
-uninstall_success
-EOF
-}
-
 main() {
+    command -v copier &>/dev/null || panic "Must install copier first."
+
     local PACKAGE_NAME="${1:-}"
     if [ "${PACKAGE_NAME}" == "" ]; then
         usage "${0}"
@@ -93,10 +27,7 @@ main() {
 
     test ! -d "${PACKAGE_NAME}" || panic "${PACKAGE_NAME} already exists!"
 
-    mkdir --parent "${PACKAGE_NAME}"
-    generate_info > "${PACKAGE_NAME}/info"
-    generate_main > "${PACKAGE_NAME}/main" && chmod +x "${PACKAGE_NAME}/main"
-    generate_undo > "${PACKAGE_NAME}/undo" && chmod +x "${PACKAGE_NAME}/undo"
+    copier copy _templates/github-release "${PACKAGE_NAME}" --trust
 }
 
 main "${@}"

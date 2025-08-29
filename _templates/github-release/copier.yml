@@ -1,0 +1,25 @@
+github_org:
+  type: str
+  help: "Enter the org / username that owns the GitHub repository:"
+github_repo:
+  type: str
+  help: "Enter the repository name:"
+binary_name:
+  type: str
+  help: "Enter the name of the main executable:"
+artifact_name:
+  type: str
+  placeholder: "TODO"
+  help: "Enter raw download artifact name:"
+artifact_type:
+  choices:
+    - tar.gz
+    - tar.xz
+    - zip
+    - raw_binary
+  default: "tar.gz"
+  help: "What kind of file is the raw artifact?"
+
+_tasks:
+  - command: ['tasks/populate-info.sh', '{{github_org}}/{{github_repo}}']
+  - command: ['rm', '-r', 'tasks']
