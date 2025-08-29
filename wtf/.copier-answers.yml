@@ -1,0 +1,9 @@
+# Changes here will be overwritten by Copier
+# Don't edit manually!
+# <https://copier.readthedocs.io/en/stable/updating/>
+_src_path: _templates/github-release
+artifact_name: wtf_$(latest_version)_linux_amd64.tar.gz
+artifact_type: tar.gz
+binary_name: wtfutil
+github_org: wtfutil
+github_repo: wtf

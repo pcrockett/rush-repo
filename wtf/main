@@ -13,7 +13,7 @@ require_commands tar
 BIN_NAME="wtfutil"
 
 latest_version() {
-    # strip the leading `v` from the tag name
+    # strip the leading `v` from the tag name:
     echo "${GITHUB_LATEST_TAG}" | cut --characters 2-
 }
 
@@ -36,7 +36,8 @@ download_url() {
 
 install_artifact() {
     tar -xzf "${ARTIFACT_PATH}"
-    install_user_bin "wtf_$(latest_version)_linux_amd64/${BIN_NAME}"
+    subdir="$(basename "${ARTIFACT_PATH}" .tar.gz)"
+    install_user_bin "${subdir}/${BIN_NAME}"
 }
 
 install_from_github
