@@ -9,7 +9,7 @@ binary_name:
   help: "Enter the name of the main executable:"
 artifact_name:
   type: str
-  placeholder: "TODO"
+  default: "{{binary_name}}"
   help: "Enter raw download artifact name:"
 artifact_type:
   choices:
