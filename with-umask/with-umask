@@ -9,6 +9,6 @@ set -Eeuo pipefail
 #     with-umask u=rw,g=,o= touch foo
 #
 
-umask "${1}"
+umask "${1:?no umask specified}"
 shift
 "${@}"
