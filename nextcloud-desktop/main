@@ -3,12 +3,15 @@
 # shellcheck source=lib.sh
 source "${REPO_PATH}/lib.sh"
 
-GITHUB_ORG="nextcloud-releases"
-GITHUB_REPO="desktop"
+# shellcheck disable=SC2034  # variables used in `install_from_github()`
+{
+    GITHUB_ORG="nextcloud-releases"
+    GITHUB_REPO="desktop"
+}
 BIN_NAME="Nextcloud.AppImage"
 
 latest_version() {
-    # strip the leading `v` from the tag name
+    # strip the leading `v` from the tag name:
     echo "${GITHUB_LATEST_TAG}" | cut --characters 2-
 }
 
@@ -18,16 +21,11 @@ installed_version() {
         return 0
     fi
 
-    if ! [[ "$("${BIN_NAME}" --version 2> /dev/null)" =~ ^Nextcloud\ version\ ([[:digit:]]+\.[[:digit:]]+\.[[:digit:]]) ]]; then
-        panic "Unable to determine currently installed nextcloud version!"
-        exit 1  # redundant, but useful to shellcheck
-    fi
-
-    echo "${BASH_REMATCH[1]}"
+    installed_package_version
 }
 
 artifact_name() {
-    echo "Nextcloud-${GITHUB_LATEST_VERSION}-x86_64.AppImage"
+    echo "Nextcloud-$(latest_version)-x86_64.AppImage"
 }
 
 download_url() {
@@ -41,4 +39,4 @@ install_artifact() {
 }
 
 install_from_github
-install_success
+install_success "$(latest_version)"
