@@ -2,6 +2,6 @@
 
 # shellcheck source=lib.sh
 source "${REPO_PATH}/lib.sh"
-rm -f "${RUSH_USER_BIN}/{{binary_name}}"
+rm -f "${RUSH_USER_BIN}/{{binary_name|trim}}"
 uninstall_success
 
