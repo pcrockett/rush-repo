@@ -1,9 +1,10 @@
 # shellcheck shell=bash
 
 breakpoint() {
-    # enable a debug prompt that allows you to see expanded variables and execute each line
-    # thereafter step-by-step
+    # enable a debug prompt that allows you to see expanded variables and execute each
+    # line thereafter step-by-step
 
+    # shellcheck disable=SC2329  # shellcheck has a hard time with traps
     debug_prompt() {
         # ex usage:
         #

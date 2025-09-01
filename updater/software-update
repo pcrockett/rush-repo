@@ -10,7 +10,7 @@ init() {
     trap 'on_exit' EXIT
 }
 
-# shellcheck disable=SC2317  # shellcheck has a hard time with traps
+# shellcheck disable=SC2317,SC2329  # shellcheck has a hard time with traps
 on_exit() {
     rm -r "${SCRIPT_TEMP_DIR}"
 }
