@@ -3,19 +3,36 @@
 # shellcheck source=lib.sh
 source "${REPO_PATH}/lib.sh"
 
+should_skip() {
+    # given the name of a command, check if there's a UPDATER_SKIP_{COMMAND} variable
+    # defined. if it is a non-empty string, return a zero exit-code.
+    local command command_upper
+    command="${1:?must specify a command}"
+    command_upper="$(echo "${command}" | tr '[:punct:][:blank:]' '_' | tr '[:lower:]' '[:upper:]')"
+    local skip_variable_name="UPDATER_SKIP_${command_upper}"
+    test "${!skip_variable_name:-}" != ""
+}
+
 run_if() {
-    if command_exists "${1}"; then
+    local command
+    command="${1:?must specify a command}"
+    should_skip "${command}" && return 0
+    if command_exists "${command}"; then
         "${@}"
     fi
 }
 
 root_run_if() {
-    if command_exists "${1}"; then
+    local command
+    command="${1:?must specify a command}"
+    should_skip "${command}" && return 0
+    if command_exists "${command}"; then
         as_root "${@}"
     fi
 }
 
 rush_packages() {
+    should_skip "rush" && return 0
     local installed_packages_dir
     installed_packages_dir="$(repo_state_dir)/installed_packages"
     mkdir --parent "${installed_packages_dir}"
@@ -31,7 +48,7 @@ rush_packages() {
 }
 
 check_arch_news() {
-    if ! command_exists arch-news-check; then
+    if ! command_exists arch-news-check || should_skip arch-news-check; then
         return 0
     elif arch-news-check; then
         log_info "No new Arch news."
