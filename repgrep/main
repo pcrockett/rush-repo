@@ -5,8 +5,11 @@ source "${REPO_PATH}/lib.sh"
 
 require_commands rg tar
 
-GITHUB_ORG="acheronfail"
-GITHUB_REPO="repgrep"
+# shellcheck disable=SC2034  # variables used in `install_from_github()`
+{
+    GITHUB_ORG="acheronfail"
+    GITHUB_REPO="repgrep"
+}
 BIN_NAME="rgr"
 
 latest_version() {
@@ -19,16 +22,11 @@ installed_version() {
         return 0
     fi
 
-    if ! [[ "$("${BIN_NAME}" --version)" =~ ^repgrep\ ([[:digit:]]+\.[[:digit:]]+\.[[:digit:]]+) ]]; then
-        panic "Unable to determine currently installed version!"
-        exit 1  # redundant, but useful to shellcheck
-    fi
-
-    echo "${BASH_REMATCH[1]}"
+    installed_package_version
 }
 
 artifact_name() {
-    echo "repgrep-${GITHUB_LATEST_TAG}-x86_64-unknown-linux-gnu.tar.gz"
+    echo "repgrep-$(latest_version)-x86_64-unknown-linux-musl.tar.gz"
 }
 
 download_url() {
@@ -36,9 +34,10 @@ download_url() {
 }
 
 install_artifact() {
-    tar xzf "${ARTIFACT_PATH}"
-    install_user_bin "repgrep-${GITHUB_LATEST_TAG}-x86_64-unknown-linux-gnu/${BIN_NAME}"
+    tar -xzf "${ARTIFACT_PATH}"
+    subdir="$(basename "${ARTIFACT_PATH}" .tar.gz)"
+    install_user_bin "${subdir}/${BIN_NAME}"
 }
 
 install_from_github
-install_success
+install_success "$(latest_version)"
