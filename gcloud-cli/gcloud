@@ -39,4 +39,13 @@ docker_cmd+=(
     localhost/gcloud gcloud "${@}"
 )
 
+if [ "${PCROCKETT_GCLOUD_DEBUG:-}" != "" ]; then
+    cat >&2 <<EOF
+Running...
+
+    ${docker_cmd[*]}
+
+EOF
+fi
+
 "${docker_cmd[@]}"
