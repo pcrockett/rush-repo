@@ -1,7 +1,3 @@
-# Copy / paste / modified from <https://github.com/actions/starter-workflows/blob/main/.github/dependabot.yml>
-# MIT license
-# Dependabot docs: <https://docs.github.com/github/administering-a-repository/configuration-options-for-dependency-updates>
-
 version: 2
 updates:
   # - package-ecosystem: "npm"
@@ -10,6 +6,15 @@ updates:
   #     prefix: "chore"
   #   schedule:
   #     interval: "weekly"
+
+  # - package-ecosystem: "pip"
+  #   directory: "/"
+  #   insecure-external-code-execution: "allow"
+  #   schedule:
+  #     interval: "weekly"
+  #   allow:
+  #     - dependency-type: "direct"
+  #     - dependency-type: "indirect"
 
   - package-ecosystem: "github-actions"
     directory: "/"
