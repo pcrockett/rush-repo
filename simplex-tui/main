@@ -1,9 +1,13 @@
 #!/usr/bin/env bash
+
 # shellcheck source=lib.sh
 source "${REPO_PATH}/lib.sh"
 
-GITHUB_ORG="simplex-chat"
-GITHUB_REPO="simplex-chat"
+# shellcheck disable=SC2034  # variables used in `install_from_github()`
+{
+    GITHUB_ORG="simplex-chat"
+    GITHUB_REPO="simplex-chat"
+}
 BIN_NAME="simplex-chat"
 
 latest_version() {
@@ -16,12 +20,7 @@ installed_version() {
         return 0
     fi
 
-    if ! [[ "$("${BIN_NAME}" --version)" =~ ^SimpleX\ Chat\ (v[[:digit:]]+\.[[:digit:]]+\.[[:digit:]]+\.[[:digit:]]+) ]]; then
-        panic "Unable to determine currently installed version!"
-        exit 1  # redundant, but useful to shellcheck
-    fi
-
-    echo "${BASH_REMATCH[1]}"
+    installed_package_version
 }
 
 artifact_name() {
@@ -33,10 +32,10 @@ download_url() {
 }
 
 install_artifact() {
+    chmod +x "${ARTIFACT_PATH}"
     mv "${ARTIFACT_PATH}" "${BIN_NAME}"
-    chmod +x "${BIN_NAME}"
     install_user_bin "${BIN_NAME}"
 }
 
 install_from_github
-install_success
+install_success "$(latest_version)"

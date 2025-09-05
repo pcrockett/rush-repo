@@ -1,0 +1,9 @@
+# Changes here will be overwritten by Copier
+# Don't edit manually!
+# <https://copier.readthedocs.io/en/stable/updating/>
+_src_path: _templates/github-release
+artifact_name: simplex-chat-ubuntu-22_04-x86_64
+artifact_type: raw_binary
+binary_name: simplex-chat
+github_org: simplex-chat
+github_repo: simplex-chat
