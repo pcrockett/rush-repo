@@ -20,13 +20,28 @@ panic() {
     exit 1
 }
 
+# copy / paste / modified from [ref:curl_download]
 curl_download() {
     local url="${1}"
-    curl --proto '=https' --tlsv1.3 \
-        --silent \
-        --show-error \
-        --fail \
-        --location "${url}"
+
+    curl_cmd=(
+        curl
+        --proto '=https'
+        --tlsv1.3
+        --silent
+        --show-error
+        --fail
+    )
+
+    if [[ "${url}" =~ ^https://api\.github\.com/ ]]; then
+        if [ "${GITHUB_TOKEN:-}" != "" ]; then
+            curl_cmd+=(--header "Authorization: Bearer ${GITHUB_TOKEN}")
+        elif command -v gh &>/dev/null; then
+            curl_cmd+=(--header "Authorization: Bearer $(gh auth token)")
+        fi
+    fi
+
+    "${curl_cmd[@]}" --location "${url}"
 }
 
 github_latest_tag() {
