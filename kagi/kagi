@@ -48,7 +48,7 @@ def "main gpt" [
 
     print $data.output
 
-    if ($data | get references --ignore-errors | length) > 0 {
+    if ($data | get references --optional | length) > 0 {
         print "References:\n"
         $data.references | enumerate | each {|it|
             print $"($it.index + 1). [($it.item.title)]\(($it.item.url))"
@@ -131,7 +131,7 @@ def api_post [endpoint: string, data: record] {
 }
 
 def token_path [] {
-    let config_home = match ($env | get --ignore-errors XDG_CONFIG_HOME) {
+    let config_home = match ($env | get --optional XDG_CONFIG_HOME) {
         null => { $env.HOME | path join ".config/kagi-cli" }
         $val => { $val | path join "kagi-cli" }
     }
