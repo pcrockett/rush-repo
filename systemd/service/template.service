@@ -28,4 +28,3 @@ ExecStart=/bin/echo howdy
 
 [Install]
 WantedBy=default.target
-

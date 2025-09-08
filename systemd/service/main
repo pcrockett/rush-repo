@@ -13,4 +13,3 @@ if [ ! -e "${dest}" ] || force_please; then
 else
     panic "template.service already exists in this directory. Use --force to overwrite."
 fi
-

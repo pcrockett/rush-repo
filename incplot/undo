@@ -4,4 +4,3 @@
 source "${REPO_PATH}/lib.sh"
 rm -f "${RUSH_USER_BIN}/incplot"
 uninstall_success
-

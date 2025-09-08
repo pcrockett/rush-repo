@@ -16,7 +16,7 @@ set -Eeuo pipefail
 #
 # especially useful when you need to manually rig up a volume up / down / mute button on your
 # keyboard. not so useful when you're making more advanced audio tweaks.
-# 
+#
 
 usage() {
     local command_name

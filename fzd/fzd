@@ -22,4 +22,3 @@ FZF_DEFAULT_COMMAND="${FZD_DICT_PREFIX} $(printf %q "${INITIAL_QUERY}") ${SUFFIX
         --preview "dict {}" \
         --preview-window 'right,70%' \
         --bind "enter:become(dict {})"
-
