@@ -3,10 +3,12 @@
 # Export a bitwarden vault to stdout. Will prompt for credentials if you are not logged
 # in or your vault is locked. Also supports exporting an organization's vault.
 #
+# TIP: `pushd "$(mktemp --directory)"` before using
+#
 # Example:
 #
 #   # export a vault and save it to a gramps repo
-#   bw-export | gramps encrypt --filename my-vault.json
+#   bw-export > my-vault.json
 #
 # Dependencies:
 #
@@ -16,14 +18,18 @@
 #
 set -Eeuo pipefail
 
+log() {
+  # it's important we keep only JSON data on stdout. all output here should be stderr.
+  echo "${*}" >&2
+}
+
 panic() {
-  echo "ERROR: ${*}" >&2
+  log "ERROR: ${*}"
   exit 1
 }
 
 step() {
-  # it's important we keep only JSON data on stdout. all output here should be stderr.
-  echo "--> ${*}" >&2
+  log "--> ${*}"
 }
 
 refresh_status() {
@@ -39,11 +45,15 @@ refresh_orgs() {
 
 unlock() {
   if [ "${BW_STATUS}" == "unauthenticated" ]; then
+    log "Logging in..."
     BW_SESSION="$(bw login --raw)"
+    log "BW_SESSION=${BW_SESSION}"
     export BW_SESSION
     refresh_status
   elif [ "${BW_STATUS}" == "locked" ]; then
+    log "Unlocking vault for ${BW_USER}..."
     BW_SESSION="$(bw unlock --raw)"
+    log "BW_SESSION=${BW_SESSION}"
     export BW_SESSION
     refresh_status
   fi
@@ -71,7 +81,7 @@ main() {
   refresh_status
   unlock
 
-  step "Querying organizations..."
+  step "Querying organizations for ${BW_USER}..."
   refresh_orgs
 
   if [ "${BW_ORG_COUNT}" -eq 0 ]; then

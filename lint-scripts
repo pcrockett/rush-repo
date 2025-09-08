@@ -5,6 +5,7 @@
 _bin/*
 _templates/github-release/tasks/*.sh
 arch-news-check/arch-news-check
+bw-export/bw-export
 caldav-dump/caldav-dump
 fancygpt/fancygpt
 fzd/fzd
