@@ -1,0 +1,65 @@
+#!/usr/bin/env bash
+
+# shellcheck source=lib.sh
+source "${REPO_PATH}/lib.sh"
+
+require_commands tar
+
+# shellcheck disable=SC2034  # variables used in `install_from_github()`
+{
+    GITHUB_ORG="jgm"
+    GITHUB_REPO="pandoc"
+}
+BIN_NAME="pandoc"
+
+latest_version() {
+    echo "${GITHUB_LATEST_TAG}"
+}
+
+installed_version() {
+    if ! command_exists "${BIN_NAME}"; then
+        echo ""
+        return 0
+    fi
+
+    installed_package_version
+}
+
+artifact_name() {
+    echo "pandoc-$(latest_version)-linux-amd64.tar.gz"
+}
+
+download_url() {
+    echo "https://github.com/${GITHUB_ORG}/${GITHUB_REPO}/releases/download/${GITHUB_LATEST_TAG}/$(artifact_name)"
+}
+
+install_artifact() {
+    tar -xzf "${ARTIFACT_PATH}"
+    # example file tree after extraction:
+    #
+    # .
+    # ├── pandoc-3.8
+    # │   ├── bin
+    # │   │   ├── pandoc
+    # │   │   ├── pandoc-lua -> pandoc
+    # │   │   └── pandoc-server -> pandoc
+    # │   └── share
+    # │       └── man
+    # │           └── man1
+    # │               ├── pandoc.1.gz
+    # │               ├── pandoc-lua.1.gz
+    # │               └── pandoc-server.1.gz
+    # └── pandoc-3.8-linux-amd64.tar.gz
+
+    extraction_dir="pandoc-$(latest_version)"
+    man_dir="${XDG_DATA_HOME}/man/man1"
+    mkdir --parent "${man_dir}"
+    for file in "${BIN_NAME}" pandoc-lua pandoc-server
+    do
+        install_user_bin "${extraction_dir}/bin/${file}"
+        cp "${extraction_dir}/share/man/man1/${file}.1.gz" "${man_dir}"
+    done
+}
+
+install_from_github
+install_success "$(latest_version)"

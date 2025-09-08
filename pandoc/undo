@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+
+# shellcheck source=lib.sh
+source "${REPO_PATH}/lib.sh"
+for file in pandoc pandoc-lua pandoc-server
+do
+    rm -f "${RUSH_USER_BIN}/${file}" "${XDG_DATA_HOME}/man/man1/${file}.1.gz"
+done
+uninstall_success
