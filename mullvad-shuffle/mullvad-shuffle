@@ -1,50 +1,45 @@
 #!/usr/bin/env bash
-set -Eeuo pipefail
+set -euo pipefail
 
-# https://theprivacygroup.com/articles/gdpr-countries/
-EXIT_COUNTRIES=(
-    Austria
-    Belgium
-    Bulgaria
-    Croatia
-    Cyprus
-    Czech
-    Denmark
-    Estonia
-    Finland
-    France
-    Germany
-    Greece
-    Hungary
-    Ireland
-    Italy
-    Latvia
-    Lithuania
-    Luxembourg
-    Malta
-    Netherlands
-    Poland
-    Portugal
-    Romania
-    Slovakia
-    Slovenia
-    Spain
-    Sweden
-    Switzerland
-    Iceland
-    Lichtenstein
-    Norway
-)
+# <https://theprivacygroup.com/articles/gdpr-countries/>
 
-# shellcheck disable=SC2016  # intentionally not expanding $ in single-quoted strings
 get_awk_program() {
-    # prints IP addresses for all nodes within the selected countries
-    echo "BEGIN {"
-    for country in "${EXIT_COUNTRIES[@]}"; do
-        echo "countries[\"${country}\"] = 1;"
-    done
-    echo "}"
-    echo '$3 in countries { print $1 }'
+    cat <<'EOF'
+BEGIN {
+    countries["Austria"] = 1;
+    countries["Belgium"] = 1;
+    countries["Bulgaria"] = 1;
+    countries["Croatia"] = 1;
+    countries["Cyprus"] = 1;
+    countries["Czech"] = 1;
+    countries["Denmark"] = 1;
+    countries["Estonia"] = 1;
+    countries["Finland"] = 1;
+    countries["France"] = 1;
+    countries["Germany"] = 1;
+    countries["Greece"] = 1;
+    countries["Hungary"] = 1;
+    countries["Ireland"] = 1;
+    countries["Italy"] = 1;
+    countries["Latvia"] = 1;
+    countries["Lithuania"] = 1;
+    countries["Luxembourg"] = 1;
+    countries["Malta"] = 1;
+    countries["Netherlands"] = 1;
+    countries["Poland"] = 1;
+    countries["Portugal"] = 1;
+    countries["Romania"] = 1;
+    countries["Slovakia"] = 1;
+    countries["Slovenia"] = 1;
+    countries["Spain"] = 1;
+    countries["Sweden"] = 1;
+    countries["Switzerland"] = 1;
+    countries["Iceland"] = 1;
+    countries["Lichtenstein"] = 1;
+    countries["Norway"] = 1;
+}
+$3 in countries { print $1 }
+EOF
 }
 
 random_exit_ip() {
