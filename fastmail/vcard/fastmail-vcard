@@ -1,0 +1,37 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Export your contacts via fastmail's CardDAV service.
+#
+# Prerequisites: Generate an app-specific password: <https://app.fastmail.com/settings/security/apps>
+#
+# Required env variables:
+#
+# * FASTMAIL_ACCOUNT: your account email address
+# * FASTMAIL_APP_PASSWORD: your app-specific password
+#
+# Example usage:
+#
+#     FASTMAIL_ACCOUNT=someone@fastmail.com \
+#       FASTMAIL_APP_PASSWORD=XXXXXXXXXXXXX \
+#       fastmail-vcard > my-contacts.vcard
+#
+# Dependencies:
+#
+# * curl
+#
+
+main() {
+  FASTMAIL_ACCOUNT="${FASTMAIL_ACCOUNT:?Must specify FASTMAIL_ACCOUNT env variable}"
+  FASTMAIL_APP_PASSWORD="${FASTMAIL_APP_PASSWORD:?Must specify FASTMAIL_APP_PASSWORD env variable}"
+  url="https://carddav.fastmail.com/dav/addressbooks/user/${FASTMAIL_ACCOUNT}/Default"
+  curl --proto '=https' \
+    --tlsv1.3 \
+    --silent \
+    --show-error \
+    --fail \
+    --user "${FASTMAIL_ACCOUNT}:${FASTMAIL_APP_PASSWORD}" \
+    --location "${url}"
+}
+
+main
