@@ -1,0 +1,6 @@
+script_name:
+  type: str
+  help: "Enter the name of the script:"
+description:
+  type: str
+  help: "Enter the package description:"
