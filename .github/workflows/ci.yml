@@ -20,7 +20,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         curl -SsfL http://philcrockett.com/yolo/v1.sh \
-          | bash -s -- tagref asdf
+          | bash -s -- tagref asdf rush
         asdf plugin add bats "https://github.com/pcrockett/asdf-bats.git"
         asdf install
 
