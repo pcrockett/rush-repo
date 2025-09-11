@@ -1,4 +1,4 @@
-all: lint tagref
+all: lint tagref test
 .PHONY: all
 
 lint:
