@@ -1,7 +1,7 @@
 # shellcheck shell=bash
 
 setup() {
-    set -Eeuo pipefail
+    set -euo pipefail
     TEST_CWD="$(mktemp --directory --tmpdir=/tmp bats-test.XXXXXX)"
     TEST_HOME="$(mktemp --directory --tmpdir=/tmp bats-home.XXXXXX)"
     mkdir -p "${TEST_HOME}/.local/bin"

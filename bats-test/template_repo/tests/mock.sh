@@ -3,9 +3,9 @@ set -Eeuo pipefail
 
 # this is designed to help you mock out a system dependency.
 #
-# ex: rename this to `fzf` and make sure it's listed earlier in the $PATH variable than the _actual_
-# `fzf` executable. then you can inspect the inputs that were passed to `fzf` without actually
-# running `fzf`.
+# ex: rename this to `fzf` and make sure it's listed earlier in the $PATH variable than
+# the _actual_ `fzf` executable. then you can inspect the inputs that were passed to
+# `fzf` without actually running `fzf`.
 
 log_stderr() {
     echo "${*}" >&2
