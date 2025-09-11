@@ -10,7 +10,7 @@ arch-news-check/arch-news-check
 bw-export/bw-export
 caldav-dump/caldav-dump
 fancygpt/fancygpt
-fastmail/contacts-export/fastmail-vcard
+fastmail/vcard/fastmail-vcard
 fzd/fzd
 fzfdump/fzfdump
 fzmake/fzmake
