@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+
+# shellcheck source=lib.sh
+source "${REPO_PATH}/lib.sh"
+rush_script="$(command -v rush)"
+install_user_bin "${rush_script}"
