@@ -36,4 +36,5 @@ jobs:
       run: make tagref
 
     - name: test
-      run: make test
+      run: |
+        PATH="${HOME}/.asdf/shims:${PATH}" make test
