@@ -10,5 +10,5 @@ tagref:
 .PHONY: tagref
 
 test:
-	bats ./_tests
+	@bats ./_tests
 .PHONY: test
