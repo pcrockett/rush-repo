@@ -2,7 +2,7 @@ all: lint tagref test
 .PHONY: all
 
 lint:
-	@_bin/lint
+	@pre-commit run shellcheck --all-files
 .PHONY: lint
 
 tagref:
