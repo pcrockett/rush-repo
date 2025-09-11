@@ -8,3 +8,7 @@ lint:
 tagref:
 	@tagref
 .PHONY: tagref
+
+test:
+	bats ./_tests
+.PHONY: test

@@ -19,5 +19,12 @@ else
     RUSH_USER_BIN="${RUSH_USER_BIN:-"${HOME}/.local/bin"}"
 fi
 
-RUSH_PACKAGE_NAME="$(basename "${PWD}")"
+# explanation for parameter expansion: <https://stackoverflow.com/a/25725435/138757>
+# given these paths:
+#
+# * stringA: /a/b/c/d
+# * stringB: /a/b
+#
+# then ${stringA#"${stringB}"} returns /c/d
+RUSH_PACKAGE_NAME="${PWD#"${REPO_PATH}"}"
 export RUSH_PACKAGE_NAME
