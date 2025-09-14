@@ -12,7 +12,7 @@ source "${REPO_PATH}/lib.sh"
 echo "${RUSH_PACKAGE_NAME}" >&2
 EOF
     capture_output rush get test
-    assert_stderr "test"
+    assert_stderr "^test$"
 }
 
 @test 'package name - subdirectory - includes all path elements' {
@@ -25,5 +25,5 @@ source "${REPO_PATH}/lib.sh"
 echo "${RUSH_PACKAGE_NAME}" >&2
 EOF
     capture_output rush get test/subdir
-    assert_stderr "test/subdir"
+    assert_stderr "^test/subdir$"
 }

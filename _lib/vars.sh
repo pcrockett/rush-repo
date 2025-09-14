@@ -23,8 +23,8 @@ fi
 # given these paths:
 #
 # * stringA: /a/b/c/d
-# * stringB: /a/b
+# * stringB: /a/b/
 #
-# then ${stringA#"${stringB}"} returns /c/d
-RUSH_PACKAGE_NAME="${PWD#"${REPO_PATH}"}"
+# then ${stringA#"${stringB}"} returns c/d
+RUSH_PACKAGE_NAME="${PWD#"${REPO_PATH}/"}"
 export RUSH_PACKAGE_NAME
