@@ -7,6 +7,11 @@ setup() {
     export HOME="${TEST_HOME}"
     export RUSH_ROOT="${TEST_HOME}/rush"
     export RUSH_CONFIG="${TEST_HOME}/rush-config"
+    export XDG_STATE_HOME="${TEST_HOME}/.local/state"
+    export XDG_DATA_HOME="${TEST_HOME}/.local/share"
+    export XDG_CONFIG_HOME="${TEST_HOME}/.config"
+    export XDG_CACHE_HOME="${TEST_HOME}/.cache"
+
     RUSH_REPO_DIR="${RUSH_ROOT}/pcrockett/rush-repo"
     mkdir -p "${TEST_HOME}/.local/bin" "${RUSH_REPO_DIR}"
     PATH="${TEST_HOME}/.local/bin:${PATH}"

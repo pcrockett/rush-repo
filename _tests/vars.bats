@@ -2,7 +2,7 @@
 
 source _tests/util.sh
 
-@test 'package name - always - relative to repo root' {
+@test 'RUSH_PACKAGE_NAME - always - relative to repo root' {
     mkdir -p "${RUSH_REPO_DIR}/test"
     cat > "${RUSH_REPO_DIR}/test/main" <<'EOF'
 #!/usr/bin/env bash
@@ -15,7 +15,7 @@ EOF
     assert_stderr "^test$"
 }
 
-@test 'package name - subdirectory - includes all path elements' {
+@test 'RUSH_PACKAGE_NAME - subdirectory - includes all path elements' {
     mkdir -p "${RUSH_REPO_DIR}/test/subdir"
     cat > "${RUSH_REPO_DIR}/test/subdir/main" <<'EOF'
 #!/usr/bin/env bash
