@@ -1,0 +1,40 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Export your calendars via fastmail's CalDAV service.
+#
+# Prerequisites: Generate an app-specific password: <https://app.fastmail.com/settings/security/apps>
+#
+# Required env variables:
+#
+# * FASTMAIL_ACCOUNT: your account email address
+# * FASTMAIL_APP_PASSWORD: your app-specific password
+# * FASTMAIL_CALENDAR_ID: the UUID in the calendar URL
+#
+# Example usage:
+#
+#     FASTMAIL_ACCOUNT=someone@fastmail.com \
+#       FASTMAIL_APP_PASSWORD=XXXXXXXXXXXXX \
+#       FASTMAIL_CALENDAR_ID=2f1e477b-8918-4607-85ee-9872d8209a4a \
+#       fastmail-caldav > my-calendar.ics
+#
+# Dependencies:
+#
+# * curl
+#
+
+main() {
+  FASTMAIL_ACCOUNT="${FASTMAIL_ACCOUNT:?Must specify FASTMAIL_ACCOUNT env variable}"
+  FASTMAIL_APP_PASSWORD="${FASTMAIL_APP_PASSWORD:?Must specify FASTMAIL_APP_PASSWORD env variable}"
+  FASTMAIL_CALENDAR_ID="${FASTMAIL_CALENDAR_ID:?Must specify FASTMAIL_CALENDAR_ID env variable}"
+  url="https://caldav.fastmail.com/dav/calendars/user/${FASTMAIL_ACCOUNT}/${FASTMAIL_CALENDAR_ID}"
+  curl --proto '=https' \
+    --tlsv1.3 \
+    --silent \
+    --show-error \
+    --fail \
+    --user "${FASTMAIL_ACCOUNT}:${FASTMAIL_APP_PASSWORD}" \
+    --location "${url}"
+}
+
+main
