@@ -5,7 +5,7 @@ def main [
     --fast(-f)              # Don't open your editor, just fire-and-forget
     --template(-t): string  # Use specific template filename under .github/
     --dry-run               # preview what would happen
-    --assignee = "@me"      # set pull request assignee
+    --assignee = "@me"      # set pull request assignee (use "none" for no assignee)
     --repo: string          # set destination github repo
 ] {
     # i would use the `find` command instead of `parse` however that produces highlighting
@@ -22,7 +22,11 @@ def main [
 
     let gh_args = (
         ["--draft"]
-        | if ($assignee != "") { append ["--assignee" $assignee] } else { $in }
+        | if (($assignee | is-not-empty) and ($assignee != "none")) {
+            append ["--assignee" $assignee]
+        } else {
+            $in
+        }
         | if ($fast) { $in } else { append "--editor" }
         | if ($template_file == null) { append "--fill" } else { append ["--template" $template_file] }
         | if ($dry_run) { append "--dry-run" } else { $in }
