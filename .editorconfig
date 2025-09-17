@@ -8,13 +8,14 @@ end_of_line = lf
 insert_final_newline = true
 trim_trailing_whitespace = true
 indent_style = space
-indent_size = 4
-
-[*.{css,hcl,html,json,less,md,xml,xsl,yml}]
 indent_size = 2
 
-[{Makefile,makefile,GNUmakefile}]
-indent_style = tab
+# shfmt options:
+switch_case_indent = true
+binary_next_line = true
 
-[*.cue]
+[.py]
+indent_size = 4
+
+[{Makefile,Caddyfile}]
 indent_style = tab
