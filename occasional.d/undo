@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+
+# shellcheck source=lib.sh
+source "${REPO_PATH}/lib.sh"
+
+if [ "$(id --user)" -eq 0 ]; then
+  install_dir=/etc/systemd/system
+  systemctl_cmd=(systemctl)
+else
+  install_dir="${HOME}/.config/systemd/user"
+  systemctl_cmd=(systemctl --user)
+fi
+
+rm_service() {
+  "${systemctl_cmd[@]}" disable --now "occasional.d-${1}.timer"
+  "${systemctl_cmd[@]}" disable --now "occasional.d-${1}.service"
+  rm -f "${install_dir}/occasional.d-${1}.timer" "${install_dir}/occasional.d-${1}.service"
+}
+
+rm_service "minute"
+rm_service "hour"
+rm_service "day"
+rm_service "week"
+rm_service "month"
+"${systemctl_cmd[@]}" daemon-reload
+
+rm -f "${RUSH_USER_BIN}/occasional.d"
+uninstall_success

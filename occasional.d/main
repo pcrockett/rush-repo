@@ -1,0 +1,52 @@
+#!/usr/bin/env bash
+
+# shellcheck source=lib.sh
+source "${REPO_PATH}/lib.sh"
+
+require_commands envsubst
+install_user_bin occasional.d
+
+if [ "$(id --user)" -eq 0 ]; then
+  install_dir=/etc/systemd/system
+  scripts_dir=/etc/occasional.d
+  systemctl_cmd=(systemctl)
+else
+  install_dir="${HOME}/.config/systemd/user"
+  scripts_dir="${XDG_CONFIG_HOME}/occasional.d"
+  systemctl_cmd=(systemctl --user)
+fi
+
+mkdir --parent "${install_dir}"
+
+render_template() {
+  TASK_NAME="${1}" \
+  TASK_SCHEDULE="${2}" \
+  TASK_PERSISTENCE="${3}" \
+    envsubst <template.timer \
+    >"${install_dir}/occasional.d-${1}.timer"
+
+  TASK_NAME="${1}" \
+  TASK_EXECUTABLE="${RUSH_USER_BIN}/occasional.d" \
+    envsubst <template.service \
+    >"${install_dir}/occasional.d-${1}.service"
+}
+
+render_template "minute" "OnUnitInactiveSec=1min" "Persistent=false"
+render_template "hour" "OnUnitInactiveSec=1h" "Persistent=false"
+render_template "day" "OnCalendar=03:00:00" "Persistent=true"
+render_template "week" "OnCalendar=Mon *-*-* 03:00:00" "Persistent=true"
+render_template "month" "OnCalendar=*-*-01 03:00:00" "Persistent=true"
+"${systemctl_cmd[@]}" daemon-reload
+
+log_attention "
+To activate a time interval, run:
+
+  ${systemctl_cmd[*]} enable --now occasional.d-\${TIME_INTERVAL}.timer
+  ${systemctl_cmd[*]} enable --now occasional.d-\${TIME_INTERVAL}.service
+
+... where \${TIME_INTERVAL} can be minute, hour, day, week, or month.
+
+Then you can drop scripts into the ${scripts_dir}/\${TIME_INTERVAL} directory.
+"
+
+install_success

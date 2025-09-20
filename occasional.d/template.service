@@ -1,0 +1,11 @@
+[Unit]
+Description=occasional.d ${TASK_NAME} service
+Wants=network.target
+After=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=${TASK_EXECUTABLE} ${TASK_NAME}
+
+[Install]
+WantedBy=default.target

@@ -1,0 +1,11 @@
+[Unit]
+Description=occasional.d ${TASK_NAME} timer
+
+[Timer]
+${TASK_SCHEDULE}
+${TASK_PERSISTENCE}
+RandomizedDelaySec=60
+FixedRandomDelay=true
+
+[Install]
+WantedBy=timers.target
