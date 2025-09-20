@@ -48,5 +48,3 @@ To activate a time interval, run:
 
 Then you can drop scripts into the ${scripts_dir}/\${TIME_INTERVAL} directory.
 "
-
-install_success

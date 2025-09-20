@@ -25,4 +25,3 @@ rm_service "month"
 "${systemctl_cmd[@]}" daemon-reload
 
 rm -f "${RUSH_USER_BIN}/occasional.d"
-uninstall_success
