@@ -41,8 +41,7 @@ render_template "month" "OnCalendar=*-*-01 03:00:00" "Persistent=true"
 log_attention "
 To activate a time interval, run:
 
-  ${systemctl_cmd[*]} enable --now occasional.d-\${TIME_INTERVAL}.timer
-  ${systemctl_cmd[*]} enable --now occasional.d-\${TIME_INTERVAL}.service
+  occasional.d \${TIME_INTERVAL} --enable
 
 ... where \${TIME_INTERVAL} can be minute, hour, day, week, or month.
 
