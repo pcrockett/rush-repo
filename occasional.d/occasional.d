@@ -105,7 +105,7 @@ operation:run() {
       exit_code=1
     fi
   done < <(
-    find "${SCRIPT_DIR}" -maxdepth 1 -print0 -executable -type f \
+    find "${SCRIPT_DIR}" -maxdepth 1 -mindepth 1 -print0 -executable -type f \
       | xargs -0 -L 1 basename \
       | sort
   )
