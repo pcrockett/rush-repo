@@ -23,6 +23,7 @@ Example usage:
 
     # execute global scripts in /etc/occasional.d/day
     sudo occasional.d day
+
 EOF
 }
 
@@ -95,14 +96,13 @@ operation:disable() {
 
 # shellcheck disable=SC2329  # function invoked indirectly
 operation:run() {
-  exit_code=0
   while read -r script; do
     echo "Starting: ${script}"
     if "${SCRIPT_DIR}/${script}"; then
       echo "SUCCESS: exited with code $?: ${script}"
     else
       echo "ERROR: exited with code $?: ${script}"
-      exit_code=1
+      return 1
     fi
   done < <(
     find "${SCRIPT_DIR}" -maxdepth 1 -mindepth 1 -print0 -executable -type f \
@@ -110,7 +110,6 @@ operation:run() {
       | sort
   )
   echo "Finished executing scripts."
-  return "${exit_code}"
 }
 
 main() {

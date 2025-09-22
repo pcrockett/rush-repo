@@ -3,9 +3,15 @@ Description=occasional.d ${TASK_NAME} service
 Wants=network.target
 After=network-online.target
 
+# rate limit settings, related to Restart* settings below
+StartLimitIntervalSec=25
+StartLimitBurst=4
+
 [Service]
 Type=oneshot
 ExecStart=${TASK_EXECUTABLE} ${TASK_NAME}
+Restart=on-failure
+RestartSec=5
 
 [Install]
 WantedBy=default.target
