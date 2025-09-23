@@ -12,6 +12,3 @@ Type=oneshot
 ExecStart=${TASK_EXECUTABLE} ${TASK_NAME}
 Restart=on-failure
 RestartSec=5
-
-[Install]
-WantedBy=default.target

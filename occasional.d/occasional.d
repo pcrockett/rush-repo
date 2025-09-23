@@ -85,13 +85,11 @@ init() {
 # shellcheck disable=SC2329  # function invoked indirectly
 operation:enable() {
   "${SYSTEMCTL_CMD[@]}" enable --now "occasional.d-${TIME_INTERVAL}.timer"
-  "${SYSTEMCTL_CMD[@]}" enable --now "occasional.d-${TIME_INTERVAL}.service"
 }
 
 # shellcheck disable=SC2329  # function invoked indirectly
 operation:disable() {
   "${SYSTEMCTL_CMD[@]}" disable --now "occasional.d-${TIME_INTERVAL}.timer"
-  "${SYSTEMCTL_CMD[@]}" disable --now "occasional.d-${TIME_INTERVAL}.service"
 }
 
 # shellcheck disable=SC2329  # function invoked indirectly

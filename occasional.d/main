@@ -31,8 +31,18 @@ render_template() {
     >"${install_dir}/occasional.d-${1}.service"
 }
 
-render_template "minute" "OnUnitInactiveSec=1min" "Persistent=false"
-render_template "hour" "OnUnitInactiveSec=1h" "Persistent=false"
+render_template \
+  "minute" \
+  "OnUnitInactiveSec=1min
+OnStartupSec=1min" \
+  "Persistent=false"
+
+render_template \
+  "hour" \
+  "OnUnitInactiveSec=1h
+OnStartupSec=1min" \
+  "Persistent=false"
+
 render_template "day" "OnCalendar=03:00:00" "Persistent=true"
 render_template "week" "OnCalendar=Mon *-*-* 03:00:00" "Persistent=true"
 render_template "month" "OnCalendar=*-*-01 03:00:00" "Persistent=true"

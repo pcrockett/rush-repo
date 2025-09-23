@@ -13,7 +13,6 @@ fi
 
 rm_service() {
   "${systemctl_cmd[@]}" disable --now "occasional.d-${1}.timer"
-  "${systemctl_cmd[@]}" disable --now "occasional.d-${1}.service"
   rm -f "${install_dir}/occasional.d-${1}.timer" "${install_dir}/occasional.d-${1}.service"
 }
 
