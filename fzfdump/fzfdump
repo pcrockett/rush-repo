@@ -1,50 +1,62 @@
 #!/usr/bin/env bash
 set -Eeuo pipefail
 
-# Dump data from a file to a device with sensible defaults and progress output. Uses fzf to select a
-# device. Defaults assume that you're dumping to a flash drive, and you don't want progress output
-# to lie to you.
-#
-# Example usage:
-#
-#     fzfdump < the-file.iso
-#
-# Takes no args, assumes the file is coming in through standard input.
-#
-# Dependencies: fzf
+usage() {
+  cat <<'EOF'
+Dump data from a file to a device with sensible defaults and progress output. Uses
+fzf to select a device. Defaults assume that you're dumping to a flash drive, and you
+don't want progress output to lie to you.
+
+Example usage:
+
+    sudo fzfdump <the-file.iso
+
+Takes no args, assumes the file is coming in through standard input.
+
+Dependencies: fzf
+
+EOF
+}
 
 panic() {
-    echo "FATAL: ${*}" >&2
-    exit 1
+  echo "FATAL: ${*}" >&2
+  exit 1
 }
 
 prompt_for_device() {
-    # Display a rich fuzzy search / menu for the user to select their output device,
-    # and output just the device's PATH
+  # Display a rich fuzzy search / menu for the user to select their output device,
+  # and output just the device's PATH
 
-    # shellcheck disable=SC2016  # Not trying to expand expressions in single-quotes
-    lsblk --list --nodeps --output PATH,SIZE \
-        | fzf \
-            --header-lines 1 \
-            --layout reverse \
-            --prompt "Select your output device: " \
-            --preview 'fdisk --list "$(echo {} | cut --fields 1 --delimiter " ")"' \
-            --preview-window down \
-        | cut --fields 1 --delimiter " "
+  # shellcheck disable=SC2016  # Not trying to expand expressions in single-quotes
+  lsblk --list --nodeps --output PATH,SIZE \
+    | fzf \
+      --header-lines 1 \
+      --layout reverse \
+      --prompt "Select your output device: " \
+      --preview 'fdisk --list "$(echo {} | cut --fields 1 --delimiter " ")"' \
+      --preview-window down \
+    | cut --fields 1 --delimiter " "
 }
 
 main() {
-    if [ "$(id --user)" -ne 0 ]; then
-        panic "Must run as root."
-    fi
+  if [ "${#@}" -gt 0 ] || tty -s; then
+    usage
+    exit 1
+  fi
 
-    local device
-    device="$(prompt_for_device)"
-    test "${device}" != "" || panic "no device selected."
-    dd "of=${device}" \
-        bs=4M \
-        oflag=direct \
-        status=progress
+  if [ "$(id --user)" -ne 0 ]; then
+    panic "Must run as root."
+  fi
+
+  local device
+  device="$(prompt_for_device)"
+  test "${device}" != "" || panic "no device selected."
+  dd "of=${device}" \
+    bs=4M \
+    oflag=direct \
+    status=progress
+
+  exit $?
 }
 
-main
+main "$@"
