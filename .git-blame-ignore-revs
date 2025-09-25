@@ -1,1 +1,2 @@
 fb8d7ab6a37d5083953ac0e0ed7d8d7e4e0eed49  # pre-commit fix whitespace
+487aebc9defbf8d99d37ba0359fbca68ac02d1df  # shfmt (mostly indentation)
