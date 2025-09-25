@@ -2,63 +2,45 @@
 set -Eeuo pipefail
 
 is_installed() {
-    command -v "${1}" &> /dev/null
-}
-
-kill_exact_command() {
-    pkill --full "${*}" || true &> /dev/null
+  command -v "${1}" &>/dev/null
 }
 
 spinner() {
-    if is_installed gum; then
-        if gum spin --title "" --show-output -- "${@}"; then
-            gum_result=0
-        else
-            gum_result=$?
-        fi
-
-        # if user hits Ctrl+C (AKA "sends SIGINT to gum"), gum will exit but the child process
-        # will continue running. Since this is in a subshell, all that does is cause the spinner to
-        # disappear and the script will just hang until curl exits naturally.
-        #
-        # this workaround actively kills gum's child process if it's still hanging around after
-        # gum exits.
-        #
-        # this workaround may become unnecessary if this github issue is ever addressed:
-        #
-        # <https://github.com/charmbracelet/gum/issues/730>
-        #
-        kill_exact_command "${@}"
-        return ${gum_result}
+  if is_installed gum; then
+    if gum spin --title "" --show-output -- "${@}"; then
+      return 0
     else
-        "${@}"
+      return $?
     fi
+  else
+    "${@}"
+  fi
 }
 
 curl_download() {
-    local url="${1}"
-    local curl_cmd=(
-        curl --silent --show-error --fail
-        --location "${url}"
-    )
-    spinner "${curl_cmd[@]}"
+  local url="${1}"
+  local curl_cmd=(
+    curl --silent --show-error --fail
+    --location "${url}"
+  )
+  spinner "${curl_cmd[@]}"
 }
 
 format_output() {
-    if is_installed jq; then
-        jq '
-            {
-                ip,
-                city: (.city + ", " + .country),
-                coords: ((.latitude | tostring) + ", " + (.longitude | tostring)),
-                isp: .organization,
-                is_mullvad: .mullvad_exit_ip,
-                blacklisted: .blacklisted.blacklisted
-            }
-        '
-    elif is_installed fx; then
-        # shellcheck disable=2016  # don't want expressions to expand in single quotes
-        fx 'x => `
+  if is_installed jq; then
+    jq '
+{
+  ip,
+  city: (.city + ", " + .country),
+  coords: ((.latitude | tostring) + ", " + (.longitude | tostring)),
+  isp: .organization,
+  is_mullvad: .mullvad_exit_ip,
+  blacklisted: .blacklisted.blacklisted
+}
+'
+  elif is_installed fx; then
+    # shellcheck disable=2016  # don't want expressions to expand in single quotes
+    fx 'x => `
 ip:          ${x.ip}
 city:        ${x.city}, ${x.country}
 coords:      ${x.latitude}, ${x.longitude}
@@ -66,20 +48,20 @@ isp:         ${x.organization}
 is_mullvad:  ${x.mullvad_exit_ip}
 blacklisted: ${x.blacklisted?.blacklisted}
 `'
-    elif is_installed bat; then
-        bat --language json --style snip
-    else
-        cat
-    fi
+  elif is_installed bat; then
+    bat --language json --style snip
+  else
+    cat
+  fi
 }
 
 main() {
-    raw_output="$(curl_download "https://am.i.mullvad.net/json")"
-    if [ "${raw_output}" == "" ]; then
-        exit 1  # either network issue or user cancelled with Ctrl+C
-    else
-        echo "${raw_output}" | format_output
-    fi
+  raw_output="$(curl_download "https://am.i.mullvad.net/json")"
+  if [ "${raw_output}" == "" ]; then
+    exit 1 # either network issue or user cancelled with Ctrl+C
+  else
+    echo "${raw_output}" | format_output
+  fi
 }
 
 main
