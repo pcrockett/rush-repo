@@ -20,13 +20,13 @@ mkdir --parent "${install_dir}"
 
 render_template() {
   TASK_NAME="${1}" \
-  TASK_SCHEDULE="${2}" \
-  TASK_PERSISTENCE="${3}" \
+    TASK_SCHEDULE="${2}" \
+    TASK_PERSISTENCE="${3}" \
     envsubst <template.timer \
     >"${install_dir}/occasional.d-${1}.timer"
 
   TASK_NAME="${1}" \
-  TASK_EXECUTABLE="${RUSH_USER_BIN}/occasional.d" \
+    TASK_EXECUTABLE="${RUSH_USER_BIN}/occasional.d" \
     envsubst <template.service \
     >"${install_dir}/occasional.d-${1}.service"
 }

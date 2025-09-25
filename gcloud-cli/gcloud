@@ -14,33 +14,33 @@ set -Eeuo pipefail
 config_home="${XDG_CONFIG_HOME:-"${HOME}/.config"}"
 
 docker_cmd=(
-    docker run --rm
-        --user "$(id --user):$(id --group)"
-        --volume "${config_home}/gcloud:/home/cloudsdk/.config/gcloud"
-        --volume "${PWD}:/tmp/workdir"
-        --workdir "/tmp/workdir"
-        --env TERM="${TERM}"
+  docker run --rm
+  --user "$(id --user):$(id --group)"
+  --volume "${config_home}/gcloud:/home/cloudsdk/.config/gcloud"
+  --volume "${PWD}:/tmp/workdir"
+  --workdir "/tmp/workdir"
+  --env TERM="${TERM}"
 )
 
 if [ -d "${HOME}/.docker" ]; then
-    docker_cmd+=(--volume "${HOME}/.docker:/home/cloudsdk/.docker")
+  docker_cmd+=(--volume "${HOME}/.docker:/home/cloudsdk/.docker")
 fi
 
 if tty --quiet; then
-    docker_cmd+=(--interactive --tty)
+  docker_cmd+=(--interactive --tty)
 fi
 
 # get all CLOUDSDK_* environment variables and feed them into the docker command
 while IFS= read -r var_setting || [ -n "${var_setting}" ]; do
-    docker_cmd+=(--env "${var_setting}")
+  docker_cmd+=(--env "${var_setting}")
 done < <(env | grep --perl-regexp "^CLOUDSDK_")
 
 docker_cmd+=(
-    localhost/gcloud gcloud "${@}"
+  localhost/gcloud gcloud "${@}"
 )
 
 if [ "${PCROCKETT_GCLOUD_DEBUG:-}" != "" ]; then
-    cat >&2 <<EOF
+  cat >&2 <<EOF
 Running...
 
     ${docker_cmd[*]}

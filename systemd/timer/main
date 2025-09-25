@@ -6,8 +6,8 @@ source "${REPO_PATH}/lib.sh"
 dest="${USER_CWD}/template.timer"
 
 if [ ! -e "${dest}" ] || force_please; then
-    cp template.timer "${dest}"
-    echo "Generated template at ${dest}"
+  cp template.timer "${dest}"
+  echo "Generated template at ${dest}"
 else
-    panic "template.timer already exists in this directory. Use --force to overwrite."
+  panic "template.timer already exists in this directory. Use --force to overwrite."
 fi

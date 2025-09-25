@@ -7,9 +7,9 @@
 set -Eeuo pipefail
 
 main() {
-    selected_remote="$(git remote | fzf --select-1 --height 7 --layout reverse)"
-    current_branch="$(git rev-parse --abbrev-ref HEAD)"
-    git push --set-upstream "${selected_remote}" "${current_branch}"
+  selected_remote="$(git remote | fzf --select-1 --height 7 --layout reverse)"
+  current_branch="$(git rev-parse --abbrev-ref HEAD)"
+  git push --set-upstream "${selected_remote}" "${current_branch}"
 }
 
 main

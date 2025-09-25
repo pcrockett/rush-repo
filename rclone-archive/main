@@ -8,32 +8,32 @@ rclone_config_file="${XDG_CONFIG_HOME}/rclone/rclone.conf"
 systemd_unit_file="${XDG_CONFIG_HOME}/systemd/user/rclone-archive.service"
 mkdir --parent "$(dirname "${rclone_config_file}")" "$(dirname "${systemd_unit_file}")"
 if [ -e "${rclone_config_file}" ] || [ -e "${systemd_unit_file}" ]; then
-    if ! force_please; then
-        panic "Already exists: ${rclone_config_file}. Use --force to overwrite."
-    fi
+  if ! force_please; then
+    panic "Already exists: ${rclone_config_file}. Use --force to overwrite."
+  fi
 fi
 
 if [ "${ARCHIVE_BUCKET_NAME:-}" == "" ]; then
-    read -r -p "Enter bucket name: " ARCHIVE_BUCKET_NAME
+  read -r -p "Enter bucket name: " ARCHIVE_BUCKET_NAME
 fi
 export ARCHIVE_BUCKET_NAME="${ARCHIVE_BUCKET_NAME}"
 
 if [ "${ARCHIVE_APPLICATION_KEY_ID:-}" == "" ]; then
-    read -r -p "Enter application key ID: " ARCHIVE_APPLICATION_KEY_ID
+  read -r -p "Enter application key ID: " ARCHIVE_APPLICATION_KEY_ID
 fi
 export ARCHIVE_APPLICATION_KEY_ID="${ARCHIVE_APPLICATION_KEY_ID}"
 
 if [ "${ARCHIVE_APPLICATION_KEY_SECRET:-}" == "" ]; then
-    read -r -p "Enter application key secret: " ARCHIVE_APPLICATION_KEY_SECRET
+  read -r -p "Enter application key secret: " ARCHIVE_APPLICATION_KEY_SECRET
 fi
 export ARCHIVE_APPLICATION_KEY_SECRET="${ARCHIVE_APPLICATION_KEY_SECRET}"
 
 if [ "${ARCHIVE_ENCRYPTION_KEY:-}" == "" ]; then
-    read -r -p "Enter obfuscated rclone encryption password: " ARCHIVE_ENCRYPTION_KEY
+  read -r -p "Enter obfuscated rclone encryption password: " ARCHIVE_ENCRYPTION_KEY
 fi
 export ARCHIVE_ENCRYPTION_KEY="${ARCHIVE_ENCRYPTION_KEY}"
 
-envsubst < rclone.conf.template > "${rclone_config_file}"
+envsubst <rclone.conf.template >"${rclone_config_file}"
 
 RCLONE_PATH="$(printf '%q' "$(command -v rclone)")"
 export RCLONE_PATH
@@ -41,6 +41,6 @@ export MOUNTPOINT_PATH=~/Cloud
 mkdir --parent "${MOUNTPOINT_PATH}"
 MOUNTPOINT_PATH="$(printf '%q' "${MOUNTPOINT_PATH}")"
 
-envsubst < rclone-archive.service.template > "${systemd_unit_file}"
+envsubst <rclone-archive.service.template >"${systemd_unit_file}"
 systemctl daemon-reload --user
 systemctl enable --now --user rclone-archive.service

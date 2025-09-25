@@ -2,17 +2,17 @@
 set -Eeuo pipefail
 
 panic() {
-    echo "${*}"
-    exit 1
+  echo "${*}"
+  exit 1
 }
 
 main() {
-    test "${#}" -ne 0 || panic "Usage: ${0} FILE_NAME [FILE_NAME...]"
-    local exclude_file=".git/info/exclude"
-    test -f "${exclude_file}" || panic "Unable to find ${exclude_file} -- are you in a git repository?"
-    for file_name in "${@}"; do
-        echo "${file_name}" >> "${exclude_file}"
-    done
+  test "${#}" -ne 0 || panic "Usage: ${0} FILE_NAME [FILE_NAME...]"
+  local exclude_file=".git/info/exclude"
+  test -f "${exclude_file}" || panic "Unable to find ${exclude_file} -- are you in a git repository?"
+  for file_name in "${@}"; do
+    echo "${file_name}" >>"${exclude_file}"
+  done
 }
 
 main "${@}"

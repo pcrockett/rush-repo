@@ -7,47 +7,47 @@ require_commands xz tar
 
 # shellcheck disable=SC2034  # variables used in `install_from_github()`
 {
-    GITHUB_ORG="helix-editor"
-    GITHUB_REPO="helix"
+  GITHUB_ORG="helix-editor"
+  GITHUB_REPO="helix"
 }
 BIN_NAME="hx"
 
 latest_version() {
-    echo "${GITHUB_LATEST_TAG}"
+  echo "${GITHUB_LATEST_TAG}"
 }
 
 installed_version() {
-    if ! command_exists "${BIN_NAME}"; then
-        echo ""
-        return 0
-    fi
+  if ! command_exists "${BIN_NAME}"; then
+    echo ""
+    return 0
+  fi
 
-    if ! [[ "$("${BIN_NAME}" --version)" =~ ^helix\ ([[:digit:]]+\.[[:digit:]]+\.[[:digit:]]+) ]]; then
-        panic "Unable to determine currently installed version!"
-        exit 1  # redundant, but useful to shellcheck
-    fi
+  if ! [[ "$("${BIN_NAME}" --version)" =~ ^helix\ ([[:digit:]]+\.[[:digit:]]+\.[[:digit:]]+) ]]; then
+    panic "Unable to determine currently installed version!"
+    exit 1 # redundant, but useful to shellcheck
+  fi
 
-    echo "${BASH_REMATCH[1]}"
+  echo "${BASH_REMATCH[1]}"
 }
 
 artifact_name() {
-    echo "helix-${GITHUB_LATEST_TAG}-x86_64-linux.tar.xz"
+  echo "helix-${GITHUB_LATEST_TAG}-x86_64-linux.tar.xz"
 }
 
 download_url() {
-    echo "https://github.com/${GITHUB_ORG}/${GITHUB_REPO}/releases/download/${GITHUB_LATEST_TAG}/$(artifact_name)"
+  echo "https://github.com/${GITHUB_ORG}/${GITHUB_REPO}/releases/download/${GITHUB_LATEST_TAG}/$(artifact_name)"
 }
 
 install_artifact() {
-    tar xf "${ARTIFACT_PATH}"
-    mkdir --parent "${XDG_DATA_HOME}"
-    local helix_home="${XDG_DATA_HOME}/helix"
-    if [ -d "${helix_home}" ]; then
-        rm -rf "${helix_home}.old"
-        mv "${helix_home}" "${helix_home}.old"
-    fi
-    mv "helix-${GITHUB_LATEST_TAG}-x86_64-linux" "${helix_home}"
-    install_user_bin "${helix_home}/hx"
+  tar xf "${ARTIFACT_PATH}"
+  mkdir --parent "${XDG_DATA_HOME}"
+  local helix_home="${XDG_DATA_HOME}/helix"
+  if [ -d "${helix_home}" ]; then
+    rm -rf "${helix_home}.old"
+    mv "${helix_home}" "${helix_home}.old"
+  fi
+  mv "helix-${GITHUB_LATEST_TAG}-x86_64-linux" "${helix_home}"
+  install_user_bin "${helix_home}/hx"
 }
 
 install_from_github

@@ -18,4 +18,4 @@ set -Eeuo pipefail
 CALDAV_BASIC_TOKEN="$(echo "${CALDAV_USERNAME}:${CALDAV_PASSWORD}" | base64)"
 
 curl -SsfL "${CALDAV_URL}" \
-    --header "Authorization: Basic ${CALDAV_BASIC_TOKEN}"
+  --header "Authorization: Basic ${CALDAV_BASIC_TOKEN}"

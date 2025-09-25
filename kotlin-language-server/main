@@ -11,49 +11,49 @@ BIN_NAME="kotlin-language-server"
 INSTALL_DIR="${HOME}/.local/share/rush/pcrockett"
 
 latest_version() {
-    echo "${GITHUB_LATEST_TAG}"
+  echo "${GITHUB_LATEST_TAG}"
 }
 
 installed_version() {
-    if ! command_exists "${BIN_NAME}"; then
-        echo ""
-        return 0
-    fi
+  if ! command_exists "${BIN_NAME}"; then
+    echo ""
+    return 0
+  fi
 
-    local version
-    version="$(
-        grep --perl-regexp --only-matching --max-count 1 \
-        '/server-\d+\.\d+\.\d+\.jar' \
-        "${INSTALL_DIR}/kotlin-language-server/bin/kotlin-language-server"
-    )"
+  local version
+  version="$(
+    grep --perl-regexp --only-matching --max-count 1 \
+      '/server-\d+\.\d+\.\d+\.jar' \
+      "${INSTALL_DIR}/kotlin-language-server/bin/kotlin-language-server"
+  )"
 
-    if ! [[ "${version}" =~ ^/server-([[:digit:]]+\.[[:digit:]]+\.[[:digit:]]+)\.jar$ ]]; then
-        panic "Unable to determine currently installed version!"
-        exit 1  # redundant, but useful to shellcheck
-    fi
+  if ! [[ "${version}" =~ ^/server-([[:digit:]]+\.[[:digit:]]+\.[[:digit:]]+)\.jar$ ]]; then
+    panic "Unable to determine currently installed version!"
+    exit 1 # redundant, but useful to shellcheck
+  fi
 
-    echo "${BASH_REMATCH[1]}"
+  echo "${BASH_REMATCH[1]}"
 }
 
 artifact_name() {
-    echo "server.zip"
+  echo "server.zip"
 }
 
 download_url() {
-    echo "https://github.com/${GITHUB_ORG}/${GITHUB_REPO}/releases/download/${GITHUB_LATEST_TAG}/$(artifact_name)"
+  echo "https://github.com/${GITHUB_ORG}/${GITHUB_REPO}/releases/download/${GITHUB_LATEST_TAG}/$(artifact_name)"
 }
 
 install_artifact() {
-    if [ -d "${INSTALL_DIR}/kotlin-language-server" ]; then
-        rm -rf "${INSTALL_DIR}/kotlin-language-server.old"
-        mv "${INSTALL_DIR}/kotlin-language-server" "${INSTALL_DIR}/kotlin-language-server.old"
-    fi
+  if [ -d "${INSTALL_DIR}/kotlin-language-server" ]; then
+    rm -rf "${INSTALL_DIR}/kotlin-language-server.old"
+    mv "${INSTALL_DIR}/kotlin-language-server" "${INSTALL_DIR}/kotlin-language-server.old"
+  fi
 
-    unzip "${ARTIFACT_PATH}"
-    mv "server" "${INSTALL_DIR}/kotlin-language-server"
+  unzip "${ARTIFACT_PATH}"
+  mv "server" "${INSTALL_DIR}/kotlin-language-server"
 
-    mkdir --parent "${RUSH_USER_BIN}"
-    ln --symbolic "${INSTALL_DIR}/kotlin-language-server/bin/kotlin-language-server" "${RUSH_USER_BIN}/kotlin-language-server"
+  mkdir --parent "${RUSH_USER_BIN}"
+  ln --symbolic "${INSTALL_DIR}/kotlin-language-server/bin/kotlin-language-server" "${RUSH_USER_BIN}/kotlin-language-server"
 }
 
 install_from_github

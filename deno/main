@@ -6,21 +6,21 @@ source "${REPO_PATH}/lib.sh"
 require_commands unzip curl
 
 if [ "${DENO_INSTALL:-}" == "" ]; then
-    log_error "DENO_INSTALL env variable hasn't been set. It should be permanently set."
-    log_error "Consider setting it to ${XDG_DATA_HOME}/deno"
-    exit 1
+  log_error "DENO_INSTALL env variable hasn't been set. It should be permanently set."
+  log_error "Consider setting it to ${XDG_DATA_HOME}/deno"
+  exit 1
 fi
 
 if command -v deno &>/dev/null; then
-    deno upgrade
+  deno upgrade
 else
-    old_dir="${DENO_INSTALL}.old"
-    rm -rf "${old_dir}"
-    test ! -d "${DENO_INSTALL}" || mv "${DENO_INSTALL}" "${old_dir}"
+  old_dir="${DENO_INSTALL}.old"
+  rm -rf "${old_dir}"
+  test ! -d "${DENO_INSTALL}" || mv "${DENO_INSTALL}" "${old_dir}"
 
-    CI=1 ./install.sh
-    test -h "${RUSH_USER_BIN}/deno" \
-        || ln --symbolic "${DENO_INSTALL}/bin/deno" "${RUSH_USER_BIN}/deno"
+  CI=1 ./install.sh
+  test -h "${RUSH_USER_BIN}/deno" \
+    || ln --symbolic "${DENO_INSTALL}/bin/deno" "${RUSH_USER_BIN}/deno"
 fi
 
 install_success

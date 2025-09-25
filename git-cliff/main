@@ -7,41 +7,41 @@ require_commands git tar
 
 # shellcheck disable=SC2034  # variables used in `install_from_github()`
 {
-    GITHUB_ORG="orhun"
-    GITHUB_REPO="git-cliff"
+  GITHUB_ORG="orhun"
+  GITHUB_REPO="git-cliff"
 }
 BIN_NAME="git-cliff"
 
 latest_version() {
-    # strip the leading `v` from the tag name
-    echo "${GITHUB_LATEST_TAG}" | cut --characters 2-
+  # strip the leading `v` from the tag name
+  echo "${GITHUB_LATEST_TAG}" | cut --characters 2-
 }
 
 installed_version() {
-    if ! command_exists "${BIN_NAME}"; then
-        echo ""
-        return 0
-    fi
+  if ! command_exists "${BIN_NAME}"; then
+    echo ""
+    return 0
+  fi
 
-    if ! [[ "$("${BIN_NAME}" --version)" =~ ^git-cliff\ ([[:digit:]]+\.[[:digit:]]+\.[[:digit:]]+) ]]; then
-        panic "Unable to determine currently installed version!"
-        exit 1  # redundant, but useful to shellcheck
-    fi
+  if ! [[ "$("${BIN_NAME}" --version)" =~ ^git-cliff\ ([[:digit:]]+\.[[:digit:]]+\.[[:digit:]]+) ]]; then
+    panic "Unable to determine currently installed version!"
+    exit 1 # redundant, but useful to shellcheck
+  fi
 
-    echo "${BASH_REMATCH[1]}"
+  echo "${BASH_REMATCH[1]}"
 }
 
 artifact_name() {
-    echo "git-cliff-$(latest_version)-x86_64-unknown-linux-musl.tar.gz"
+  echo "git-cliff-$(latest_version)-x86_64-unknown-linux-musl.tar.gz"
 }
 
 download_url() {
-    echo "https://github.com/${GITHUB_ORG}/${GITHUB_REPO}/releases/download/${GITHUB_LATEST_TAG}/$(artifact_name)"
+  echo "https://github.com/${GITHUB_ORG}/${GITHUB_REPO}/releases/download/${GITHUB_LATEST_TAG}/$(artifact_name)"
 }
 
 install_artifact() {
-    tar xzf "${ARTIFACT_PATH}"
-    install_user_bin "git-cliff-$(latest_version)/${BIN_NAME}"
+  tar xzf "${ARTIFACT_PATH}"
+  install_user_bin "git-cliff-$(latest_version)/${BIN_NAME}"
 }
 
 install_from_github

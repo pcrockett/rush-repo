@@ -3,7 +3,7 @@
 # shellcheck source=lib.sh
 source "${REPO_PATH}/lib.sh"
 rm -rf "${RUSH_USER_BIN}/roc" \
-    "${RUSH_USER_BIN}/roc_language_server" \
-    "${XDG_DATA_HOME}/roc" \
-    "${XDG_DATA_HOME}/roc.new" \
-    "${XDG_DATA_HOME}/roc.old"
+  "${RUSH_USER_BIN}/roc_language_server" \
+  "${XDG_DATA_HOME}/roc" \
+  "${XDG_DATA_HOME}/roc.new" \
+  "${XDG_DATA_HOME}/roc.old"

@@ -7,12 +7,12 @@ export GUM_WRITE_WIDTH="${GUM_WRITE_WIDTH:-90}"
 
 term_width="$(tput cols)"
 if [ "${term_width}" -lt "${GUM_WRITE_WIDTH}" ]; then
-    GUM_WRITE_WIDTH="${term_width}"
+  GUM_WRITE_WIDTH="${term_width}"
 fi
 
 query="$(
-    gum write --placeholder "Write something here... (CTRL+D to finish)" \
-        --char-limit 0
+  gum write --placeholder "Write something here... (CTRL+D to finish)" \
+    --char-limit 0
 )"
 
 # let the user see what they wrote after the prompt goes away
@@ -31,6 +31,6 @@ printf "> %s\n\n---\n\n" "${query}"
 
 gpt_command=(kagi gpt "${query}")
 gum spin --title "Waiting for response..." --show-output "${gpt_command[@]}" \
-    | sed 's|【|\\[|g' \
-    | sed 's|】|]|g' \
-    | bat --style rule --wrap never --language md --paging never
+  | sed 's|【|\\[|g' \
+  | sed 's|】|]|g' \
+  | bat --style rule --wrap never --language md --paging never

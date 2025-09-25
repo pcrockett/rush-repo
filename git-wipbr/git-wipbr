@@ -15,7 +15,6 @@ set -Eeuo pipefail
 #     # Switched to a new branch 'phil/wip/varied-cognitive'
 #
 
-
 GIT_WIPBR_MY_NAME="${GIT_WIPBR_MY_NAME:-phil}"
 XDG_CACHE_HOME="${XDG_CACHE_HOME:-${HOME}/.cache}"
 CACHE_DIR="${XDG_CACHE_HOME}/phil/wordlists"
@@ -23,24 +22,24 @@ WORD_LIST_FILE="${CACHE_DIR}/eff_short_wordlist_2_0.txt"
 WORD_LIST_URL="https://www.eff.org/files/2016/09/08/eff_short_wordlist_2_0.txt"
 
 curl_download() {
-    local url="${1}"
-    curl --proto '=https' --tlsv1.2 \
-        --silent \
-        --show-error \
-        --fail \
-        --location "${url}"
+  local url="${1}"
+  curl --proto '=https' --tlsv1.2 \
+    --silent \
+    --show-error \
+    --fail \
+    --location "${url}"
 }
 
 main() {
-    if [ ! -f "${WORD_LIST_FILE}" ]; then
-        mkdir -p "${CACHE_DIR}"
-        echo "Downloading ${WORD_LIST_URL} to ${WORD_LIST_FILE}..."
-        curl_download "${WORD_LIST_URL}" | awk '{print $2}' > "${WORD_LIST_FILE}"
-    fi
+  if [ ! -f "${WORD_LIST_FILE}" ]; then
+    mkdir -p "${CACHE_DIR}"
+    echo "Downloading ${WORD_LIST_URL} to ${WORD_LIST_FILE}..."
+    curl_download "${WORD_LIST_URL}" | awk '{print $2}' >"${WORD_LIST_FILE}"
+  fi
 
-    words="$(shuf --head-count 2 "${WORD_LIST_FILE}")"
-    branch_name="${GIT_WIPBR_MY_NAME}/wip/$(echo -n "${words}" | tr '\n' '-')"
-    git checkout -b "${branch_name}"
+  words="$(shuf --head-count 2 "${WORD_LIST_FILE}")"
+  branch_name="${GIT_WIPBR_MY_NAME}/wip/$(echo -n "${words}" | tr '\n' '-')"
+  git checkout -b "${branch_name}"
 }
 
 main

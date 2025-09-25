@@ -24,8 +24,8 @@ set -Eeuo pipefail
 MESSAGE_BODY="$(cat)"
 
 curl --silent --fail --show-error \
-    --data "text=${MESSAGE_BODY}" \
-    --data "channel=${SLACK_CHANNEL}" \
-    --header "Authorization: Bearer ${SLACK_AUTH_TOKEN}" \
-    --request POST \
-    --location "https://slack.com/api/chat.postMessage"
+  --data "text=${MESSAGE_BODY}" \
+  --data "channel=${SLACK_CHANNEL}" \
+  --header "Authorization: Bearer ${SLACK_AUTH_TOKEN}" \
+  --request POST \
+  --location "https://slack.com/api/chat.postMessage"

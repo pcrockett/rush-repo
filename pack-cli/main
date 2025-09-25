@@ -10,40 +10,40 @@ GITHUB_REPO="pack"
 BIN_NAME="pack"
 
 latest_version() {
-    # strip the leading `v` from the tag name
-    echo "${GITHUB_LATEST_TAG}" | cut --characters 2-
+  # strip the leading `v` from the tag name
+  echo "${GITHUB_LATEST_TAG}" | cut --characters 2-
 }
 
 installed_version() {
-    if ! command_exists "${BIN_NAME}"; then
-        echo ""
-        return 0
-    fi
+  if ! command_exists "${BIN_NAME}"; then
+    echo ""
+    return 0
+  fi
 
-    if ! [[ "$("${BIN_NAME}" --version 2> /dev/null)" =~ ^([[:digit:]]+\.[[:digit:]]+\.[[:digit:]]+)\+git ]]; then
-        panic "Unable to determine currently installed nextcloud version!"
-        exit 1  # redundant, but useful to shellcheck
-    fi
+  if ! [[ "$("${BIN_NAME}" --version 2>/dev/null)" =~ ^([[:digit:]]+\.[[:digit:]]+\.[[:digit:]]+)\+git ]]; then
+    panic "Unable to determine currently installed nextcloud version!"
+    exit 1 # redundant, but useful to shellcheck
+  fi
 
-    echo "${BASH_REMATCH[1]}"
+  echo "${BASH_REMATCH[1]}"
 }
 
 artifact_name() {
-    echo "pack-${GITHUB_LATEST_TAG}-linux.tgz"
+  echo "pack-${GITHUB_LATEST_TAG}-linux.tgz"
 }
 
 download_url() {
-    echo "https://github.com/${GITHUB_ORG}/${GITHUB_REPO}/releases/download/${GITHUB_LATEST_TAG}/$(artifact_name)"
+  echo "https://github.com/${GITHUB_ORG}/${GITHUB_REPO}/releases/download/${GITHUB_LATEST_TAG}/$(artifact_name)"
 }
 
 install_artifact() {
-    (
-        umask ugo=r
-        # shellcheck disable=SC2094  # we aren't reading / writing the same file
-        tar --extract --gzip --to-stdout --file "${ARTIFACT_PATH}" "${BIN_NAME}" > "${BIN_NAME}"
-    )
-    chmod +x "${BIN_NAME}"
-    install_user_bin "${BIN_NAME}"
+  (
+    umask ugo=r
+    # shellcheck disable=SC2094  # we aren't reading / writing the same file
+    tar --extract --gzip --to-stdout --file "${ARTIFACT_PATH}" "${BIN_NAME}" >"${BIN_NAME}"
+  )
+  chmod +x "${BIN_NAME}"
+  install_user_bin "${BIN_NAME}"
 }
 
 install_from_github

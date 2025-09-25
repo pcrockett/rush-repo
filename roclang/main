@@ -11,8 +11,8 @@ temp_dir="$(mktemp_dir)"
 pushd "${temp_dir}" &>/dev/null
 
 on_exit() {
-    popd &>/dev/null
-    rm -rf "${temp_dir}"
+  popd &>/dev/null
+  rm -rf "${temp_dir}"
 }
 trap 'on_exit' EXIT
 
@@ -23,9 +23,9 @@ install_dir="${XDG_DATA_HOME}/roc"
 # <https://github.com/roc-lang/roc/releases/download/nightly/roc_nightly-linux_x86_64-latest.tar.gz>
 #
 extract_tar_gz_url \
-    "https://github.com/roc-lang/roc/releases/download/alpha3-rolling/roc-linux_x86_64-alpha3-rolling.tar.gz" \
-    "${install_dir}" \
-    --strip-components 1
+  "https://github.com/roc-lang/roc/releases/download/alpha3-rolling/roc-linux_x86_64-alpha3-rolling.tar.gz" \
+  "${install_dir}" \
+  --strip-components 1
 
 ln --symbolic --force "${install_dir}/roc" "${RUSH_USER_BIN}"
 ln --symbolic --force "${install_dir}/roc_language_server" "${RUSH_USER_BIN}"

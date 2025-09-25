@@ -4,98 +4,98 @@
 source "${REPO_PATH}/lib.sh"
 
 should_skip() {
-    # given the name of a command, check if there's a UPDATER_SKIP_{COMMAND} variable
-    # defined. if it is a non-empty string, return a zero exit-code.
-    local command command_upper
-    command="${1:?must specify a command}"
-    command_upper="$(echo "${command}" | tr '[:punct:][:blank:]' '_' | tr '[:lower:]' '[:upper:]')"
-    local skip_variable_name="UPDATER_SKIP_${command_upper}"
-    test "${!skip_variable_name:-}" != ""
+  # given the name of a command, check if there's a UPDATER_SKIP_{COMMAND} variable
+  # defined. if it is a non-empty string, return a zero exit-code.
+  local command command_upper
+  command="${1:?must specify a command}"
+  command_upper="$(echo "${command}" | tr '[:punct:][:blank:]' '_' | tr '[:lower:]' '[:upper:]')"
+  local skip_variable_name="UPDATER_SKIP_${command_upper}"
+  test "${!skip_variable_name:-}" != ""
 }
 
 run_if() {
-    local command
-    command="${1:?must specify a command}"
-    should_skip "${command}" && return 0
-    if command_exists "${command}"; then
-        "${@}"
-    fi
+  local command
+  command="${1:?must specify a command}"
+  should_skip "${command}" && return 0
+  if command_exists "${command}"; then
+    "${@}"
+  fi
 }
 
 root_run_if() {
-    local command
-    command="${1:?must specify a command}"
-    should_skip "${command}" && return 0
-    if command_exists "${command}"; then
-        as_root "${@}"
-    fi
+  local command
+  command="${1:?must specify a command}"
+  should_skip "${command}" && return 0
+  if command_exists "${command}"; then
+    as_root "${@}"
+  fi
 }
 
 rush_packages() {
-    should_skip "rush" && return 0
-    local installed_packages_dir
-    installed_packages_dir="$(repo_state_dir)/installed_packages"
-    mkdir --parent "${installed_packages_dir}"
+  should_skip "rush" && return 0
+  local installed_packages_dir
+  installed_packages_dir="$(repo_state_dir)/installed_packages"
+  mkdir --parent "${installed_packages_dir}"
 
-    for package_name in $(installed_package_names); do
-        rush get "${package_name}" || panic "Unable to update ${package_name}"
-    done
+  for package_name in $(installed_package_names); do
+    rush get "${package_name}" || panic "Unable to update ${package_name}"
+  done
 }
 
 check_arch_news() {
-    if ! command_exists arch-news-check || should_skip arch-news-check; then
-        return 0
-    elif arch-news-check; then
-        log_info "No new Arch news."
-        return 0
+  if ! command_exists arch-news-check || should_skip arch-news-check; then
+    return 0
+  elif arch-news-check; then
+    log_info "No new Arch news."
+    return 0
+  else
+    if command_exists w3m; then
+      w3m "https://archlinux.org/news/"
+      log_attention "If you want to continue, run this script again."
+      return 1
     else
-        if command_exists w3m; then
-            w3m "https://archlinux.org/news/"
-            log_attention "If you want to continue, run this script again."
-            return 1
-        else
-            log_attention "Check arch news first! <https://archlinux.org/news/>"
-            return 1
-        fi
+      log_attention "Check arch news first! <https://archlinux.org/news/>"
+      return 1
     fi
+  fi
 }
 
 github_token() {
-    if command -v gh &>/dev/null; then
-        gh auth token
-    fi
+  if command -v gh &>/dev/null; then
+    gh auth token
+  fi
 }
 
 main() {
-    root_run_if apt-get update
-    root_run_if apt-get upgrade --yes --with-new-pkgs
-    if check_arch_news; then
-        root_run_if pacman -Syu --noconfirm
-        run_if yay -Syu --noconfirm --aur
-    else
-        exit 1
-    fi
+  root_run_if apt-get update
+  root_run_if apt-get upgrade --yes --with-new-pkgs
+  if check_arch_news; then
+    root_run_if pacman -Syu --noconfirm
+    run_if yay -Syu --noconfirm --aur
+  else
+    exit 1
+  fi
 
-    run_if rpm-ostree update &
-    local job_ostree_update=$!
+  run_if rpm-ostree update &
+  local job_ostree_update=$!
 
-    GITHUB_TOKEN="$(github_token)" rush_packages
+  GITHUB_TOKEN="$(github_token)" rush_packages
 
-    run_if flatpak uninstall --unused --assumeyes
-    run_if flatpak update --assumeyes
-    run_if pipx upgrade-all --include-injected
-    run_if gh extension upgrade --all
-    run_if heroku plugins:update
-    run_if brew update --quiet
-    run_if brew upgrade
-    run_if devbox version update
-    run_if asdf plugin update --all
-    run_if rustup update
+  run_if flatpak uninstall --unused --assumeyes
+  run_if flatpak update --assumeyes
+  run_if pipx upgrade-all --include-injected
+  run_if gh extension upgrade --all
+  run_if heroku plugins:update
+  run_if brew update --quiet
+  run_if brew upgrade
+  run_if devbox version update
+  run_if asdf plugin update --all
+  run_if rustup update
 
-    wait "${job_ostree_update}"
+  wait "${job_ostree_update}"
 
-    log_attention "Done"
-    exit 0
+  log_attention "Done"
+  exit 0
 }
 
 main

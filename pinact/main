@@ -7,41 +7,41 @@ require_commands tar
 
 # shellcheck disable=SC2034  # variables used in `install_from_github()`
 {
-    GITHUB_ORG="suzuki-shunsuke"
-    GITHUB_REPO="pinact"
+  GITHUB_ORG="suzuki-shunsuke"
+  GITHUB_REPO="pinact"
 }
 BIN_NAME="pinact"
 
 latest_version() {
-    # strip the leading `v` from the tag name
-    echo "${GITHUB_LATEST_TAG}" | cut --characters 2-
+  # strip the leading `v` from the tag name
+  echo "${GITHUB_LATEST_TAG}" | cut --characters 2-
 }
 
 installed_version() {
-    if ! command_exists "${BIN_NAME}"; then
-        echo ""
-        return 0
-    fi
+  if ! command_exists "${BIN_NAME}"; then
+    echo ""
+    return 0
+  fi
 
-    if ! [[ "$("${BIN_NAME}" --version)" =~ ^pinact\ version\ ([[:digit:]]+\.[[:digit:]]+\.[[:digit:]]+) ]]; then
-        panic "Unable to determine currently installed version!"
-        exit 1  # redundant, but useful to shellcheck
-    fi
+  if ! [[ "$("${BIN_NAME}" --version)" =~ ^pinact\ version\ ([[:digit:]]+\.[[:digit:]]+\.[[:digit:]]+) ]]; then
+    panic "Unable to determine currently installed version!"
+    exit 1 # redundant, but useful to shellcheck
+  fi
 
-    echo "${BASH_REMATCH[1]}"
+  echo "${BASH_REMATCH[1]}"
 }
 
 artifact_name() {
-    echo "pinact_linux_amd64.tar.gz"
+  echo "pinact_linux_amd64.tar.gz"
 }
 
 download_url() {
-    echo "https://github.com/${GITHUB_ORG}/${GITHUB_REPO}/releases/download/${GITHUB_LATEST_TAG}/$(artifact_name)"
+  echo "https://github.com/${GITHUB_ORG}/${GITHUB_REPO}/releases/download/${GITHUB_LATEST_TAG}/$(artifact_name)"
 }
 
 install_artifact() {
-    tar xzf "${ARTIFACT_PATH}"
-    install_user_bin pinact
+  tar xzf "${ARTIFACT_PATH}"
+  install_user_bin pinact
 }
 
 install_from_github

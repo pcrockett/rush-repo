@@ -7,7 +7,7 @@ require_commands direnv
 dest_file="${USER_CWD}/.envrc"
 
 if [ ! -f "${dest_file}" ] || force_please; then
-    cp envrc_template.sh "${dest_file}"
+  cp envrc_template.sh "${dest_file}"
 else
-    panic ".envrc already exists in this directory. Use --force to overwrite."
+  panic ".envrc already exists in this directory. Use --force to overwrite."
 fi

@@ -7,36 +7,36 @@ require_commands tar
 
 # shellcheck disable=SC2034  # variables used in `install_from_github()`
 {
-    GITHUB_ORG="trufflesecurity"
-    GITHUB_REPO="trufflehog"
+  GITHUB_ORG="trufflesecurity"
+  GITHUB_REPO="trufflehog"
 }
 BIN_NAME="trufflehog"
 
 latest_version() {
-    # strip the leading `v` from the tag name:
-    echo "${GITHUB_LATEST_TAG}" | cut --characters 2-
+  # strip the leading `v` from the tag name:
+  echo "${GITHUB_LATEST_TAG}" | cut --characters 2-
 }
 
 installed_version() {
-    if ! command_exists "${BIN_NAME}"; then
-        echo ""
-        return 0
-    fi
+  if ! command_exists "${BIN_NAME}"; then
+    echo ""
+    return 0
+  fi
 
-    installed_package_version
+  installed_package_version
 }
 
 artifact_name() {
-    echo "trufflehog_$(latest_version)_linux_amd64.tar.gz"
+  echo "trufflehog_$(latest_version)_linux_amd64.tar.gz"
 }
 
 download_url() {
-    echo "https://github.com/${GITHUB_ORG}/${GITHUB_REPO}/releases/download/${GITHUB_LATEST_TAG}/$(artifact_name)"
+  echo "https://github.com/${GITHUB_ORG}/${GITHUB_REPO}/releases/download/${GITHUB_LATEST_TAG}/$(artifact_name)"
 }
 
 install_artifact() {
-    tar -xzf "${ARTIFACT_PATH}"
-    install_user_bin "${BIN_NAME}"
+  tar -xzf "${ARTIFACT_PATH}"
+  install_user_bin "${BIN_NAME}"
 }
 
 install_from_github

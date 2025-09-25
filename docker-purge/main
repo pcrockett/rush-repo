@@ -14,12 +14,12 @@ require_commands apt-get
 #
 
 packages=(
-    docker-ce
-    docker-ce-cli
-    containerd.io
-    docker-buildx-plugin
-    docker-compose-plugin
-    docker-ce-rootless-extras
+  docker-ce
+  docker-ce-cli
+  containerd.io
+  docker-buildx-plugin
+  docker-compose-plugin
+  docker-ce-rootless-extras
 )
 
 as_root apt-get purge "${packages[@]}"

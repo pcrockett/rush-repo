@@ -7,8 +7,8 @@ src="compose.yaml"
 dst="${USER_CWD}/compose.yaml"
 
 if [ -e "${dst}" ] && ! force_please; then
-    panic "Already exists: ${dst}"
+  panic "Already exists: ${dst}"
 else
-    cp "${src}" "${dst}"
-    log_attention "Created ${dst}"
+  cp "${src}" "${dst}"
+  log_attention "Created ${dst}"
 fi

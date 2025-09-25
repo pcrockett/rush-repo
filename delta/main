@@ -7,36 +7,36 @@ require_commands tar
 
 # shellcheck disable=SC2034  # variables used in `install_from_github()`
 {
-    GITHUB_ORG="dandavison"
-    GITHUB_REPO="delta"
+  GITHUB_ORG="dandavison"
+  GITHUB_REPO="delta"
 }
 BIN_NAME="delta"
 
 latest_version() {
-    echo "${GITHUB_LATEST_TAG}"
+  echo "${GITHUB_LATEST_TAG}"
 }
 
 installed_version() {
-    if ! command_exists "${BIN_NAME}"; then
-        echo ""
-        return 0
-    fi
+  if ! command_exists "${BIN_NAME}"; then
+    echo ""
+    return 0
+  fi
 
-    installed_package_version
+  installed_package_version
 }
 
 artifact_name() {
-    echo "delta-${GITHUB_LATEST_TAG}-x86_64-unknown-linux-musl.tar.gz"
+  echo "delta-${GITHUB_LATEST_TAG}-x86_64-unknown-linux-musl.tar.gz"
 }
 
 download_url() {
-    echo "https://github.com/${GITHUB_ORG}/${GITHUB_REPO}/releases/download/${GITHUB_LATEST_TAG}/$(artifact_name)"
+  echo "https://github.com/${GITHUB_ORG}/${GITHUB_REPO}/releases/download/${GITHUB_LATEST_TAG}/$(artifact_name)"
 }
 
 install_artifact() {
-    tar -xzf "${ARTIFACT_PATH}"
-    subdir="$(basename "${ARTIFACT_PATH}" .tar.gz)"
-    install_user_bin "${subdir}/${BIN_NAME}"
+  tar -xzf "${ARTIFACT_PATH}"
+  subdir="$(basename "${ARTIFACT_PATH}" .tar.gz)"
+  install_user_bin "${subdir}/${BIN_NAME}"
 }
 
 install_from_github

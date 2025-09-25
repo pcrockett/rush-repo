@@ -12,9 +12,9 @@ set -Eeuo pipefail
 #
 
 usage() {
-    local command_name
-    command_name="$(basename "${0}")"
-    cat <<EOF
+  local command_name
+  command_name="$(basename "${0}")"
+  cat <<EOF
 ${command_name}: TODO: Synopsis here
 
 Usage: ${command_name} [OPTIONS...] [SUBCOMMAND]
@@ -36,41 +36,41 @@ EOF
 }
 
 panic() {
-    echo "$*" >&2
-    exit 1
+  echo "$*" >&2
+  exit 1
 }
 
 init() {
-    SUBCOMMAND="help"
-    SUBCOMMAND_ARGS=()
+  SUBCOMMAND="help"
+  SUBCOMMAND_ARGS=()
 }
 
 subcommand:help() {
-    usage
+  usage
 }
 
 parse_args() {
-    while [ ${#} -ge 1 ]; do
-        case "${1}" in
-            help|-h|--help|/?)
-                SUBCOMMAND="help"
-            ;;
-            --TODO)
-                SUBCOMMAND_ARGS+=("TODO")
-            ;;
-            *)
-                panic "Unrecognized arg: \"${1}\". See --help for usage."
-            ;;
-        esac
-        shift
-    done
+  while [ ${#} -ge 1 ]; do
+    case "${1}" in
+      help | -h | --help | /?)
+        SUBCOMMAND="help"
+        ;;
+      --TODO)
+        SUBCOMMAND_ARGS+=("TODO")
+        ;;
+      *)
+        panic "Unrecognized arg: \"${1}\". See --help for usage."
+        ;;
+    esac
+    shift
+  done
 }
 
 main() {
-    init
-    parse_args "${@}"
-    "subcommand:${SUBCOMMAND}" "${SUBCOMMAND_ARGS[@]}"
-    exit $?  # in case this script changes while running
+  init
+  parse_args "${@}"
+  "subcommand:${SUBCOMMAND}" "${SUBCOMMAND_ARGS[@]}"
+  exit $? # in case this script changes while running
 }
 
 main "${@}"

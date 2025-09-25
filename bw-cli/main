@@ -8,21 +8,21 @@ require_commands unzip
 download_url="https://vault.bitwarden.com/download/?app=cli&platform=linux"
 
 if command_exists bw; then
-    download_url="$(bw update --raw)"
-    if [ "${download_url}" == "" ]; then
-        log_attention "Already installed and up-to-date."
-        exit
-    fi
+  download_url="$(bw update --raw)"
+  if [ "${download_url}" == "" ]; then
+    log_attention "Already installed and up-to-date."
+    exit
+  fi
 fi
 
 temp_dir="$(mktemp_dir)"
 on_exit() {
-    rm -rf "${temp_dir}"
+  rm -rf "${temp_dir}"
 }
 trap 'on_exit' EXIT
 
 cd "${temp_dir}"
-curl_download "${download_url}" > bw.zip
+curl_download "${download_url}" >bw.zip
 unzip bw.zip
 install_user_bin bw
 install_success

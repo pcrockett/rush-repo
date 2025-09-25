@@ -37,8 +37,8 @@ init() {
   shift 1
 
   case "${TIME_INTERVAL}" in
-    minute|hour|day|week|month)
-      true  # input looks good, carry on
+    minute | hour | day | week | month)
+      true # input looks good, carry on
       ;;
     *)
       echo "ERROR: Must specify one of minute, hour, day, week, or month as first argument"
@@ -115,7 +115,7 @@ main() {
   SCRIPT_DIR="${OCCASIONAL_CONFIG_DIR}/${TIME_INTERVAL}"
 
   (
-    umask u=rwx,g=,o=  # restrict permissions so it's safe to hard-code secrets in scripts
+    umask u=rwx,g=,o= # restrict permissions so it's safe to hard-code secrets in scripts
     mkdir --parent "${SCRIPT_DIR}"
   )
   test -d "${SCRIPT_DIR}" || panic "Not a directory: ${SCRIPT_DIR}"

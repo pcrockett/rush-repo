@@ -11,13 +11,12 @@ systemd_service_file="${systemd_config_dir}/filen-sync.service"
 systemd_timer_file="${systemd_config_dir}/filen-sync.timer"
 mkdir --parent "${systemd_config_dir}"
 
-for file in "${systemd_service_file}" "${systemd_timer_file}";
-do
-    if [ -e "${file}" ]; then
-        if ! force_please; then
-            panic "Already exists: ${file}. Use --force to overwrite."
-        fi
+for file in "${systemd_service_file}" "${systemd_timer_file}"; do
+  if [ -e "${file}" ]; then
+    if ! force_please; then
+      panic "Already exists: ${file}. Use --force to overwrite."
     fi
+  fi
 done
 
 FILEN_PATH="$(printf '%q' "$(command -v filen)")"
@@ -26,7 +25,7 @@ export MOUNTPOINT_PATH=~/Filen/Sync
 mkdir --parent "${MOUNTPOINT_PATH}"
 MOUNTPOINT_PATH="$(printf '%q' "${MOUNTPOINT_PATH}")"
 
-envsubst < filen-sync.service.template > "${systemd_service_file}"
+envsubst <filen-sync.service.template >"${systemd_service_file}"
 cp filen-sync.timer "${systemd_config_dir}"
 
 systemctl daemon-reload --user

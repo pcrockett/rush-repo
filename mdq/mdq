@@ -35,48 +35,48 @@ MDQUERY_DEBUG="${MDQUERY_DEBUG:-false}"
 MDQUERY_FILE_TYPE="${MDQUERY_FILE_TYPE:-markdown}"
 
 log_debug() {
-    if [ "${MDQUERY_DEBUG}" = "true" ]; then
-        echo "DEBUG: ${*}"
-    fi
+  if [ "${MDQUERY_DEBUG}" = "true" ]; then
+    echo "DEBUG: ${*}"
+  fi
 }
 
 find_files_with_term() {
-    local term="${1}"
-    shift 1
-    local files=("${@}")
-    rg --files-with-matches --fixed-strings --null --ignore-case \
-        --regexp "${term}" \
-        "${files[@]}"
+  local term="${1}"
+  shift 1
+  local files=("${@}")
+  rg --files-with-matches --fixed-strings --null --ignore-case \
+    --regexp "${term}" \
+    "${files[@]}"
 }
 
 fzf_preview() {
-    SHELL="sh" \
+  SHELL="sh" \
     fzf --ansi \
-        --preview "bat --color=always {1} --terminal-width \${FZF_PREVIEW_COLUMNS} --wrap never" \
-        --preview-window 'up,70%,border-bottom' \
-        --multi
+    --preview "bat --color=always {1} --terminal-width \${FZF_PREVIEW_COLUMNS} --wrap never" \
+    --preview-window 'up,70%,border-bottom' \
+    --multi
 }
 
 find_files_with_all_terms() {
-    local terms=("${@}")
-    local files
-    readarray -d '' files < <(rg --files --null --type "${MDQUERY_FILE_TYPE}")
-    log_debug "initial file count: ${#files[@]}"
-    for t in "${terms[@]}"; do
-        log_debug "searching for '${t}'..."
-        readarray -d '' files < <(find_files_with_term "${t}" "${files[@]}")
-        log_debug "new file count: ${#files[@]}"
-        if [ "${#files[@]}" -eq 0 ]; then
-            exit 1
-        fi
-    done
-    for f in "${files[@]}"; do
-        echo "${f}"
-    done
+  local terms=("${@}")
+  local files
+  readarray -d '' files < <(rg --files --null --type "${MDQUERY_FILE_TYPE}")
+  log_debug "initial file count: ${#files[@]}"
+  for t in "${terms[@]}"; do
+    log_debug "searching for '${t}'..."
+    readarray -d '' files < <(find_files_with_term "${t}" "${files[@]}")
+    log_debug "new file count: ${#files[@]}"
+    if [ "${#files[@]}" -eq 0 ]; then
+      exit 1
+    fi
+  done
+  for f in "${files[@]}"; do
+    echo "${f}"
+  done
 }
 
 main() {
-    find_files_with_all_terms "${@}" | sort --stable | fzf_preview
+  find_files_with_all_terms "${@}" | sort --stable | fzf_preview
 }
 
 main "${@}"

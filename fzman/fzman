@@ -18,16 +18,16 @@ set -Eeuo pipefail
 CLI_ARGS=("$@")
 
 main() {
-    INITIAL_QUERY="${CLI_ARGS[*]}"
-    FZF_DEFAULT_COMMAND="man -k $(printf %q "${INITIAL_QUERY}")" \
-    SHELL=sh \
+  INITIAL_QUERY="${CLI_ARGS[*]}"
+  FZF_DEFAULT_COMMAND="man -k $(printf %q "${INITIAL_QUERY}")" \
+  SHELL=sh \
     fzf --ansi \
-        --disabled \
-        --query "${INITIAL_QUERY}" \
-        --bind "change:reload(man -k {q} || true;)" \
-        --preview "man {1}{2}" \
-        --preview-window "top,70%" \
-        --bind "enter:become(man {1}{2})"
+    --disabled \
+    --query "${INITIAL_QUERY}" \
+    --bind "change:reload(man -k {q} || true;)" \
+    --preview "man {1}{2}" \
+    --preview-window "top,70%" \
+    --bind "enter:become(man {1}{2})"
 }
 
 main

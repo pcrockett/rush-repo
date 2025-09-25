@@ -4,10 +4,13 @@
 source "${REPO_PATH}/lib.sh"
 
 main() {
-    CURRENT_OS_VERSION="$(source /etc/os-release; echo "${VERSION_ID}";)"
-    NEXT_OS_VERSION=$((CURRENT_OS_VERSION + 1))
-    rpm-ostree rebase "fedora:fedora/${NEXT_OS_VERSION}/x86_64/silverblue"
-    exit $?
+  CURRENT_OS_VERSION="$(
+    source /etc/os-release
+    echo "${VERSION_ID}"
+  )"
+  NEXT_OS_VERSION=$((CURRENT_OS_VERSION + 1))
+  rpm-ostree rebase "fedora:fedora/${NEXT_OS_VERSION}/x86_64/silverblue"
+  exit $?
 }
 
 main

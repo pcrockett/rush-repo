@@ -24,30 +24,30 @@ set -Eeuo pipefail
 #
 
 panic() {
-    echo "FATAL: ${*}" >&2
-    exit 1
+  echo "FATAL: ${*}" >&2
+  exit 1
 }
 
 init() {
-    THIS_SCRIPT="$(readlink -f "${0}")"
-    THIS_USER_NAME="$(id --user --name)"
-    NOTIFY_SEND_USER="${NOTIFY_SEND_USER:-"${THIS_USER_NAME}"}"
+  THIS_SCRIPT="$(readlink -f "${0}")"
+  THIS_USER_NAME="$(id --user --name)"
+  NOTIFY_SEND_USER="${NOTIFY_SEND_USER:-"${THIS_USER_NAME}"}"
 }
 
 main() {
-    init
-    if [ "${NOTIFY_SEND_USER}" == "${THIS_USER_NAME}" ]; then
-        local dest_uid dbus_address
-        dest_uid="$(id --user "${NOTIFY_SEND_USER}")"
-        dbus_address="/run/user/${dest_uid}/bus"
-        test -e "${dbus_address}" || panic "Unable to find ${dbus_address}"
+  init
+  if [ "${NOTIFY_SEND_USER}" == "${THIS_USER_NAME}" ]; then
+    local dest_uid dbus_address
+    dest_uid="$(id --user "${NOTIFY_SEND_USER}")"
+    dbus_address="/run/user/${dest_uid}/bus"
+    test -e "${dbus_address}" || panic "Unable to find ${dbus_address}"
 
-        # Thanks https://stackoverflow.com/a/49426970/138757
-        DISPLAY=:0 DBUS_SESSION_BUS_ADDRESS="unix:path=${dbus_address}" \
-            notify-send "${@}"
-    else
-        sudo --user "${NOTIFY_SEND_USER}" -- "${THIS_SCRIPT}" "${@}"
-    fi
+    # Thanks https://stackoverflow.com/a/49426970/138757
+    DISPLAY=:0 DBUS_SESSION_BUS_ADDRESS="unix:path=${dbus_address}" \
+      notify-send "${@}"
+  else
+    sudo --user "${NOTIFY_SEND_USER}" -- "${THIS_SCRIPT}" "${@}"
+  fi
 
 }
 

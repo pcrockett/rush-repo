@@ -4,20 +4,20 @@
 source "${REPO_PATH}/lib.sh"
 
 safe_kill() {
-    for proc_name in "${@}"; do
-        if pgrep "${proc_name}"; then
-            pkill "${proc_name}"
-        fi
-    done
+  for proc_name in "${@}"; do
+    if pgrep "${proc_name}"; then
+      pkill "${proc_name}"
+    fi
+  done
 }
 
 safe_kill aw-qt aw-server aw-watcher
 
 rm -f \
-    "${RUSH_USER_BIN}/aw-qt" \
-    "${RUSH_USER_BIN}/aw-server" \
-    "${HOME}/.config/autostart/aw-qt.desktop" \
-    "${HOME}/.local/share/applications/aw-qt.desktop"
+  "${RUSH_USER_BIN}/aw-qt" \
+  "${RUSH_USER_BIN}/aw-server" \
+  "${HOME}/.config/autostart/aw-qt.desktop" \
+  "${HOME}/.local/share/applications/aw-qt.desktop"
 
 rm -rf "${HOME}/.local/share/rush/pcrockett/activitywatch"
 

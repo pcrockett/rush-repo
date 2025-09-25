@@ -5,36 +5,36 @@ source "${REPO_PATH}/lib.sh"
 
 # shellcheck disable=SC2034  # variables used in `install_from_github()`
 {
-    GITHUB_ORG="simplex-chat"
-    GITHUB_REPO="simplex-chat"
+  GITHUB_ORG="simplex-chat"
+  GITHUB_REPO="simplex-chat"
 }
 BIN_NAME="simplex-chat"
 
 latest_version() {
-    echo "${GITHUB_LATEST_TAG}"
+  echo "${GITHUB_LATEST_TAG}"
 }
 
 installed_version() {
-    if ! command_exists "${BIN_NAME}"; then
-        echo ""
-        return 0
-    fi
+  if ! command_exists "${BIN_NAME}"; then
+    echo ""
+    return 0
+  fi
 
-    installed_package_version
+  installed_package_version
 }
 
 artifact_name() {
-    echo "simplex-chat-ubuntu-22_04-x86_64"
+  echo "simplex-chat-ubuntu-22_04-x86_64"
 }
 
 download_url() {
-    echo "https://github.com/${GITHUB_ORG}/${GITHUB_REPO}/releases/download/${GITHUB_LATEST_TAG}/$(artifact_name)"
+  echo "https://github.com/${GITHUB_ORG}/${GITHUB_REPO}/releases/download/${GITHUB_LATEST_TAG}/$(artifact_name)"
 }
 
 install_artifact() {
-    chmod +x "${ARTIFACT_PATH}"
-    mv "${ARTIFACT_PATH}" "${BIN_NAME}"
-    install_user_bin "${BIN_NAME}"
+  chmod +x "${ARTIFACT_PATH}"
+  mv "${ARTIFACT_PATH}" "${BIN_NAME}"
+  install_user_bin "${BIN_NAME}"
 }
 
 install_from_github

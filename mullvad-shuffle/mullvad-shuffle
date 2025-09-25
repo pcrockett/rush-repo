@@ -4,7 +4,7 @@ set -euo pipefail
 # <https://theprivacygroup.com/articles/gdpr-countries/>
 
 get_awk_program() {
-    cat <<'EOF'
+  cat <<'EOF'
 BEGIN {
     countries["Austria"] = 1;
     countries["Belgium"] = 1;
@@ -43,21 +43,21 @@ EOF
 }
 
 random_exit_ip() {
-    tailscale exit-node list \
-        | grep --invert-match --perl-regexp '^#' \
-        | grep --invert-match --perl-regexp '^\s*$' \
-        | tail --lines +2 \
-        | awk "$(get_awk_program)" \
-        | shuf --head-count 1
+  tailscale exit-node list \
+    | grep --invert-match --perl-regexp '^#' \
+    | grep --invert-match --perl-regexp '^\s*$' \
+    | tail --lines +2 \
+    | awk "$(get_awk_program)" \
+    | shuf --head-count 1
 }
 
 main() {
-    local exit_node
-    exit_node="$(random_exit_ip)"
-    if [ "${exit_node}" == "" ]; then
-        exit 1 # `tailscale` has already printed a good error to stderr, no need to repeat it
-    fi
-    tailscale set --exit-node "${exit_node}"
+  local exit_node
+  exit_node="$(random_exit_ip)"
+  if [ "${exit_node}" == "" ]; then
+    exit 1 # `tailscale` has already printed a good error to stderr, no need to repeat it
+  fi
+  tailscale set --exit-node "${exit_node}"
 }
 
 main

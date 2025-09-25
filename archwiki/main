@@ -4,7 +4,7 @@
 source "${REPO_PATH}/lib.sh"
 
 require_commands pacman fzf w3m rg
-pacman --query arch-wiki-docs &> /dev/null \
-    || panic "Need to install arch-wiki-docs first"
+pacman --query arch-wiki-docs &>/dev/null \
+  || panic "Need to install arch-wiki-docs first"
 install_user_bin archwiki
 install_success

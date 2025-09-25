@@ -8,35 +8,35 @@ GITHUB_REPO="fzf"
 BIN_NAME="fzf"
 
 latest_version() {
-    # strip the leading `v` from the tag name
-    echo "${GITHUB_LATEST_TAG}" | cut --characters 2-
+  # strip the leading `v` from the tag name
+  echo "${GITHUB_LATEST_TAG}" | cut --characters 2-
 }
 
 installed_version() {
-    if ! command_exists "${BIN_NAME}"; then
-        echo ""
-        return 0
-    fi
+  if ! command_exists "${BIN_NAME}"; then
+    echo ""
+    return 0
+  fi
 
-    if ! [[ "$("${BIN_NAME}" --version)" =~ ^([[:digit:]]+\.[[:digit:]]+\.[[:digit:]]+) ]]; then
-        panic "Unable to determine currently installed version!"
-        exit 1  # redundant, but useful to shellcheck
-    fi
+  if ! [[ "$("${BIN_NAME}" --version)" =~ ^([[:digit:]]+\.[[:digit:]]+\.[[:digit:]]+) ]]; then
+    panic "Unable to determine currently installed version!"
+    exit 1 # redundant, but useful to shellcheck
+  fi
 
-    echo "${BASH_REMATCH[1]}"
+  echo "${BASH_REMATCH[1]}"
 }
 
 artifact_name() {
-    echo "fzf-$(latest_version)-linux_amd64.tar.gz"
+  echo "fzf-$(latest_version)-linux_amd64.tar.gz"
 }
 
 download_url() {
-    echo "https://github.com/${GITHUB_ORG}/${GITHUB_REPO}/releases/download/${GITHUB_LATEST_TAG}/$(artifact_name)"
+  echo "https://github.com/${GITHUB_ORG}/${GITHUB_REPO}/releases/download/${GITHUB_LATEST_TAG}/$(artifact_name)"
 }
 
 install_artifact() {
-    tar xzf "${ARTIFACT_PATH}"
-    install_global_bin "${BIN_NAME}"
+  tar xzf "${ARTIFACT_PATH}"
+  install_global_bin "${BIN_NAME}"
 }
 
 install_from_github

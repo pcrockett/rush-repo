@@ -24,52 +24,52 @@ set -Eeuo pipefail
 #
 
 panic() {
-    echo "${@}" >&2
-    exit 1
+  echo "${@}" >&2
+  exit 1
 }
 
 init() {
-    INITIAL_QUERY="${*}"
+  INITIAL_QUERY="${*}"
 }
 
 select_ykman_item() {
-    # prompt the user to select a ykman item (if necessary) and write it to stdout
+  # prompt the user to select a ykman item (if necessary) and write it to stdout
 
-    codes="$(ykman oath accounts code)" || exit 1
-    test "${codes}" != "" || panic "No TOTP codes found on key."
-    echo "${codes}" \
-        | fzf --height 10 --reverse --select-1 --query "${INITIAL_QUERY}"
+  codes="$(ykman oath accounts code)" || exit 1
+  test "${codes}" != "" || panic "No TOTP codes found on key."
+  echo "${codes}" \
+    | fzf --height 10 --reverse --select-1 --query "${INITIAL_QUERY}"
 }
 
 get_code() {
-    # expects a ykman "item" on stdin
-    # outputs the code on stdout
-    # will output `[Requires Touch]` if it requires touch
-    grep --only-matching --perl-regexp '\d+$|\[Requires Touch\]$'
+  # expects a ykman "item" on stdin
+  # outputs the code on stdout
+  # will output `[Requires Touch]` if it requires touch
+  grep --only-matching --perl-regexp '\d+$|\[Requires Touch\]$'
 }
 
 main() {
-    init "$@"
+  init "$@"
 
-    ykman_item="$(select_ykman_item)"
-    code="$(echo "${ykman_item}" | get_code)"
+  ykman_item="$(select_ykman_item)"
+  code="$(echo "${ykman_item}" | get_code)"
 
-    if [ "${code}" == "[Requires Touch]" ]; then
-        # in order to go through the manual "touch" workflow, we need to re-run `ykman`
-        # with the exact ID of the code that was selected
-        item_id="$(
-            echo "${ykman_item}" | grep --only-matching --perl-regexp '\S+(?=\s+\[Requires Touch\]$)'
-        )"
-        code="$(ykman oath accounts code --single "${item_id}" | get_code)"
-    fi
+  if [ "${code}" == "[Requires Touch]" ]; then
+    # in order to go through the manual "touch" workflow, we need to re-run `ykman`
+    # with the exact ID of the code that was selected
+    item_id="$(
+      echo "${ykman_item}" | grep --only-matching --perl-regexp '\S+(?=\s+\[Requires Touch\]$)'
+    )"
+    code="$(ykman oath accounts code --single "${item_id}" | get_code)"
+  fi
 
-    # don't require xsel, but use it if you have it.
-    if command -v xsel &> /dev/null; then
-        echo -n "${code}" | xsel --clipboard
-        echo "Code copied to clipboard." >&2
-    fi
+  # don't require xsel, but use it if you have it.
+  if command -v xsel &>/dev/null; then
+    echo -n "${code}" | xsel --clipboard
+    echo "Code copied to clipboard." >&2
+  fi
 
-    echo "${code}"
+  echo "${code}"
 }
 
 main "$@"

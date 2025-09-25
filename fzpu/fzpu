@@ -19,16 +19,17 @@ CLI_ARGS=("${@}")
 
 select_job_ids() {
 
-    local js_query
+  local js_query
 
-    # construct an `fx` query that returns the following lines from `pueue status --json`:
-    #
-    #     TASK_ID\\STATUS\\COMMAND\\PATH\\GROUP
-    #
-    # we will use `\\` as the delimiter later when running the `column` command, to give
-    # us a nice table output.
-    #
-    js_query="$(cat <<EOF
+  # construct an `fx` query that returns the following lines from `pueue status --json`:
+  #
+  #     TASK_ID\\STATUS\\COMMAND\\PATH\\GROUP
+  #
+  # we will use `\\` as the delimiter later when running the `column` command, to give
+  # us a nice table output.
+  #
+  js_query="$(
+    cat <<EOF
 status => Object.values(status.tasks)
     .map(task => {
         // task.status can be one of the following:
@@ -47,42 +48,42 @@ status => Object.values(status.tasks)
     })
     .join("\n")
 EOF
-)"
+  )"
 
-    # shellcheck disable=SC1003  # double-backslash is not meant for escaping.
-    pueue status --json \
-        | fx "${js_query}" \
-        | column \
-            --table \
-            --separator '\' \
-            --table-columns ID,Status,Command,Path,Group \
-            --table-truncate Command,Path \
-            --table-noextreme Command,Path \
-            --output-width "${OUTPUT_WIDTH}" \
-        | fzf --multi --tac --height 10 --header-lines 1 \
-        | awk '{print $1}'
+  # shellcheck disable=SC1003  # double-backslash is not meant for escaping.
+  pueue status --json \
+    | fx "${js_query}" \
+    | column \
+      --table \
+      --separator '\' \
+      --table-columns ID,Status,Command,Path,Group \
+      --table-truncate Command,Path \
+      --table-noextreme Command,Path \
+      --output-width "${OUTPUT_WIDTH}" \
+    | fzf --multi --tac --height 10 --header-lines 1 \
+    | awk '{print $1}'
 }
 
 main() {
-    if [ "${#CLI_ARGS[@]}" -eq 0 ]; then
-        # user just wants to see `pueue status`
-        pueue status
-        exit 0
-    fi
+  if [ "${#CLI_ARGS[@]}" -eq 0 ]; then
+    # user just wants to see `pueue status`
+    pueue status
+    exit 0
+  fi
 
-    OUTPUT_WIDTH="$(tput cols)"
-    OUTPUT_WIDTH=$((OUTPUT_WIDTH-3))
+  OUTPUT_WIDTH="$(tput cols)"
+  OUTPUT_WIDTH=$((OUTPUT_WIDTH - 3))
 
-    if [ "${OUTPUT_WIDTH}" -le 0 ]; then
-        echo "Error: output width \"${OUTPUT_WIDTH}\"?"
-        exit 1
-    fi
+  if [ "${OUTPUT_WIDTH}" -le 0 ]; then
+    echo "Error: output width \"${OUTPUT_WIDTH}\"?"
+    exit 1
+  fi
 
-    local jobs
-    jobs="$(select_job_ids)"
-    test "${jobs}" != "" || exit 1  # user probably hit ctrl+c in fzf interface
+  local jobs
+  jobs="$(select_job_ids)"
+  test "${jobs}" != "" || exit 1 # user probably hit ctrl+c in fzf interface
 
-    echo "${jobs}" | xargs pueue "${CLI_ARGS[@]}"
+  echo "${jobs}" | xargs pueue "${CLI_ARGS[@]}"
 }
 
 main

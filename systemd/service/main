@@ -8,8 +8,8 @@ source "${REPO_PATH}/lib.sh"
 dest="${USER_CWD}/template.service"
 
 if [ ! -e "${dest}" ] || force_please; then
-    cp template.service "${dest}"
-    echo "Generated template at ${dest}"
+  cp template.service "${dest}"
+  echo "Generated template at ${dest}"
 else
-    panic "template.service already exists in this directory. Use --force to overwrite."
+  panic "template.service already exists in this directory. Use --force to overwrite."
 fi

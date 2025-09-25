@@ -12,6 +12,6 @@ log_attention "Created ${dst_earthfile}"
 src_ignorefile=".earthlyignore_template"
 dst_ignorefile="${USER_CWD}/.earthlyignore"
 if [ ! -f "${dst_ignorefile}" ]; then
-    cp "${src_ignorefile}" "${dst_ignorefile}"
-    log_attention "Created ${dst_ignorefile}"
+  cp "${src_ignorefile}" "${dst_ignorefile}"
+  log_attention "Created ${dst_ignorefile}"
 fi

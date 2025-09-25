@@ -10,20 +10,20 @@ set -Eeuo pipefail
 DEFAULT_IGNORE_REVS_FILE=".git-blame-ignore-revs"
 
 init() {
-    # thanks <https://stackoverflow.com/a/957978/138757>
-    REPO_ROOT="$(git rev-parse --show-toplevel)"
+  # thanks <https://stackoverflow.com/a/957978/138757>
+  REPO_ROOT="$(git rev-parse --show-toplevel)"
 }
 
 main() {
-    init
+  init
 
-    local full_path="${REPO_ROOT}/${DEFAULT_IGNORE_REVS_FILE}"
-    local command=(git blame)
-    if [ -f "${full_path}" ]; then
-        command+=(--ignore-revs-file "${full_path}")
-    fi
-    command+=("${@}")
-    "${command[@]}"
+  local full_path="${REPO_ROOT}/${DEFAULT_IGNORE_REVS_FILE}"
+  local command=(git blame)
+  if [ -f "${full_path}" ]; then
+    command+=(--ignore-revs-file "${full_path}")
+  fi
+  command+=("${@}")
+  "${command[@]}"
 }
 
 main "${@}"

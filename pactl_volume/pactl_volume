@@ -19,9 +19,9 @@ set -Eeuo pipefail
 #
 
 usage() {
-    local command_name
-    command_name="$(basename "${0}")"
-    cat <<EOF
+  local command_name
+  command_name="$(basename "${0}")"
+  cat <<EOF
 ${command_name}: Dumbed-down pactl volume interface
 
 usage: ${command_name} [OPTIONS...] [SUBCOMMAND]
@@ -62,102 +62,102 @@ EOF
 }
 
 panic() {
-    echo "${*}" >&2
-    exit 1
+  echo "${*}" >&2
+  exit 1
 }
 
 init() {
-    PACTL_VOLUME_INCREMENT="${PACTL_VOLUME_INCREMENT:-10}"
-    DEVICE="@DEFAULT_SINK@"
-    TARGET="sink"
-    SUBCOMMAND="get"
-    SUBCOMMAND_ARGS=()
+  PACTL_VOLUME_INCREMENT="${PACTL_VOLUME_INCREMENT:-10}"
+  DEVICE="@DEFAULT_SINK@"
+  TARGET="sink"
+  SUBCOMMAND="get"
+  SUBCOMMAND_ARGS=()
 }
 
 subcommand:get() {
-    pactl "get-${TARGET}-volume" "${DEVICE}" \
-        | awk '$1 == "Volume:" {print $0}' \
-        | grep --perl-regexp --only-matching "[\d\.]+(?=%)" \
-        | head -n 1
+  pactl "get-${TARGET}-volume" "${DEVICE}" \
+    | awk '$1 == "Volume:" {print $0}' \
+    | grep --perl-regexp --only-matching "[\d\.]+(?=%)" \
+    | head -n 1
 }
 
 subcommand:set() {
-    local new_level="${1}"
-    test "${new_level}" -ge 0 || panic "volume must be greater than or equal to 0"
-    test "${new_level}" -le 100 || panic "volume must be less than or equal to 100"
-    pactl "set-${TARGET}-volume" "${DEVICE}" "${new_level}%"
+  local new_level="${1}"
+  test "${new_level}" -ge 0 || panic "volume must be greater than or equal to 0"
+  test "${new_level}" -le 100 || panic "volume must be less than or equal to 100"
+  pactl "set-${TARGET}-volume" "${DEVICE}" "${new_level}%"
 }
 
 subcommand:up() {
-    local current_vol new_vol
-    current_vol="$(subcommand:get)"
-    new_vol=$((current_vol + PACTL_VOLUME_INCREMENT))
-    if [ "${new_vol}" -ge 100 ]; then
-        subcommand:set 100
-    elif [ "${new_vol}" -le 0 ]; then
-        subcommand:set 0
-    else
-        subcommand:set "${new_vol}"
-    fi
+  local current_vol new_vol
+  current_vol="$(subcommand:get)"
+  new_vol=$((current_vol + PACTL_VOLUME_INCREMENT))
+  if [ "${new_vol}" -ge 100 ]; then
+    subcommand:set 100
+  elif [ "${new_vol}" -le 0 ]; then
+    subcommand:set 0
+  else
+    subcommand:set "${new_vol}"
+  fi
 
-    subcommand:get
+  subcommand:get
 }
 
 subcommand:down() {
-    local current_vol new_vol
-    current_vol="$(subcommand:get)"
-    new_vol=$((current_vol - PACTL_VOLUME_INCREMENT))
-    if [ "${new_vol}" -ge 100 ]; then
-        subcommand:set 100
-    elif [ "${new_vol}" -le 0 ]; then
-        subcommand:set 0
-    else
-        subcommand:set "${new_vol}"
-    fi
+  local current_vol new_vol
+  current_vol="$(subcommand:get)"
+  new_vol=$((current_vol - PACTL_VOLUME_INCREMENT))
+  if [ "${new_vol}" -ge 100 ]; then
+    subcommand:set 100
+  elif [ "${new_vol}" -le 0 ]; then
+    subcommand:set 0
+  else
+    subcommand:set "${new_vol}"
+  fi
 
-    subcommand:get
+  subcommand:get
 }
 
 subcommand:help() {
-    usage
+  usage
 }
 
 parse_args() {
-    while [ ${#} -ge 1 ]; do
-        case "${1}" in
-            up)
-                SUBCOMMAND="up"
-            ;;
-            down)
-                SUBCOMMAND="down"
-            ;;
-            get|"")
-                SUBCOMMAND="get"
-            ;;
-            set)
-                SUBCOMMAND="set"
-                SUBCOMMAND_ARGS=("${2:?must specify volume level between 0 and 100}")
-                shift
-            ;;
-            --mic)
-                TARGET="source"
-                DEVICE="@DEFAULT_SOURCE@"
-            ;;
-            help|-h|--help|/?)
-                SUBCOMMAND="help"
-            ;;
-            *)
-                panic "unrecognized arg: \"${1}\". see --help for usage."
-            ;;
-        esac
+  while [ ${#} -ge 1 ]; do
+    case "${1}" in
+      up)
+        SUBCOMMAND="up"
+        ;;
+      down)
+        SUBCOMMAND="down"
+        ;;
+      get | "")
+        SUBCOMMAND="get"
+        ;;
+      set)
+        SUBCOMMAND="set"
+        SUBCOMMAND_ARGS=("${2:?must specify volume level between 0 and 100}")
         shift
-    done
+        ;;
+      --mic)
+        TARGET="source"
+        DEVICE="@DEFAULT_SOURCE@"
+        ;;
+      help | -h | --help | /?)
+        SUBCOMMAND="help"
+        ;;
+      *)
+        panic "unrecognized arg: \"${1}\". see --help for usage."
+        ;;
+    esac
+    shift
+  done
 }
 
 main() {
-    init
-    parse_args "${@}"
-    "subcommand:${SUBCOMMAND}" "${SUBCOMMAND_ARGS[@]}"
+  init
+  parse_args "${@}"
+  "subcommand:${SUBCOMMAND}" "${SUBCOMMAND_ARGS[@]}"
 }
 
 main "$@"

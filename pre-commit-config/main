@@ -6,7 +6,7 @@ source "${REPO_PATH}/lib.sh"
 dest="${USER_CWD}/.pre-commit-config.yaml"
 
 if [ ! -e "${dest}" ] || force_please; then
-    cp template.yaml "${dest}"
+  cp template.yaml "${dest}"
 else
-    panic ".pre-commit-config.yaml already exists in this directory. Use --force to overwrite."
+  panic ".pre-commit-config.yaml already exists in this directory. Use --force to overwrite."
 fi

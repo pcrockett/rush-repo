@@ -5,14 +5,14 @@ source "${REPO_PATH}/lib.sh"
 require_commands docker
 
 create_config_home() {
-    mkdir --parent "${XDG_CONFIG_HOME}/gcloud"
+  mkdir --parent "${XDG_CONFIG_HOME}/gcloud"
 }
 
 create_config_home
 docker build --pull --tag localhost/gcloud \
-    --build-arg "UID=$(id --user)" \
-    --build-arg "GID=$(id --group)" \
-    .
+  --build-arg "UID=$(id --user)" \
+  --build-arg "GID=$(id --group)" \
+  .
 
 install_user_bin gcloud
 install_success

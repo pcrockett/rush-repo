@@ -10,36 +10,36 @@ GITHUB_REPO="rclone"
 BIN_NAME="rclone"
 
 latest_version() {
-    echo "${GITHUB_LATEST_TAG}"
+  echo "${GITHUB_LATEST_TAG}"
 }
 
 installed_version() {
-    if ! command_exists "${BIN_NAME}"; then
-        echo ""
-        return 0
-    fi
+  if ! command_exists "${BIN_NAME}"; then
+    echo ""
+    return 0
+  fi
 
-    if ! [[ "$("${BIN_NAME}" --version)" =~ ^rclone\ (v[[:digit:]]+\.[[:digit:]]+\.[[:digit:]]+) ]]; then
-        panic "Unable to determine currently installed version!"
-        exit 1  # redundant, but useful to shellcheck
-    fi
+  if ! [[ "$("${BIN_NAME}" --version)" =~ ^rclone\ (v[[:digit:]]+\.[[:digit:]]+\.[[:digit:]]+) ]]; then
+    panic "Unable to determine currently installed version!"
+    exit 1 # redundant, but useful to shellcheck
+  fi
 
-    echo "${BASH_REMATCH[1]}"
+  echo "${BASH_REMATCH[1]}"
 }
 
 artifact_name() {
-    echo "rclone-${GITHUB_LATEST_TAG}-linux-amd64.zip"
+  echo "rclone-${GITHUB_LATEST_TAG}-linux-amd64.zip"
 }
 
 download_url() {
-    echo "https://github.com/${GITHUB_ORG}/${GITHUB_REPO}/releases/download/${GITHUB_LATEST_TAG}/$(artifact_name)"
+  echo "https://github.com/${GITHUB_ORG}/${GITHUB_REPO}/releases/download/${GITHUB_LATEST_TAG}/$(artifact_name)"
 }
 
 install_artifact() {
-    unzip "${ARTIFACT_PATH}"
-    local extract_dir
-    extract_dir="$(basename --suffix .zip "${ARTIFACT_PATH}")"
-    install_user_bin "./${extract_dir}/rclone"
+  unzip "${ARTIFACT_PATH}"
+  local extract_dir
+  extract_dir="$(basename --suffix .zip "${ARTIFACT_PATH}")"
+  install_user_bin "./${extract_dir}/rclone"
 }
 
 install_from_github

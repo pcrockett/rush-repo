@@ -6,8 +6,8 @@ source "${REPO_PATH}/lib.sh"
 require_commands tar envsubst xdg-settings
 
 if command_exists Postman && ! force_please; then
-    log_attention "Postman is already installed. Use \`--force\` to reinstall / update."
-    exit 0
+  log_attention "Postman is already installed. Use \`--force\` to reinstall / update."
+  exit 0
 fi
 
 INSTALL_DIR="${XDG_DATA_HOME}/Postman"
@@ -16,15 +16,15 @@ mkdir --parent "${INSTALL_DIR}"
 
 temp_dir="$(mktemp_dir)"
 archive="${temp_dir}/postman-linux-x64.tar.gz"
-curl_download "https://dl.pstmn.io/download/latest/linux64" > "${archive}.tmp"
+curl_download "https://dl.pstmn.io/download/latest/linux64" >"${archive}.tmp"
 mv "${archive}.tmp" "${archive}"
 tar --extract --gzip --strip-components 1 \
-    --directory "${INSTALL_DIR}" \
-    --file "${archive}"
+  --directory "${INSTALL_DIR}" \
+  --file "${archive}"
 chmod -R go-w "${INSTALL_DIR}"
 
 mkdir --parent "${XDG_DATA_HOME}/applications"
-envsubst < postman.desktop.template > "${XDG_DATA_HOME}/applications/postman.desktop"
+envsubst <postman.desktop.template >"${XDG_DATA_HOME}/applications/postman.desktop"
 xdg-settings set default-url-scheme-handler postman postman.desktop
 
 rm -f "${RUSH_USER_BIN}/Postman"

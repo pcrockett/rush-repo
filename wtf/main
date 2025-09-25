@@ -7,37 +7,37 @@ require_commands tar
 
 # shellcheck disable=SC2034  # variables used in `install_from_github()`
 {
-    GITHUB_ORG="wtfutil"
-    GITHUB_REPO="wtf"
+  GITHUB_ORG="wtfutil"
+  GITHUB_REPO="wtf"
 }
 BIN_NAME="wtfutil"
 
 latest_version() {
-    # strip the leading `v` from the tag name:
-    echo "${GITHUB_LATEST_TAG}" | cut --characters 2-
+  # strip the leading `v` from the tag name:
+  echo "${GITHUB_LATEST_TAG}" | cut --characters 2-
 }
 
 installed_version() {
-    if ! command_exists "${BIN_NAME}"; then
-        echo ""
-        return 0
-    fi
+  if ! command_exists "${BIN_NAME}"; then
+    echo ""
+    return 0
+  fi
 
-    installed_package_version
+  installed_package_version
 }
 
 artifact_name() {
-    echo "wtf_$(latest_version)_linux_amd64.tar.gz"
+  echo "wtf_$(latest_version)_linux_amd64.tar.gz"
 }
 
 download_url() {
-    echo "https://github.com/${GITHUB_ORG}/${GITHUB_REPO}/releases/download/${GITHUB_LATEST_TAG}/$(artifact_name)"
+  echo "https://github.com/${GITHUB_ORG}/${GITHUB_REPO}/releases/download/${GITHUB_LATEST_TAG}/$(artifact_name)"
 }
 
 install_artifact() {
-    tar -xzf "${ARTIFACT_PATH}"
-    subdir="$(basename "${ARTIFACT_PATH}" .tar.gz)"
-    install_user_bin "${subdir}/${BIN_NAME}"
+  tar -xzf "${ARTIFACT_PATH}"
+  subdir="$(basename "${ARTIFACT_PATH}" .tar.gz)"
+  install_user_bin "${subdir}/${BIN_NAME}"
 }
 
 install_from_github

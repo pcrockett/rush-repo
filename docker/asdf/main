@@ -15,7 +15,7 @@ latest_tag="$(github_latest_tag asdf-vm asdf)"
 git clone https://github.com/asdf-vm/asdf.git "${ASDF_DIR}" --branch "${latest_tag}" --depth 1
 
 # shellcheck disable=SC2016
-echo '. "${ASDF_DIR}/asdf.sh"' >> "${HOME}/.profile"
+echo '. "${ASDF_DIR}/asdf.sh"' >>"${HOME}/.profile"
 
 # shellcheck disable=SC2016
-echo '. "${ASDF_DIR}/asdf.sh"' >> "${HOME}/.bashrc"
+echo '. "${ASDF_DIR}/asdf.sh"' >>"${HOME}/.bashrc"

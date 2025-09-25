@@ -61,10 +61,11 @@ unlock() {
 
 get_vaults() {
   local jq_script
-  jq_script="$(cat <<EOF
+  jq_script="$(
+    cat <<EOF
 map(.name) | join("\\n")
 EOF
-)"
+  )"
 
   echo "${BW_USER}"
   echo "${BW_ORGS_JSON}" | jq --raw-output "${jq_script}"
@@ -100,10 +101,11 @@ main() {
   elif [ "${selected_vault}" == "" ]; then
     panic "No vault selected."
   else
-    jq_script="$(cat <<EOF
+    jq_script="$(
+      cat <<EOF
 map(select(.name == "${selected_vault}").id).[0]
 EOF
-)"
+    )"
     org_id="$(echo "${BW_ORGS_JSON}" | jq --raw-output "${jq_script}")"
     "${export_cmd[@]}" --organizationid "${org_id}"
   fi

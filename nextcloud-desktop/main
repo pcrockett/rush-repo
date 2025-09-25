@@ -5,37 +5,37 @@ source "${REPO_PATH}/lib.sh"
 
 # shellcheck disable=SC2034  # variables used in `install_from_github()`
 {
-    GITHUB_ORG="nextcloud-releases"
-    GITHUB_REPO="desktop"
+  GITHUB_ORG="nextcloud-releases"
+  GITHUB_REPO="desktop"
 }
 BIN_NAME="Nextcloud.AppImage"
 
 latest_version() {
-    # strip the leading `v` from the tag name:
-    echo "${GITHUB_LATEST_TAG}" | cut --characters 2-
+  # strip the leading `v` from the tag name:
+  echo "${GITHUB_LATEST_TAG}" | cut --characters 2-
 }
 
 installed_version() {
-    if ! command_exists "${BIN_NAME}"; then
-        echo ""
-        return 0
-    fi
+  if ! command_exists "${BIN_NAME}"; then
+    echo ""
+    return 0
+  fi
 
-    installed_package_version
+  installed_package_version
 }
 
 artifact_name() {
-    echo "Nextcloud-$(latest_version)-x86_64.AppImage"
+  echo "Nextcloud-$(latest_version)-x86_64.AppImage"
 }
 
 download_url() {
-    echo "https://github.com/${GITHUB_ORG}/${GITHUB_REPO}/releases/download/${GITHUB_LATEST_TAG}/$(artifact_name)"
+  echo "https://github.com/${GITHUB_ORG}/${GITHUB_REPO}/releases/download/${GITHUB_LATEST_TAG}/$(artifact_name)"
 }
 
 install_artifact() {
-    chmod +x "${ARTIFACT_PATH}"
-    mv "${ARTIFACT_PATH}" "${BIN_NAME}"
-    install_user_bin "${BIN_NAME}"
+  chmod +x "${ARTIFACT_PATH}"
+  mv "${ARTIFACT_PATH}" "${BIN_NAME}"
+  install_user_bin "${BIN_NAME}"
 }
 
 install_from_github

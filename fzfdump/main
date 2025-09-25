@@ -8,8 +8,8 @@ require_commands fzf
 rm -f "${RUSH_USER_BIN}/fzfdump"
 
 if files_are_same "${RUSH_GLOBAL_BIN}/fzfdump" fzfdump; then
-    log_attention "Already installed and up-to-date."
+  log_attention "Already installed and up-to-date."
 else
-    install_global_bin fzfdump
-    install_success
+  install_global_bin fzfdump
+  install_success
 fi

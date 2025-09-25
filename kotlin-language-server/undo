@@ -5,8 +5,8 @@ source "${REPO_PATH}/lib.sh"
 
 INSTALL_DIR="${HOME}/.local/share/rush/pcrockett/kotlin-language-server"
 rm -rf \
-    "${INSTALL_DIR}" \
-    "${INSTALL_DIR}.old" \
-    "${RUSH_USER_BIN}/kotlin-language-server"
+  "${INSTALL_DIR}" \
+  "${INSTALL_DIR}.old" \
+  "${RUSH_USER_BIN}/kotlin-language-server"
 
 uninstall_success

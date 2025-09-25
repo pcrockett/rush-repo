@@ -3,6 +3,6 @@
 # shellcheck source=lib.sh
 source "${REPO_PATH}/lib.sh"
 rm -rf \
-    "${XDG_DATA_HOME}/Postman" \
-    "${RUSH_USER_BIN}/Postman" \
-    "${XDG_CONFIG_HOM}/Postman"
+  "${XDG_DATA_HOME}/Postman" \
+  "${RUSH_USER_BIN}/Postman" \
+  "${XDG_CONFIG_HOM}/Postman"

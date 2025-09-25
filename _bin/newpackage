@@ -2,56 +2,56 @@
 set -Eeuo pipefail
 
 usage() {
-    local script_name
-    script_name="$(basename "${1}")"
-    echo "Initialize a new package"
-    echo
-    echo "Usage:"
-    echo "  ${script_name} PACKAGE_NAME [TEMPLATE_NAME]"
-    echo
+  local script_name
+  script_name="$(basename "${1}")"
+  echo "Initialize a new package"
+  echo
+  echo "Usage:"
+  echo "  ${script_name} PACKAGE_NAME [TEMPLATE_NAME]"
+  echo
 }
 
 panic() {
-    echo "FATAL: ${*}" >&2
-    exit 1
+  echo "FATAL: ${*}" >&2
+  exit 1
 }
 
 init() {
-    command -v copier &>/dev/null || panic "Must install copier first."
+  command -v copier &>/dev/null || panic "Must install copier first."
 
-    PACKAGE_NAME="${1:-}"
-    case "${PACKAGE_NAME}" in
-        "")
-            usage "${0}"
-            panic "Must specify package name."
-            ;;
-        --help|-h|/?)
-            usage "${0}"
-            exit
-            ;;
-    esac
+  PACKAGE_NAME="${1:-}"
+  case "${PACKAGE_NAME}" in
+    "")
+      usage "${0}"
+      panic "Must specify package name."
+      ;;
+    --help | -h | /?)
+      usage "${0}"
+      exit
+      ;;
+  esac
 
-    TEMPLATE_NAME="${2:-}"
+  TEMPLATE_NAME="${2:-}"
 }
 
 list_templates() {
-    find _templates -mindepth 1 -maxdepth 1 -print0 -type d | xargs -0 -L 1 basename
+  find _templates -mindepth 1 -maxdepth 1 -print0 -type d | xargs -0 -L 1 basename
 }
 
 select_template() {
-    list_templates \
-        | fzf --query "${1}" \
-            --ansi \
-            --preview "bat --color always --wrap never _templates/{}/main.jinja" \
-            --preview-window right,70% \
-            --select-1
+  list_templates \
+    | fzf --query "${1}" \
+      --ansi \
+      --preview "bat --color always --wrap never _templates/{}/main.jinja" \
+      --preview-window right,70% \
+      --select-1
 }
 
 main() {
-    init "${@}"
-    test ! -d "${PACKAGE_NAME}" || panic "${PACKAGE_NAME} already exists!"
-    TEMPLATE_NAME="$(select_template "${TEMPLATE_NAME}")"
-    copier copy "_templates/${TEMPLATE_NAME}" "${PACKAGE_NAME}" --trust
+  init "${@}"
+  test ! -d "${PACKAGE_NAME}" || panic "${PACKAGE_NAME} already exists!"
+  TEMPLATE_NAME="$(select_template "${TEMPLATE_NAME}")"
+  copier copy "_templates/${TEMPLATE_NAME}" "${PACKAGE_NAME}" --trust
 }
 
 main "${@}"

@@ -17,17 +17,17 @@ set -Eeuo pipefail
 CLI_ARGS=("$@")
 
 panic() {
-    echo "$*" >&2
-    exit 1
+  echo "$*" >&2
+  exit 1
 }
 
 init() {
-    panic "not implemented yet"
+  panic "not implemented yet"
 }
 
 main() {
-    init
-    panic "not implemented yet"
+  init
+  panic "not implemented yet"
 }
 
 main

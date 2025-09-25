@@ -14,11 +14,11 @@ FZD_DICT_PREFIX="${FZD_DICT_PREFIX:-dict --match --formatted --strategy substrin
 SUFFIX=" | cut --fields 4- | sort | uniq || true"
 
 FZF_DEFAULT_COMMAND="${FZD_DICT_PREFIX} $(printf %q "${INITIAL_QUERY}") ${SUFFIX}" \
-    SHELL="sh" fzf \
-        --query "${INITIAL_QUERY}" \
-        -i \
-        --bind "change:reload(${FZD_DICT_PREFIX} {q} ${SUFFIX};)" \
-        --bind "ctrl-r:reload(${FZD_DICT_PREFIX} {q} ${SUFFIX};)" \
-        --preview "dict {}" \
-        --preview-window 'right,70%' \
-        --bind "enter:become(dict {})"
+SHELL="sh" fzf \
+  --query "${INITIAL_QUERY}" \
+  -i \
+  --bind "change:reload(${FZD_DICT_PREFIX} {q} ${SUFFIX};)" \
+  --bind "ctrl-r:reload(${FZD_DICT_PREFIX} {q} ${SUFFIX};)" \
+  --preview "dict {}" \
+  --preview-window 'right,70%' \
+  --bind "enter:become(dict {})"
