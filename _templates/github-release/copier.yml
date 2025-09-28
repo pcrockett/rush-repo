@@ -6,10 +6,10 @@ github_repo:
   help: "Enter the repository name:"
 binary_name:
   type: str
+  default: "{{github_repo}}"
   help: "Enter the name of the main executable:"
 artifact_name:
   type: str
-  default: "{{binary_name}}"
   help: "Enter raw download artifact name:"
 artifact_type:
   choices:
