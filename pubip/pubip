@@ -5,16 +5,29 @@ is_installed() {
   command -v "${1}" &>/dev/null
 }
 
-spinner() {
-  if is_installed gum; then
-    if gum spin --title "" --show-output -- "${@}"; then
-      return 0
-    else
-      return $?
-    fi
+is_tty() {
+  test -t "${1}"
+}
+
+stdout_is_tty() {
+  is_tty 1
+}
+
+stderr_is_tty() {
+  is_tty 2
+}
+
+init() {
+  if stdout_is_tty && stderr_is_tty && is_installed gum; then
+    SPINNER_CMD=(gum spin --title "" --show-output --)
   else
-    "${@}"
+    SPINNER_CMD=()
   fi
+}
+
+spinner() {
+  full_cmd=("${SPINNER_CMD[@]}" "$@")
+  "${full_cmd[@]}"
 }
 
 curl_download() {
@@ -56,6 +69,7 @@ blacklisted: ${x.blacklisted?.blacklisted}
 }
 
 main() {
+  init
   raw_output="$(curl_download "https://am.i.mullvad.net/json")"
   if [ "${raw_output}" == "" ]; then
     exit 1 # either network issue or user cancelled with Ctrl+C
