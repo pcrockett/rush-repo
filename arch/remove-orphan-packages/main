@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+
+# shellcheck source=lib.sh
+source "${REPO_PATH}/lib.sh"
+
+# thanks to <https://wiki.archlinux.org/title/Pacman/Tips_and_tricks#Removing_unused_packages_(orphans)>
+
+require_commands pacman
+pacman --query --deps --unrequired --quiet \
+  | as_root pacman --remove --nosave --recursive -
