@@ -23,8 +23,8 @@ repos:
   - repo: https://github.com/koalaman/shellcheck-precommit
     rev: v0.11.0
     hooks:
-    - id: shellcheck
-      exclude: "(template.bash|example.bats)"
+      - id: shellcheck
+        exclude: "(template.bash|example.bats)"
   - repo: local
     hooks:
       - id: shfmt
