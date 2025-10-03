@@ -1,0 +1,9 @@
+# Changes here will be overwritten by Copier
+# Don't edit manually!
+# <https://copier.readthedocs.io/en/stable/updating/>
+_src_path: _templates/github-release
+artifact_name: signal-cli-$(latest_version)-Linux-native.tar.gz
+artifact_type: tar.gz
+binary_name: signal-cli
+github_org: AsamK
+github_repo: signal-cli
