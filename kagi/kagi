@@ -4,137 +4,137 @@ const BASE_URL = "https://kagi.com/api/v0"
 
 # Kagi CLI
 def main [] {
-    "ERROR: Must specify a subcommand.\n" | print
-    ^$env.CURRENT_FILE --help
+  "ERROR: Must specify a subcommand.\n" | print
+  exec $env.CURRENT_FILE "--help"
 }
 
 # Set your Kagi API token
 def "main set-token" [] {
-    let token = (input --suppress-output "Paste your API token here and press enter to continue.")
-    $token | save --force (token_path)
+  let token = (input --suppress-output "Paste your API token here and press enter to continue.")
+  $token | save --force (token_path)
 }
 
 # Search Kagi (opens your browser)
 def "main search" [
-    query?: string  # Search query
+  query?: string  # Search query
 ] {
-    match $query {
-        null | "" => { xdg-open "https://kagi.com" }
-        $q => { xdg-open $"https://kagi.com/search?q=($q | url encode)" }
-    }
+  match $query {
+    null | "" => { xdg-open "https://kagi.com" }
+    $q => { xdg-open $"https://kagi.com/search?q=($q | url encode)" }
+  }
 }
 
 # Query FastGPT
 def "main gpt" [
-    query?: string  # Query to send to FastGPT
-    --verbose(-v)  # Display meta information at the end
+  query?: string  # Query to send to FastGPT
+  --verbose(-v)   # Display meta information at the end
 ] {
 
-    let query = if $query == null {
-        $in
-    } else {
-        $query
+  let query = if $query == null {
+    $in
+  } else {
+    $query
+  }
+
+  # <https://help.kagi.com/kagi/api/fastgpt.html#examples>
+  let response = (
+    api_post fastgpt {
+      query: $query
+      cache: true
     }
+  )
 
-    # <https://help.kagi.com/kagi/api/fastgpt.html#examples>
-    let response = (
-        api_post fastgpt {
-            query: $query
-            cache: true
-        }
-    )
+  let data = $response.data
 
-    let data = $response.data
+  print $data.output
 
-    print $data.output
-
-    if ($data | get references --optional | length) > 0 {
-        print "References:\n"
-        $data.references | enumerate | each {|it|
-            print $"($it.index + 1). [($it.item.title)]\(($it.item.url))"
-        }
+  if ($data | get references --optional | length) > 0 {
+    print "References:\n"
+    $data.references | enumerate | each {|it|
+      print $"($it.index + 1). [($it.item.title)]\(($it.item.url))"
     }
+  }
 
-    if $verbose {
-        print ""
-        print "---"
-        print ""
-        print $"* **Tokens used:** _($data.tokens)_"
-        print $"* **API balance:** _$($response.meta.api_balance)_"
-    }
+  if $verbose {
+    print ""
+    print "---"
+    print ""
+    print $"* **Tokens used:** _($data.tokens)_"
+    print $"* **API balance:** _$($response.meta.api_balance)_"
+  }
 
-    ignore
+  ignore
 }
 
 # Summarize a URL
 def "main summarize" [
-    url: string             # URL to summarize
-    --type(-t) = "summary"  # `summary` or `takeaway`
-    --engine(-e) = "cecil"  # Engine to use. `cecil`, `agnes`, `daphne`, `muriel`
-    --language(-l): string  # Output language (two-letter code)
-    --verbose(-v)           # Verbose output at end
+  url: string             # URL to summarize
+  --type(-t) = "summary"  # `summary` or `takeaway`
+  --engine(-e) = "cecil"  # Engine to use. `cecil`, `agnes`, `daphne`, `muriel`
+  --language(-l): string  # Output language (two-letter code)
+  --verbose(-v)           # Verbose output at end
 ] {
-    def get_params [] {
-        let api_params = {
-            url: $url
-            engine: $engine  # https://help.kagi.com/kagi/api/summarizer.html#summarization-engines
-            summary_type: $type
-        }
-
-        if ($language != null) and (($language | str length) > 0) {
-            # https://help.kagi.com/kagi/api/summarizer.html#target-language-codes
-            $api_params | insert target_language $language
-        } else {
-            $api_params
-        }
+  def get_params [] {
+    let api_params = {
+      url: $url
+      engine: $engine  # https://help.kagi.com/kagi/api/summarizer.html#summarization-engines
+      summary_type: $type
     }
 
-    let response = (
-        api_post summarize (get_params)
-    )
-
-    let data = $response.data
-
-    print $data.output
-
-    if $verbose {
-        let meta = $response.meta
-        print ""
-        print "---"
-        print ""
-        print $"* **Tokens used:** _($data.tokens)_"
-        print $"* **Time:** _($meta.ms)_"
-        print $"* **API balance:** _$($meta.api_balance)_"
+    if ($language != null) and (($language | str length) > 0) {
+      # https://help.kagi.com/kagi/api/summarizer.html#target-language-codes
+      $api_params | insert target_language $language
+    } else {
+      $api_params
     }
+  }
 
-    ignore
+  let response = (
+    api_post summarize (get_params)
+  )
+
+  let data = $response.data
+
+  print $data.output
+
+  if $verbose {
+    let meta = $response.meta
+    print ""
+    print "---"
+    print ""
+    print $"* **Tokens used:** _($data.tokens)_"
+    print $"* **Time:** _($meta.ms)_"
+    print $"* **API balance:** _$($meta.api_balance)_"
+  }
+
+  ignore
 }
 
 def api_post [endpoint: string, data: record] {
-    let token_path = (token_path)
-    let token = match ($token_path | path exists) {
-        true => { open $token_path --raw | decode "utf-8" | str trim }
-        false => {
-            error make {
-                msg: "API Token has not been set yet. Run `kagi set-token`."
-            }
-        }
+  let token_path = (token_path)
+  let token = match ($token_path | path exists) {
+    true => { open $token_path --raw | decode "utf-8" | str trim }
+    false => {
+      error make {
+        msg: "API Token has not been set yet. Run `kagi set-token`."
+      }
     }
+  }
 
-    (
-        http post
-            --content-type "application/json"
-            --headers ["Authorization" $"Bot ($token)"]
-            $"($BASE_URL)/($endpoint)"
-            $data
-    )
+  (
+    http post
+      --content-type "application/json"
+      --headers ["Authorization" $"Bot ($token)"]
+      $"($BASE_URL)/($endpoint)"
+      $data
+  )
 }
 
 def token_path [] {
-    let config_home = match ($env | get --optional XDG_CONFIG_HOME) {
-        null => { $env.HOME | path join ".config/kagi-cli" }
-        $val => { $val | path join "kagi-cli" }
-    }
-    mkdir $config_home
-    $config_home | path join "token"
+  let config_home = match ($env | get --optional XDG_CONFIG_HOME) {
+    null => { $env.HOME | path join ".config/kagi-cli" }
+    $val => { $val | path join "kagi-cli" }
+  }
+  mkdir $config_home
+  $config_home | path join "token"
 }
