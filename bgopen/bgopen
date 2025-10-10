@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# like xdg-open, but always in the background
+# like xdg-open, but discarding output and disowning the process
 #
 # Usage: bgopen [XDG_OPEN_ARGS...]
 #
@@ -15,8 +15,7 @@ set -euo pipefail
 #
 
 main() {
-  nohup xdg-open "$@" &>/dev/null &
-  disown
+  bgstart xdg-open "$@"
   exit
 }
 

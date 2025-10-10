@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Start a program in the background, discarding output and disowning the process
+#
+# Usage: bgstart COMMAND...
+#
+# Example usage:
+#
+#     bgstart Nextcloud.AppImage
+#     bgstart xdg-open some-file.pdf
+#
+
+main() {
+  nohup "$@" &>/dev/null &
+  disown
+  exit
+}
+
+main "$@"
