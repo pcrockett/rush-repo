@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# like xdg-open, but always in the background
+#
+# Usage: bgopen [XDG_OPEN_ARGS...]
+#
+# Example usage:
+#
+#     bgopen some-file.pdf
+#
+# Dependencies:
+#
+# * xdg-open
+#
+
+main() {
+  nohup xdg-open "$@" &>/dev/null &
+  disown
+  exit
+}
+
+main "$@"
