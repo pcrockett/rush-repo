@@ -3,19 +3,38 @@ set -euo pipefail
 
 # like xdg-open, but discarding output and disowning the process
 #
-# Usage: bgopen [XDG_OPEN_ARGS...]
+# Usage: bgopen [ITEMS...]
 #
 # Example usage:
 #
+#     # open one or more files with interactive fzf file picker
+#     bgopen
+#
+#     # open a single file
 #     bgopen some-file.pdf
+#
+#     # open multiple URLs in your browser
+#     bgopen https://philcrockett.com/ http://kagi.com/
 #
 # Dependencies:
 #
+# * bgstart (also in this rush-repo)
 # * xdg-open
+# * fzf (optional)
 #
 
+fzf_ui() {
+  fzf --multi --height 10 --reverse --prompt 'Select file(s): ' --print0
+}
+
 main() {
-  bgstart xdg-open "$@"
+  if [ $# -eq 0 ]; then
+    fzf_ui | xargs -0 -L 1 bgstart xdg-open
+  else
+    for arg in "$@"; do
+      bgstart xdg-open "$arg"
+    done
+  fi
   exit
 }
 
