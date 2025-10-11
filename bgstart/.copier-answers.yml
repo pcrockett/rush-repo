@@ -2,6 +2,5 @@
 # Don't edit manually!
 # <https://copier.readthedocs.io/en/stable/updating/>
 _src_path: _templates/script
-description: Start a program in the background, discarding output and disowning the
-    process
+description: Start a program in the background, discarding output and disowning the process
 script_name: bgstart
