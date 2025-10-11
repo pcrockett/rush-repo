@@ -36,3 +36,9 @@ repos:
         types:
           - shell
         exclude: deno/install\.sh
+      - id: yamlfmt
+        name: yamlfmt
+        entry: yamlfmt
+        language: system
+        types:
+          - yaml
