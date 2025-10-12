@@ -2,7 +2,7 @@
 
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v6.0.0
+    rev: 3e8a8703264a2f4a69428a0aa4dcb512790b2c8c  # frozen: v6.0.0
     hooks:
       # https://github.com/pre-commit/pre-commit-hooks?tab=readme-ov-file#hooks-available
       - id: check-executables-have-shebangs
@@ -13,27 +13,43 @@ repos:
       - id: end-of-file-fixer
       - id: trailing-whitespace
   - repo: https://github.com/thermondo/pre-commit-hooks
-    rev: v1.0.2
+    rev: 6b0a643c5b27285da3a932a0cd8c1a93900358c4  # frozen: v1.0.2
     hooks:
       - id: check-terraform-lock
       - id: terraform-fmt
   - repo: https://github.com/rhysd/actionlint
-    rev: v1.7.7
+    rev: e7d448ef7507c20fc4c88a95d0c448b848cd6127  # frozen: v1.7.8
     hooks:
       - id: actionlint
   - repo: https://github.com/gitleaks/gitleaks
-    rev: v8.28.0
+    rev: 39fdb480a06768cc41a84ef86959c07ff33091c4  # frozen: v8.28.0
     hooks:
       - id: gitleaks
   - repo: https://github.com/hadolint/hadolint
-    rev: v2.14.0
+    rev: 4e697ba704fd23b2409b947a319c19c3ee54d24f  # frozen: v2.14.0
     hooks:
       - id: hadolint-docker
   - repo: https://github.com/koalaman/shellcheck-precommit
-    rev: v0.11.0
+    rev: 99470f5e12208ff0fb17ab81c3c494f7620a1d8d  # frozen: v0.11.0
     hooks:
       - id: shellcheck
-  - repo: https://github.com/scop/pre-commit-shfmt
-    rev: v3.12.0-2
+  - repo: https://github.com/adrienverge/yamllint
+    rev: 79a6b2b1392eaf49cdd32ac4f14be1a809bbd8f7  # frozen: v1.37.1
+    hooks:
+      - id: yamllint
+  - repo: local
     hooks:
       - id: shfmt
+        name: shfmt
+        entry: shfmt
+        args:
+          - --write
+        language: system
+        types:
+          - shell
+      - id: yamlfmt
+        name: yamlfmt
+        entry: yamlfmt
+        language: system
+        types:
+          - yaml
