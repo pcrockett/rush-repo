@@ -1,0 +1,11 @@
+extends: default
+rules:
+  document-start: disable
+  line-length: disable
+  comments:
+    require-starting-space: true
+    ignore-shebangs: true
+    min-spaces-from-content: 1
+  truthy:
+    level: error
+    check-keys: false
