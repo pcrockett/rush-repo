@@ -7,7 +7,12 @@ src_dir="template_dir"
 dst_dir="${USER_CWD}/.github"
 
 if [ -d "${dst_dir}" ]; then
-  panic "Already exists: ${dst_dir}"
+  if force_please; then
+    cp --recursive "${src_dir}/"* "${dst_dir}"
+    log_attention "Updated ${dst_dir}"
+  else
+    panic "Already exists: ${dst_dir}. Add --force if you want to update."
+  fi
 else
   cp --recursive "${src_dir}" "${dst_dir}"
   log_attention "Created ${dst_dir}"

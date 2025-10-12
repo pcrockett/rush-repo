@@ -3,12 +3,14 @@ updates:
   # - package-ecosystem: "npm"
   #   directory: "/"
   #   commit-message:
-  #     prefix: "chore"
+  #     prefix: "chore(deps)"
   #   schedule:
   #     interval: "weekly"
 
   # - package-ecosystem: "pip"
   #   directory: "/"
+  #   commit-message:
+  #     prefix: "chore(deps)"
   #   insecure-external-code-execution: "allow"
   #   schedule:
   #     interval: "weekly"
@@ -19,6 +21,6 @@ updates:
   - package-ecosystem: "github-actions"
     directory: "/"
     commit-message:
-      prefix: "chore"
+      prefix: "chore(deps)"
     schedule:
       interval: "weekly"
