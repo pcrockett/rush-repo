@@ -11,6 +11,9 @@ packages_to_run=(
   editorconfig
   asdfignore
   pre-commit-config
+  shellcheckrc
+  yamlfmt-config
+  yamllint-config
 )
 
 rush_cmd=(rush get)
