@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+
+# shellcheck source=lib.sh
+source "${REPO_PATH}/lib.sh"
+
+test -d .git || git init "${USER_CWD}"
+
+packages_to_run=(
+  ghboilerplate
+  gpl
+  editorconfig
+  asdfignore
+  pre-commit-config
+)
+
+rush_cmd=(rush get)
+
+if force_please; then
+  rush_cmd+=(--force)
+fi
+
+for package in "${packages_to_run[@]}"; do
+  "${rush_cmd[@]}" "${package}"
+done
