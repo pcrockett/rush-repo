@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -Eeuo pipefail
+set -euo pipefail
 
 # Open a web browser to a predefined URL and copy the URL to the clipboard
 #
@@ -22,7 +22,7 @@ init() {
 main() {
   init
   echo -n "${MEET_URL}" | xsel --clipboard
-  xdg-open "${MEET_URL}"
+  bgopen "${MEET_URL}"
 }
 
 main
