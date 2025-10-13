@@ -110,6 +110,38 @@ def "main summarize" [
   ignore
 }
 
+# Use Kagi Assistant (opens your browser)
+def "main assist" [
+  query?: string     # set your initial query
+  --profile: string  # choose a non-default model
+  --no-internet      # disable internet access
+  --lens: string     # select a lens if internet access enabled
+  --stdin            # read query from stdin
+] {
+  let query = if $stdin { $in } else { $query }
+
+  # <https://help.kagi.com/kagi/ai/assistant.html#url-parameters>
+  let query_params = (
+    {
+      internet: (if $no_internet { "false" } else { "true" })
+    }
+    | insert-if { $profile | is-not-empty } "profile" $profile
+    | insert-if { $lens | is-not-empty } "lens" $lens
+    | insert-if { $query | is-not-empty } "q" $query
+  )
+  let query_string = $query_params | url build-query
+  xdg-open $"https://kagi.com/assistant/?($query_string)"
+}
+
+def insert-if [condition: closure, field: string, new_value: any] {
+  let obj = $in
+  if (do $condition) {
+    $obj | insert $field $new_value
+  } else {
+    $obj
+  }
+}
+
 def api_post [endpoint: string, data: record] {
   let token_path = (token_path)
   let token = match ($token_path | path exists) {
