@@ -1,21 +1,21 @@
 #!/usr/bin/env bash
 
-set -Eeuo pipefail
+set -euo pipefail
 
 # get, set, increment, and decrement volume levels with pactl
 #
-# commands like `pactl set-sink-volume @DEFAULT_SINK@ +10%` have a few undesired / unexpected
-# effects, such as the ability to increase volume WAY over 100%. this script is a simplified
-# wrapper around `pactl` that:
+# commands like `pactl set-sink-volume @DEFAULT_SINK@ +10%` have a few undesired /
+# unexpected effects, such as the ability to increase volume WAY over 100%. this script
+# is a simplified wrapper around `pactl` that:
 #
 # * assumes there's just "volume". no left channel, right channel, balance, etc.
 # * adjusts volume based on percentages. no dB, arbitrary integer values, etc.
 # * ensures volume stays strictly between 0% and 100%
-# * only adjusts the @DEFAULT_SINK@ or @DEFAULT_SOURCE@ -- if you want something else, you can use
-#   `pactl` directly.
+# * only adjusts the @DEFAULT_SINK@ or @DEFAULT_SOURCE@ -- if you want something else,
+#   you can use `pactl` directly.
 #
-# especially useful when you need to manually rig up a volume up / down / mute button on your
-# keyboard. not so useful when you're making more advanced audio tweaks.
+# especially useful when you need to manually rig up a volume up / down / mute button on
+# your keyboard. not so useful when you're making more advanced audio tweaks.
 #
 
 usage() {
