@@ -19,8 +19,8 @@ def "main search" [
   query?: string  # Search query
 ] {
   match $query {
-    null | "" => { xdg-open "https://kagi.com" }
-    $q => { xdg-open $"https://kagi.com/search?q=($q | url encode)" }
+    null | "" => { browser open "https://kagi.com" }
+    $q => { browser open $"https://kagi.com/search?q=($q | url encode)" }
   }
 }
 
@@ -130,7 +130,7 @@ def "main assist" [
     | insert-if { $query | is-not-empty } "q" $query
   )
   let query_string = $query_params | url build-query
-  xdg-open $"https://kagi.com/assistant/?($query_string)"
+  browser open $"https://kagi.com/assistant/?($query_string)"
 }
 
 def insert-if [condition: closure, field: string, new_value: any] {
@@ -169,4 +169,21 @@ def token_path [] {
   }
   mkdir $config_home
   $config_home | path join "token"
+}
+
+def "browser open" [$url: string] {
+  let open_cmd = (
+    $env
+    | get --optional KAGI_OPEN_COMMAND
+    | if ($in | is-empty) {
+      "xdg-open"
+    } else {
+      $in
+    }
+  )
+
+  ^$open_cmd $url | complete | match $in {
+    { exit_code: 0 } => { ignore }
+    _ => { error make { msg: $"exited with code ($in.exit_code): `($open_cmd) ($url)`" } }
+  }
 }
