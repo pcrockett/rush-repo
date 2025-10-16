@@ -4,7 +4,7 @@
 #
 # Stole this from:
 #
-#     https://github.com/junegunn/fzf/blob/master/ADVANCED.md#using-fzf-as-interactive-ripgrep-launcher
+#     <https://github.com/junegunn/fzf/blob/master/ADVANCED.md#using-fzf-as-interactive-ripgrep-launcher>
 #
 # ... and then made a couple tweaks.
 #
@@ -19,26 +19,40 @@
 # 2. Interactively restart Ripgrep with reload action
 # 3. Execute a command with the selected search result
 
-SRCH_RG_PREFIX="${SRCH_RG_PREFIX:-rg --column --line-number --no-heading --color=always --smart-case --hidden --glob !.git/ }"
-# The search regex will be tacked onto the end of this command (hence the trailing space at the end)
+export SRCH_RG_ARGS="${SRCH_RG_ARGS:---column --line-number --no-heading --color=always --smart-case --hidden --glob !.git/}"
+SRCH_RG_PREFIX="rg ${SRCH_RG_ARGS}"
+# The search regex will be tacked onto the end of this command (hence the trailing space
+# at the end)
 #
 # In english, this command means roughly: "Find files with the given regex, like this:"
 #
-# * output columns, line numbers as well as file paths when you have a hit (these will be parsed out
-#   by fzf below)
-# * if the search query is all lowercase, then ignore case. if there's some uppercase in there, then
-#   pay attention to case
+# * output columns, line numbers as well as file paths when you have a hit (these will
+#   be parsed out by fzf below)
+# * if the search query is all lowercase, then ignore case. if there's some uppercase in
+#   there, then pay attention to case
 # * please **DO** search in hidden files
 # * ... however you can still ignore .gitignored files and .git directories
 #
 
 SRCH_RESULT_COMMAND="${SRCH_RESULT_COMMAND:-echo {1\}:{2\}:{3\}}"
-# The command to execute when a search result has been selected. The default string is kinda trippy;
-# here's what it should look like after the escaping, etc.:
+# The command to execute when a search result has been selected. The default string is
+# kinda trippy; here's what it should look like after the escaping, etc.:
 #
 #     echo {1}:{2}:{3}
 #
-# {1} is replaced by the filepath of the selected search result, {2} is line num, {3} is column num
+# * {1} is replaced by the filepath of the selected search result
+# * {2} is line num
+# * {3} is column num
+# * {} is all result information
+# * {q} is the query typed in the UI
+# * ${SRCH_RG_ARGS} is the ripgrep command args, excluding the query
+#
+# Example of advanced usage: Use `srch` to figure out a good search query to then launch
+# `rgr` (repgrep, not to be confused with ripgrep), which will give you an interactive
+# find / replace user interface:
+#
+#     SRCH_RESULT_COMMAND='rgr ${SRCH_RG_ARGS} {q}' srch
+#
 
 STATE_DIR="${XDG_STATE_HOME:-${HOME}/.local/state}/srch"
 mkdir --parent "${STATE_DIR}"
