@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Use srch / fzf for a more interactive repgrep (rgr) experience
+#
+# Dependencies:
+#
+# * srch (in this rush repo) and all its dependencies, including...
+# * ripgrep (`rg`)
+# * repgrep (`rgr`)
+# * bat
+#
+
+main() {
+  # shellcheck disable=SC2016  # I don't want `$` to expand here
+  SRCH_RESULT_COMMAND='rgr ${SRCH_RG_ARGS} {q}' srch
+}
+
+main "$@"
