@@ -3,6 +3,11 @@ set -euo pipefail
 
 # Use srch / fzf for a more interactive repgrep (rgr) experience
 #
+# Takes no command-line parameters. Customization is done via environment variables:
+#
+# * RGRZ_CONTEXT: Number of lines of context around search results in `rgr` UI.
+#                 Defaults to 5.
+#
 # Dependencies:
 #
 # * srch (in this rush repo) and all its dependencies, including...
@@ -12,8 +17,20 @@ set -euo pipefail
 #
 
 main() {
-  # shellcheck disable=SC2016  # I don't want `$` to expand here
-  SRCH_RESULT_COMMAND='rgr ${SRCH_RG_ARGS} {q}' srch
+  RGRZ_CONTEXT="${RGRZ_CONTEXT:-5}"
+
+  # shellcheck disable=SC2016  # I don't want `$` to expand in some places here
+  find_replace_command=(
+    rgr '${SRCH_RG_ARGS}'
+    --context "${RGRZ_CONTEXT}"
+    '--regexp={q}'
+  )
+
+  # SRCH_RG_ARGS here is just copy / pasted from the `srch` script, but added
+  # `--no-config`. That's what `rgr` does to underlying `rg` commands as well.
+  SRCH_RG_ARGS='--column --line-number --no-heading --color=always --smart-case --hidden --glob !.git/ --no-config' \
+    SRCH_RESULT_COMMAND="${find_replace_command[*]}" \
+    srch
 }
 
 main "$@"
