@@ -17,7 +17,9 @@ def "main set-token" [] {
 # Search Kagi (opens your browser)
 def "main search" [
   query?: string  # Search query
+  --stdin         # Read query from stdin
 ] {
+  let query = if $stdin { $in } else { $query }
   match $query {
     null | "" => { browser open "https://kagi.com" }
     $q => { browser open $"https://kagi.com/search?q=($q | url encode)" }
