@@ -18,8 +18,13 @@ def "main set-token" [] {
 def "main search" [
   query?: string  # Search query
   --stdin         # Read query from stdin
+  --write         # open text editor to get query
 ] {
-  let query = if $stdin { $in } else { $query }
+  let query = (
+    if $stdin { $in }
+    else if $write { long_form_input }
+    else { $query }
+  )
   match $query {
     null | "" => { browser open "https://kagi.com" }
     $q => { browser open $"https://kagi.com/search?q=($q | url encode)" }
@@ -189,10 +194,7 @@ def "browser open" [$url: string] {
     }
   )
 
-  ^$open_cmd $url | complete | match $in {
-    { exit_code: 0 } => { ignore }
-    _ => { error make { msg: $"exited with code ($in.exit_code): `($open_cmd) ($url)`" } }
-  }
+  strict_exec [$open_cmd $url]
 }
 
 # open your $EDITOR to a temp file, and return the contents of that temp file when
@@ -207,17 +209,10 @@ def long_form_input [] {
       $in
     }
   )
-  let temp_dir = (
-    ^mktemp --directory
-    | complete
-    | match $in {
-      {exit_code: 0} => { $in.stdout | str trim }
-      {exit_code: $x} => { error make { msg: $"mktemp exited with code ($x)" } }
-    }
-  )
+  let temp_dir = strict_exec [mktemp --directory]
   let cleanup = { rm --recursive --force $temp_dir }
   let result = try {
-    let temp_file = $temp_dir | path join "assist-input.md"
+    let temp_file = $temp_dir | path join "input.md"
     ^$editor $temp_file
     (
       $temp_file
@@ -237,5 +232,16 @@ def long_form_input [] {
     error make { msg: "Aborted due to empty input" }
   } else {
     $result
+  }
+}
+
+def strict_exec [$command: list<string>] {
+  ^$command
+  | complete
+  | match $in {
+    {exit_code: 0} => { $in.stdout | str trim }
+    {exit_code: $x} => {
+      error make { msg: $"($command) exited with code ($x)" }
+    }
   }
 }
