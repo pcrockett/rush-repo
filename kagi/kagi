@@ -119,8 +119,13 @@ def "main assist" [
   --no-internet      # disable internet access
   --lens: string     # select a lens if internet access enabled
   --stdin            # read query from stdin
+  --write:           # open $EDITOR to write your query
 ] {
-  let query = if $stdin { $in } else { $query }
+  let query = (
+    if $stdin { $in }
+    else if $write { long_form_input }
+    else { $query }
+  )
 
   # <https://help.kagi.com/kagi/ai/assistant.html#url-parameters>
   let query_params = (
@@ -187,5 +192,50 @@ def "browser open" [$url: string] {
   ^$open_cmd $url | complete | match $in {
     { exit_code: 0 } => { ignore }
     _ => { error make { msg: $"exited with code ($in.exit_code): `($open_cmd) ($url)`" } }
+  }
+}
+
+# open your $EDITOR to a temp file, and return the contents of that temp file when
+# editor is closed
+def long_form_input [] {
+  let editor = (
+    $env
+    | get --optional EDITOR
+    | if ($in | is-empty) {
+      error make { msg: "Must specify $EDITOR env variable." }
+    } else {
+      $in
+    }
+  )
+  let temp_dir = (
+    ^mktemp --directory
+    | complete
+    | match $in {
+      {exit_code: 0} => { $in.stdout | str trim }
+      {exit_code: $x} => { error make { msg: $"mktemp exited with code ($x)" } }
+    }
+  )
+  let cleanup = { rm --recursive --force $temp_dir }
+  let result = try {
+    let temp_file = $temp_dir | path join "assist-input.md"
+    ^$editor $temp_file
+    (
+      $temp_file
+      | if ($in | path exists) {
+        open $in | str trim
+      } else {
+        error make { msg: "Aborted" }
+      }
+    )
+  } catch { |err|
+    do $cleanup
+    error make { msg: $err.msg }
+  }
+
+  do $cleanup
+  if ($result | is-empty) {
+    error make { msg: "Aborted due to empty input" }
+  } else {
+    $result
   }
 }
