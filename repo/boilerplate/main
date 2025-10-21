@@ -6,10 +6,11 @@ source "${REPO_PATH}/lib.sh"
 test -d .git || git init "${USER_CWD}"
 
 packages_to_run=(
+  asdfignore
+  editorconfig
+  envrc
   ghboilerplate
   gpl
-  editorconfig
-  asdfignore
   pre-commit-config
   shellcheckrc
   yamlfmt-config
@@ -25,3 +26,5 @@ fi
 for package in "${packages_to_run[@]}"; do
   "${rush_cmd[@]}" "${package}"
 done
+
+test ! -f "${USER_CWD}/.envrc.example" && mv "${USER_CWD}/.envrc" "${USER_CWD}/.envrc.example"
