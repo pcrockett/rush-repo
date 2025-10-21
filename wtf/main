@@ -36,8 +36,7 @@ download_url() {
 
 install_artifact() {
   tar -xzf "${ARTIFACT_PATH}"
-  subdir="$(basename "${ARTIFACT_PATH}" .tar.gz)"
-  install_user_bin "${subdir}/${BIN_NAME}"
+  install_user_bin "${BIN_NAME}"
 }
 
 install_from_github
