@@ -31,7 +31,7 @@ install_from_github() {
   pushd "${temp_dir}" &>/dev/null || cleanup
 
   log_info "Download ${__download_url} to ${temp_dir}/${__artifact_name}..."
-  curl_download "${__download_url}" >"${temp_dir}/${__artifact_name}" || cleanup
+  download_artifact "${__download_url}" "${temp_dir}/${__artifact_name}" || cleanup
 
   log_info "Installing..."
   ARTIFACT_PATH="${temp_dir}/${__artifact_name}" \
