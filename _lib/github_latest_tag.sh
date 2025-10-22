@@ -1,4 +1,5 @@
 # shellcheck shell=bash
+# [tag:github_latest_tag]
 
 github_latest_tag() {
   local owner="${1}"

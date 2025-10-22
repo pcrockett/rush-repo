@@ -1,0 +1,51 @@
+#!/usr/bin/env bash
+
+# shellcheck source=lib.sh
+source "${REPO_PATH}/lib.sh"
+
+require_commands tar
+
+# shellcheck disable=SC2034  # variables used in `install_from_github()`
+{
+  GITHUB_ORG="ente-io"
+  GITHUB_REPO="ente"
+}
+BIN_NAME="ente"
+
+# I'm not sure if I like this hack, or hate it... But I'm re-defining the existing
+# [ref:github_latest_tag] function. This is necessary because this is a monorepo, and
+# the "latest" marker in the GitHub API may not even be pointing to the Ente CLI.
+github_latest_tag() {
+  git ls-remote --tags --sort version:refname "https://github.com/${GITHUB_ORG}/${GITHUB_REPO}.git" \
+    | grep --perl-regexp '(?<=refs/tags/)cli-v\d+\.\d+\.\d+$' --only-matching \
+    | tail -n 1
+}
+
+latest_version() {
+  echo "${GITHUB_LATEST_TAG}"
+}
+
+installed_version() {
+  if ! command_exists "${BIN_NAME}"; then
+    echo ""
+    return 0
+  fi
+
+  installed_package_version
+}
+
+artifact_name() {
+  echo "ente-$(latest_version)-linux-amd64.tar.gz"
+}
+
+download_url() {
+  echo "https://github.com/${GITHUB_ORG}/${GITHUB_REPO}/releases/download/${GITHUB_LATEST_TAG}/$(artifact_name)"
+}
+
+install_artifact() {
+  tar -xzf "${ARTIFACT_PATH}"
+  install_user_bin "${BIN_NAME}"
+}
+
+install_from_github
+install_success "$(latest_version)"
