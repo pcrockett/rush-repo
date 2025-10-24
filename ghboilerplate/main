@@ -6,6 +6,11 @@ source "${REPO_PATH}/lib.sh"
 src_dir="template_dir"
 dst_dir="${USER_CWD}/.github"
 
+# TODO: use the following command to help fill in CODEOWNERS automatically:
+#
+#     gh auth status --active --json hosts --jq '.hosts."github.com"[0].login'
+#
+
 if [ -d "${dst_dir}" ]; then
   if force_please; then
     cp --recursive "${src_dir}/"* "${dst_dir}"
