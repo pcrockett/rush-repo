@@ -10,6 +10,16 @@ source "${REPO_PATH}/lib.sh"
 }
 BIN_NAME="Nextcloud.AppImage"
 
+# i've filed an issue about this, but NextCloud's release process is... not as
+# organized and predictable as i'd like. in any case, we can't rely on GitHub's
+# concept of a "latest" release. we need to parse Git tags ourselves, so we redefine
+# [ref:github_latest_tag] just for this project.
+github_latest_tag() {
+  git ls-remote --tags --sort version:refname "https://github.com/nextcloud-releases/desktop.git" \
+    | grep --perl-regexp '(?<=refs/tags/)v\d+\.\d+\.\d+$' --only-matching \
+    | tail -n 1
+}
+
 latest_version() {
   # strip the leading `v` from the tag name:
   echo "${GITHUB_LATEST_TAG}" | cut --characters 2-

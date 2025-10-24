@@ -12,9 +12,10 @@ require_commands tar
 }
 BIN_NAME="ente"
 
-# I'm not sure if I like this hack, or hate it... But I'm re-defining the existing
-# [ref:github_latest_tag] function. This is necessary because this is a monorepo, and
-# the "latest" marker in the GitHub API may not even be pointing to the Ente CLI.
+# ente uses a monorepo, and releases all products there at different times. so we can't
+# rely on GitHub's "latest" release, because that may be pointing to, for example,
+# the Android app and not the CLI. thus we have to redefine [ref:github_latest_tag] to
+# figure out the latest Git tag ourselves.
 github_latest_tag() {
   git ls-remote --tags --sort version:refname "https://github.com/${GITHUB_ORG}/${GITHUB_REPO}.git" \
     | grep --perl-regexp '(?<=refs/tags/)cli-v\d+\.\d+\.\d+$' --only-matching \
