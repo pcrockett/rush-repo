@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+
+# shellcheck source=lib.sh
+source "${REPO_PATH}/lib.sh"
+
+if [ -f Makefile ] && ! force_please; then
+  panic "Makefile already exists. To overwrite, use --force."
+fi
+
+cat >"${USER_CWD}/Makefile" <<"EOF"
+# INSTALL_DIR ?= ~/.local/bin
+
+lint:
+	pre-commit run --all --show-diff-on-failure --color always
+.PHONY: lint
+EOF
+
+log_attention "Makefile created at ${USER_CWD}/Makefile"
