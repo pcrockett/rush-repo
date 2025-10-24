@@ -11,6 +11,7 @@ packages_to_run=(
   envrc
   ghboilerplate
   gpl
+  makefile
   pre-commit-config
   shellcheckrc
   yamlfmt-config
