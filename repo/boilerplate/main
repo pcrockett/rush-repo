@@ -3,7 +3,7 @@
 # shellcheck source=lib.sh
 source "${REPO_PATH}/lib.sh"
 
-test -d .git || git init "${USER_CWD}"
+test -d "${USER_CWD}/.git" || git init "${USER_CWD}"
 
 packages_to_run=(
   asdfignore
