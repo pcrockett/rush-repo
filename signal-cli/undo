@@ -2,5 +2,5 @@
 
 # shellcheck source=lib.sh
 source "${REPO_PATH}/lib.sh"
-rm -f "${RUSH_USER_BIN}/signal-cli"
+rm -rf "${RUSH_USER_BIN}/signal-cli" "${XDG_DATA_HOME}/signal-cli"
 uninstall_success
