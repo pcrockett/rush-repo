@@ -43,7 +43,7 @@ rush_packages() {
     rush get "${package_name}" || panic "Unable to update ${package_name}"
   done
 
-  run_if yolodl commit
+  run_if yolodl commit || true
   run_if yolodl push
 }
 
