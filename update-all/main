@@ -33,6 +33,8 @@ root_run_if() {
 
 rush_packages() {
   should_skip "rush" && return 0
+  run_if yolodl pull
+
   local installed_packages_dir
   installed_packages_dir="$(repo_state_dir)/installed_packages"
   mkdir --parent "${installed_packages_dir}"
@@ -40,6 +42,9 @@ rush_packages() {
   for package_name in $(installed_package_names); do
     rush get "${package_name}" || panic "Unable to update ${package_name}"
   done
+
+  run_if yolodl commit
+  run_if yolodl push
 }
 
 check_arch_news() {
