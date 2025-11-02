@@ -116,7 +116,10 @@ EOF
 main() {
   run_id="$(select_run)"
   gh run watch "${run_id}"
-  gh run view --web "${run_id}"
+
+  # make sure opening the browser isn't blocking
+  nohup gh run view --web "${run_id}" &>/dev/null &
+  disown
 }
 
 main
