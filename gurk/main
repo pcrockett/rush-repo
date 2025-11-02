@@ -5,7 +5,7 @@ source "${REPO_PATH}/lib.sh"
 
 require_commands tar
 
-GITHUB_ORG="pcrockett"
+GITHUB_ORG="boxdot"
 GITHUB_REPO="gurk-rs"
 BIN_NAME="gurk"
 
