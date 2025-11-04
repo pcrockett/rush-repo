@@ -1,0 +1,42 @@
+#!/usr/bin/env bash
+
+# shellcheck source=lib.sh
+source "${REPO_PATH}/lib.sh"
+
+require_commands tar
+
+# shellcheck disable=SC2034  # variables used in `install_from_github()`
+{
+  GITHUB_ORG="mike-engel"
+  GITHUB_REPO="jwt-cli"
+}
+BIN_NAME="jwt"
+
+latest_version() {
+  echo "${GITHUB_LATEST_TAG}"
+}
+
+installed_version() {
+  if ! command_exists "${BIN_NAME}"; then
+    echo ""
+    return 0
+  fi
+
+  installed_package_version
+}
+
+artifact_name() {
+  echo "jwt-linux-musl.tar.gz"
+}
+
+download_url() {
+  echo "https://github.com/${GITHUB_ORG}/${GITHUB_REPO}/releases/download/${GITHUB_LATEST_TAG}/$(artifact_name)"
+}
+
+install_artifact() {
+  tar -xzf "${ARTIFACT_PATH}"
+  install_user_bin "${BIN_NAME}"
+}
+
+install_from_github
+install_success "$(latest_version)"
