@@ -3,49 +3,59 @@ set -Eeuo pipefail
 
 # https://cloud.google.com/sdk/docs/downloads-docker
 #
-# a wrapper script for the gcloud docker container. makes the container behave as if you have the
-# CLI installed traditionally.
+# a wrapper script for the gcloud docker container. makes the container behave as if you
+# have the CLI installed traditionally.
 #
 # usage:
 #
-#     gcloud help
+#   gcloud help
 #
 
-config_home="${XDG_CONFIG_HOME:-"${HOME}/.config"}"
+init() {
+  XDG_CONFIG_HOME="${XDG_CONFIG_HOME:-"${HOME}/.config"}"
+  PCROCKETT_GCLOUD_CONFIG_DIR="${PCROCKETT_GCLOUD_CONFIG_DIR:-"${XDG_CONFIG_HOME}/gcloud"}"
+  mkdir --parent "${PCROCKETT_GCLOUD_CONFIG_DIR}"
+}
 
-docker_cmd=(
-  docker run --rm
-  --user "$(id --user):$(id --group)"
-  --volume "${config_home}/gcloud:/home/cloudsdk/.config/gcloud"
-  --volume "${PWD}:/tmp/workdir"
-  --workdir "/tmp/workdir"
-  --env TERM="${TERM}"
-)
+main() {
+  init
 
-if [ -d "${HOME}/.docker" ]; then
-  docker_cmd+=(--volume "${HOME}/.docker:/home/cloudsdk/.docker")
-fi
+  docker_cmd=(
+    docker run --rm
+    --user "$(id --user):$(id --group)"
+    --volume "${PCROCKETT_GCLOUD_CONFIG_DIR}:/home/cloudsdk/.config/gcloud"
+    --volume "${PWD}:/tmp/workdir"
+    --workdir "/tmp/workdir"
+    --env TERM="${TERM}"
+  )
 
-if tty --quiet; then
-  docker_cmd+=(--interactive --tty)
-fi
+  if [ -d "${HOME}/.docker" ]; then
+    docker_cmd+=(--volume "${HOME}/.docker:/home/cloudsdk/.docker")
+  fi
 
-# get all CLOUDSDK_* environment variables and feed them into the docker command
-while IFS= read -r var_setting || [ -n "${var_setting}" ]; do
-  docker_cmd+=(--env "${var_setting}")
-done < <(env | grep --perl-regexp "^CLOUDSDK_")
+  if tty --quiet; then
+    docker_cmd+=(--interactive --tty)
+  fi
 
-docker_cmd+=(
-  localhost/gcloud gcloud "${@}"
-)
+  # get all CLOUDSDK_* environment variables and feed them into the docker command
+  while IFS= read -r var_setting || [ -n "${var_setting}" ]; do
+    docker_cmd+=(--env "${var_setting}")
+  done < <(env | grep --perl-regexp "^CLOUDSDK_")
 
-if [ "${PCROCKETT_GCLOUD_DEBUG:-}" != "" ]; then
-  cat >&2 <<EOF
+  docker_cmd+=(
+    localhost/gcloud gcloud "${@}"
+  )
+
+  if [ "${PCROCKETT_GCLOUD_DEBUG:-}" != "" ]; then
+    cat >&2 <<EOF
 Running...
 
-    ${docker_cmd[*]}
+  ${docker_cmd[*]}
 
 EOF
-fi
+  fi
 
-"${docker_cmd[@]}"
+  "${docker_cmd[@]}"
+}
+
+main "$@"
