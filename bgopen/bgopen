@@ -16,6 +16,10 @@ set -euo pipefail
 #     # open multiple URLs in your browser
 #     bgopen https://philcrockett.com/ http://kagi.com/
 #
+# Environment variables:
+#
+# * BGOPEN_HEIGHT: height of interactive UI (defaults to 20)
+#
 # Dependencies:
 #
 # * bgstart (also in this rush-repo)
@@ -24,7 +28,7 @@ set -euo pipefail
 #
 
 fzf_ui() {
-  fzf --multi --height 10 --reverse --prompt 'Select file(s): ' --print0
+  fzf --multi --height "${BGOPEN_HEIGHT:-20}" --reverse --prompt 'Select file(s): ' --print0
 }
 
 main() {
