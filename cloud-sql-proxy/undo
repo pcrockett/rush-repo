@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+
+# shellcheck source=lib.sh
+source "${REPO_PATH}/lib.sh"
+rm -f "${RUSH_USER_BIN}/cloud-sql-proxy"
+uninstall_success

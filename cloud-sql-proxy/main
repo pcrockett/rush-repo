@@ -1,0 +1,42 @@
+#!/usr/bin/env bash
+
+# shellcheck source=lib.sh
+source "${REPO_PATH}/lib.sh"
+
+# shellcheck disable=SC2034  # variables used in `install_from_github()`
+{
+  GITHUB_ORG="GoogleCloudPlatform"
+  GITHUB_REPO="cloud-sql-proxy"
+}
+BIN_NAME="cloud-sql-proxy"
+
+latest_version() {
+  echo "${GITHUB_LATEST_TAG}"
+}
+
+installed_version() {
+  if ! command_exists "${BIN_NAME}"; then
+    echo ""
+    return 0
+  fi
+
+  installed_package_version
+}
+
+artifact_name() {
+  echo "cloud-sql-proxy.linux.amd64"
+}
+
+download_url() {
+  # google throws its release assets into their own bucket, rather than relying on github
+  echo "https://storage.googleapis.com/cloud-sql-connectors/cloud-sql-proxy/${GITHUB_LATEST_TAG}/$(artifact_name)"
+}
+
+install_artifact() {
+  chmod +x "${ARTIFACT_PATH}"
+  mv "${ARTIFACT_PATH}" "${BIN_NAME}"
+  install_user_bin "${BIN_NAME}"
+}
+
+install_from_github
+install_success "$(latest_version)"
