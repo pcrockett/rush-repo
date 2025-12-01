@@ -124,7 +124,7 @@ def "main assist" [
   --no-internet      # disable internet access
   --lens: string     # select a lens if internet access enabled
   --stdin            # read query from stdin
-  --write:           # open $EDITOR to write your query
+  --write            # open $EDITOR to write your query
 ] {
   let query = (
     if $stdin { $in }
@@ -143,6 +143,50 @@ def "main assist" [
   )
   let query_string = $query_params | url build-query
   browser open $"https://kagi.com/assistant/?($query_string)"
+}
+
+# Use Kagi Translate (opens your browser)
+def "main translate" [
+  query?: string     # set your initial query
+  --from = "auto"    # from language
+  --to: string       # to language
+  --stdin            # read query from stdin
+  --write            # open $EDITOR to write your query
+] {
+  let query = (
+    if $stdin { $in }
+    else if $write { long_form_input }
+    else { $query }
+  )
+
+  let query_params = (
+    {
+      from: $from
+    }
+    | insert-if { $to | is-not-empty } "to" $to
+    | insert-if { $query | is-not-empty } "text" $query
+  )
+  let query_string = $query_params | url build-query
+  browser open $"https://translate.kagi.com/?($query_string)"
+}
+
+# Use Kagi Translate to proofread texts (opens your browser)
+def "main proofread" [
+  query?: string     # set your initial query
+  --stdin            # read query from stdin
+  --write            # open $EDITOR to write your query
+] {
+  let query = (
+    if $stdin { $in }
+    else if $write { long_form_input }
+    else { $query }
+  )
+
+  let query_params = (
+    {} | insert-if { $query | is-not-empty } "text" $query
+  )
+  let query_string = $query_params | url build-query
+  browser open $"https://translate.kagi.com/proofread?($query_string)"
 }
 
 def insert-if [condition: closure, field: string, new_value: any] {
