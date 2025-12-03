@@ -3,7 +3,7 @@
 # shellcheck source=lib.sh
 source "${REPO_PATH}/lib.sh"
 
-dest="${USER_CWD}/Justfile"
+dest="${USER_CWD}/justfile"
 
 if [ ! -e "${dest}" ] || force_please; then
   cat >"${dest}" <<'EOF'
@@ -16,7 +16,7 @@ lint:
     pre-commit run --all --show-diff-on-failure --color always
 EOF
 
-  log_attention "Justfile created at ${dest}"
+  log_attention "justfile created at ${dest}"
 else
-  panic "Justfile already exists in this directory. Use --force to overwrite."
+  panic "justfile already exists in this directory. Use --force to overwrite."
 fi
