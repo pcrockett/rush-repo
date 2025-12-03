@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+
+# shellcheck source=lib.sh
+source "${REPO_PATH}/lib.sh"
+
+dest="${USER_CWD}/Justfile"
+
+if [ ! -e "${dest}" ] || force_please; then
+  cat >"${dest}" <<'EOF'
+[private]
+_default:
+    @just --list --list-submodules
+
+# Run pre-commit on all files
+lint:
+    pre-commit run --all --show-diff-on-failure --color always
+EOF
+
+  log_attention "Justfile created at ${dest}"
+else
+  panic "Justfile already exists in this directory. Use --force to overwrite."
+fi
