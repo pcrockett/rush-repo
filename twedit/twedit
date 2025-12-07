@@ -1,5 +1,6 @@
 #!/usr/bin/env nu
 
+# Interactively edit Taskwarrior task attributes with your $EDITOR
 def main [
   task: string       # Task ID
   attribute: string  # Name of the attribute to edit
@@ -24,9 +25,7 @@ def main [
 }
 
 def safe-exec [$args: list<string>]: nothing -> string {
-  do {
-    ^$args
-  }
+  do { ^$args }
   | complete
   | match $in {
     {exit_code: 0} => { $in.stdout }
