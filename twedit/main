@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+
+# shellcheck source=lib.sh
+source "${REPO_PATH}/lib.sh"
+
+if [ "${EDITOR:-}" == "" ]; then
+  panic "twedit only works if \$EDITOR is non-empty and exported."
+fi
+
+require_commands task nu
+install_user_bin twedit
+install_success
