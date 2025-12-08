@@ -1,0 +1,60 @@
+#!/usr/bin/env nu
+#
+# <https://nominatim.org/release-docs/develop/api/Search/>
+#
+
+const ME = path self
+const BASE_PATH = "https://nominatim.openstreetmap.org/search"
+
+def main [] {
+  "ERROR: Must specify a subcommand.\n" | print
+  exec $ME "--help"
+}
+
+# Perform an unstructured search query
+def "main query" [query: string] {
+  # <https://nominatim.org/release-docs/develop/api/Search/#free-form-query>
+  let query_str = {
+    q: $query
+    format: "jsonv2"
+  } | url build-query
+  (
+    http get $"($BASE_PATH)?($query_str)"
+    | select name lat lon category type display_name
+  )
+}
+
+# Perform a structured search query
+def "main address" [
+  --amenity: string     # name and/or type of POI
+  --street: string      # housenumber and streetname
+  --city: string        # city
+  --county: string      # county
+  --state: string       # state
+  --country: string     # country
+  --postalcode: string  # postal code
+] {
+  # <https://nominatim.org/release-docs/develop/api/Search/#structured-query>
+  let api_params = (
+    { format: "jsonv2" }
+    | merge-if { $amenity | is-not-empty } { amenity: $amenity }
+    | merge-if { $street | is-not-empty } { street: $street }
+    | merge-if { $city | is-not-empty } { city: $city }
+    | merge-if { $county | is-not-empty } { county: $county }
+    | merge-if { $state | is-not-empty } { state: $state }
+    | merge-if { $country | is-not-empty } { country: $country }
+    | merge-if { $postalcode | is-not-empty } { postalcode: $postalcode }
+  )
+  (
+    http get $"($BASE_PATH)?($api_params | url build-query)"
+    | select name lat lon category type display_name
+  )
+}
+
+def merge-if [condition: closure, to_merge: record]: record -> record {
+  if (do $condition) {
+    merge $to_merge
+  } else {
+    $in
+  }
+}
