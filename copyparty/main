@@ -1,0 +1,64 @@
+#!/usr/bin/env bash
+
+# shellcheck source=lib.sh
+source "${REPO_PATH}/lib.sh"
+
+require_commands python3 grep
+
+# shellcheck disable=SC2034  # variables used in `install_from_github()`
+{
+  GITHUB_ORG="9001"
+  GITHUB_REPO="copyparty"
+}
+BIN_NAME="copyparty"
+
+# pipx preferred over direct github download, but not required
+# we'll only use github download as a last resort
+install_from_pipx() {
+  current_version="$(pipx list --short | grep --perl-regexp '^copyparty ' || true)"
+  if [ "${current_version}" == "" ]; then
+    pipx install copyparty
+  else
+    pipx upgrade --include-injected copyparty
+  fi
+  current_version="$(pipx list --short | grep --perl-regexp '^copyparty ' || true)"
+  install_success "${current_version}"
+}
+
+if command_exists pipx; then
+  install_from_pipx
+  exit 0
+fi
+
+# if we've gotten this far, there's no pipx. do direct github download instead.
+
+latest_version() {
+  # strip the leading `v` from the tag name:
+  echo "${GITHUB_LATEST_TAG}" | cut --characters 2-
+}
+
+installed_version() {
+  if ! command_exists "${BIN_NAME}"; then
+    echo ""
+    return 0
+  fi
+
+  installed_package_version
+}
+
+artifact_name() {
+  echo "copyparty-sfx.py"
+}
+
+download_url() {
+  echo "https://github.com/${GITHUB_ORG}/${GITHUB_REPO}/releases/download/${GITHUB_LATEST_TAG}/$(artifact_name)"
+}
+
+install_artifact() {
+  chmod +x "${ARTIFACT_PATH}"
+  mv "${ARTIFACT_PATH}" "${BIN_NAME}"
+  install_user_bin "${BIN_NAME}"
+}
+
+install_from_github
+install_success "$(latest_version)"

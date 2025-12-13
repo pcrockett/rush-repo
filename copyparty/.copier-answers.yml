@@ -1,0 +1,9 @@
+# Changes here will be overwritten by Copier
+# Don't edit manually!
+# <https://copier.readthedocs.io/en/stable/updating/>
+_src_path: _templates/github-release
+artifact_name: copyparty-sfx.py
+artifact_type: raw_binary
+binary_name: copyparty
+github_org: '9001'
+github_repo: copyparty

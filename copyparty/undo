@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+
+# shellcheck source=lib.sh
+source "${REPO_PATH}/lib.sh"
+
+uninstall_from_pipx() {
+  current_version="$(pipx list --short | grep --perl-regexp '^copyparty ' || true)"
+  if [ "${current_version}" != "" ]; then
+    pipx uninstall copyparty
+  fi
+}
+
+if command_exists pipx; then
+  uninstall_from_pipx
+fi
+
+rm -f "${RUSH_USER_BIN}/copyparty"
+uninstall_success
