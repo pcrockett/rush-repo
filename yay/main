@@ -5,8 +5,9 @@ source "${REPO_PATH}/lib.sh"
 
 require_commands pacman git makepkg
 
-if command_exists yay; then
+if command_exists yay && ! force_please; then
   log_attention "Yay already installed. Use it to self-update instead of rush."
+  log_attention "If Yay is broken and needs a rebuild / reinstall, use --force."
   exit 0
 fi
 
