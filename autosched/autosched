@@ -1,0 +1,65 @@
+#!/usr/bin/env nu
+
+const DEFAULT_TASK_DURATION = 30min
+
+# Bulk-schedule taskwarrior tasks within a time window
+def main [
+  begin_timestamp: string  # the beginning of your time window
+  duration: duration       # how long your time window will last
+  ...filter_args: string   # additional taskwarrior filter args
+] {
+  let tasks = (
+    ^task -BLOCKED status:pending ...$filter_args export
+    | from json
+    | each {|t|
+      merge {
+        urgency: ($t | get-urgency)
+        duration: ($t | get-duration)
+      }
+    }
+    | sort-by --reverse --custom {|a,b|
+      # sort by duration, descending
+      # if duration is the same, then sort by urgency, descending
+      if ($a.duration == $b.duration) {
+        $a.urgency < $b.urgency
+      } else {
+        $a.duration < $b.duration
+      }
+    }
+  )
+
+  # we could pass a datetime directly in as a parameter, however when we do that, for
+  # some reason Nushell always interprets it as a UTC timestamp if you don't explicitly
+  # specify the time zone offset yourself. explicitly calling `into datetime` assumes
+  # local time zone, which is more what we want.
+  let begin_time = ($begin_timestamp | into datetime)
+  let end_time = $begin_time + $duration
+
+  # TODO: use simple FFD to schedule tasks in the time window
+  # <https://kagi.com/assistant/46830a18-f190-4cd7-a060-fd173f532781>
+
+  $"
+Would schedule:
+
+($tasks | select id description urgency duration | table --expand)
+
+between ($begin_time) and ($end_time)
+" | print
+}
+
+# retrieve the calculated urgency of a task and parse it.
+def get-urgency []: record -> float {
+  (
+    ^task $in.uuid _urgency
+    | parse 'task {id} urgency {urgency}'
+    | get urgency
+    | into float
+    | first
+  )
+}
+
+# retrieve the `duration` UDA of a task and parse it.
+# if the UDA isn't defined, a default will be chosen.
+def get-duration []: record -> duration {
+  get --optional duration | default $DEFAULT_TASK_DURATION | into duration
+}

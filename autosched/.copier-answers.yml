@@ -1,0 +1,6 @@
+# Changes here will be overwritten by Copier
+# Don't edit manually!
+# <https://copier.readthedocs.io/en/stable/updating/>
+_src_path: _templates/script
+description: Automatically schedule a batch of Taskwarrior tasks in a time window
+script_name: autosched
