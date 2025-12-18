@@ -1,20 +1,24 @@
 #!/usr/bin/env nu
 
-const DEFAULT_TASK_DURATION = 30min
-
 # Bulk-schedule taskwarrior tasks within a time window
 def main [
-  begin_timestamp: string  # the beginning of your time window
-  duration: string         # how long your time window will last
-  ...filter_args: string   # additional taskwarrior filter args
+  begin_timestamp: string      # the beginning of your time window
+  duration: string             # how long your time window will last
+  ...filter_args: string       # additional taskwarrior filter args
+  --default-duration = "30min" # duration to use if task has none
+  --commit                     # don't just show changes; make them
 ] {
+  # we could require a `duration` type instead of `string` for the `default_duration`
+  # parameter, however Nushell's automatic parsing of CLI args isn't as robust as us
+  # manually parsing ourselves :'(
+  let default_duration = $default_duration | into duration
   let tasks = (
     ^task -BLOCKED status:pending ...$filter_args export
     | from json
     | each {|t|
       merge {
         urgency: ($t | get-urgency)
-        duration: ($t | get-duration)
+        duration: ($t | get-duration $default_duration)
         schedule: null  # reset task scheduled time if it already exists
       }
     }
@@ -22,7 +26,12 @@ def main [
       # sort by duration, descending
       # if duration is the same, then sort by urgency, descending
       if ($a.duration == $b.duration) {
-        $a.urgency < $b.urgency
+        if ($a.urgency == $b.urgency) {
+          # the two tasks are equivalent. just make sorting deterministic now.
+          $a.uuid < $b.uuid
+        } else {
+          $a.urgency < $b.urgency
+        }
       } else {
         $a.duration < $b.duration
       }
@@ -42,7 +51,16 @@ def main [
     $tasks | schedule-tasks {begin: $begin_time, duration: $duration}
   )
 
-  $"
+  if ($commit) {
+    (
+      $scheduled_tasks
+      | each {
+        let sched = ($in.schedule | default "")
+        ^task $in.uuid modify $"schedule:($sched)"
+      }
+    )
+  } else {
+    $"
 Would schedule:
 
 (
@@ -50,7 +68,9 @@ Would schedule:
   | select id description schedule duration urgency
   | table --expand --index false
 )
+Add `--commit` if you want to make these changes.
 " | print
+  }
 }
 
 # retrieve the calculated urgency of a task and parse it.
@@ -66,8 +86,8 @@ def get-urgency []: record -> float {
 
 # retrieve the `duration` UDA of a task and parse it.
 # if the UDA isn't defined, a default will be chosen.
-def get-duration []: record -> duration {
-  get --optional duration | default $DEFAULT_TASK_DURATION | into duration
+def get-duration [default: duration]: record -> duration {
+  get --optional duration | default $default | into duration
 }
 
 def schedule-tasks [
