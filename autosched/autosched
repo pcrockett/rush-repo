@@ -5,7 +5,7 @@ const DEFAULT_TASK_DURATION = 30min
 # Bulk-schedule taskwarrior tasks within a time window
 def main [
   begin_timestamp: string  # the beginning of your time window
-  duration: duration       # how long your time window will last
+  duration: string         # how long your time window will last
   ...filter_args: string   # additional taskwarrior filter args
 ] {
   let tasks = (
@@ -15,6 +15,7 @@ def main [
       merge {
         urgency: ($t | get-urgency)
         duration: ($t | get-duration)
+        schedule: null  # reset task scheduled time if it already exists
       }
     }
     | sort-by --reverse --custom {|a,b|
@@ -33,17 +34,22 @@ def main [
   # specify the time zone offset yourself. explicitly calling `into datetime` assumes
   # local time zone, which is more what we want.
   let begin_time = ($begin_timestamp | into datetime)
-  let end_time = $begin_time + $duration
+  let duration = ($duration | into duration)
 
   # TODO: use simple FFD to schedule tasks in the time window
   # <https://kagi.com/assistant/46830a18-f190-4cd7-a060-fd173f532781>
+  let scheduled_tasks = (
+    $tasks | schedule-tasks {begin: $begin_time, duration: $duration}
+  )
 
   $"
 Would schedule:
 
-($tasks | select id description urgency duration | table --expand)
-
-between ($begin_time) and ($end_time)
+(
+  $scheduled_tasks
+  | select id description schedule duration urgency
+  | table --expand --index false
+)
 " | print
 }
 
@@ -62,4 +68,71 @@ def get-urgency []: record -> float {
 # if the UDA isn't defined, a default will be chosen.
 def get-duration []: record -> duration {
   get --optional duration | default $DEFAULT_TASK_DURATION | into duration
+}
+
+def schedule-tasks [
+  time_window: record<begin: datetime, duration: duration>
+]: list<record> -> list<record> {
+  let original_tasks = $in
+  if ($original_tasks | length) == 0 {
+    return $original_tasks
+  }
+
+  let new_state = (
+    $original_tasks | schedule-first $time_window
+  )
+
+  if $new_state.has_changes {
+    (
+      $new_state.scheduled
+      | append (
+        $new_state.unscheduled | schedule-tasks $new_state.time_window
+      )
+    )
+  } else {
+    (
+      $new_state.scheduled | append $new_state.unscheduled
+    )
+  }
+}
+
+def schedule-first [
+  time_window: record<begin: datetime, duration: duration>
+]: list<record> -> record<has_changes: bool, scheduled: list<record>, unscheduled: list<record>, time_window: record<begin: datetime, duration: duration>> {
+  let original_tasks = $in
+  let unscheduled = $original_tasks | where { is-empty schedule }
+  let scheduled = $original_tasks | where { is-not-empty schedule }
+  if (($unscheduled | length) == 0) or ($time_window.duration <= 0min) {
+    return {
+      has_changes: false
+      scheduled: $scheduled
+      unscheduled: $unscheduled
+      time_window: $time_window
+    }
+  }
+
+  let to_schedule = (
+    $unscheduled | where {|t| $t.duration <= $time_window.duration } | first
+  )
+  if ($to_schedule | is-empty) {
+    return {
+      has_changes: false
+      scheduled: $scheduled
+      unscheduled: $unscheduled
+      time_window: $time_window
+    }
+  } else {
+    let formatted_time = $time_window.begin | format date "%Y-%m-%dT%H:%M"
+    let updated_task = $to_schedule | update schedule $formatted_time
+    let updated_window = {
+      begin: ($time_window.begin + $updated_task.duration)
+      duration: ($time_window.duration - $updated_task.duration)
+    }
+    return {
+      has_changes: true
+      scheduled: ($scheduled | append $updated_task)
+      unscheduled: ($unscheduled | where { $in.uuid != $to_schedule.uuid })
+      time_window: $updated_window
+    }
+  }
 }
