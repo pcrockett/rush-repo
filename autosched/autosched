@@ -70,7 +70,7 @@ def get-dependencies []: record -> list<record> {
     $in
     | get --optional depends
     | default []
-    | str join ","
+    | str join " "
   )
   if ($dep_list | is-empty) {
     []
