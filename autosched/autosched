@@ -19,12 +19,13 @@ def main [
   let default_duration = $default_duration | into duration
 
   let tasks = (
-    ^task -BLOCKED status:pending ...$filter_args export
+    ^task status:pending ...$filter_args export
     | from json
     | each {|t|
       merge {
-        urgency: ($t.urgency | math round --precision 1)
+        urgency: ($t.urgency | math round --precision 2)
         duration: ($t | get-duration $default_duration)
+        dependency_count: ($t | get-dependencies | length)
         schedule: null  # reset task scheduled time if it already exists
       }
     }
@@ -63,12 +64,32 @@ def get-duration [default: duration]: record -> duration {
   get --optional duration | default $default | into duration
 }
 
+# retrieve pending dependencies for a task, if any
+def get-dependencies []: record -> list<record> {
+  let dep_list = (
+    $in
+    | get --optional depends
+    | default []
+    | str join ","
+  )
+  if ($dep_list | is-empty) {
+    []
+  } else {
+    (
+      ^task $dep_list export
+      | from json
+      | where { $in.status == "pending" }
+    )
+  }
+}
+
 def sort-tasks []: list<record> -> list<record> {
   let fields_to_sort_by = [
-    { name: urgency  order: desc }
-    { name: impact   order: desc }
-    { name: duration order: desc }
-    { name: uuid     order: asc  }
+    { name: urgency          order: desc }
+    { name: dependency_count order: asc  }
+    { name: impact           order: desc }
+    { name: duration         order: desc }
+    { name: uuid             order: asc  }
   ]
   $in | sort-by --custom {|a,b|
     let first_nonequal_field = (
