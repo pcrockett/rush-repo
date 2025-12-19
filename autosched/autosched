@@ -23,24 +23,12 @@ def main [
     | from json
     | each {|t|
       merge {
+        urgency: ($t.urgency | math round --precision 1)
         duration: ($t | get-duration $default_duration)
         schedule: null  # reset task scheduled time if it already exists
       }
     }
-    | sort-by --reverse --custom {|a,b|
-      # sort by duration, descending
-      # if duration is the same, then sort by urgency, descending
-      if ($a.duration == $b.duration) {
-        if ($a.urgency == $b.urgency) {
-          # the two tasks are equivalent. just make sorting deterministic now.
-          $a.uuid < $b.uuid
-        } else {
-          $a.urgency < $b.urgency
-        }
-      } else {
-        $a.duration < $b.duration
-      }
-    }
+    | sort-tasks
   )
 
   let tasks = (
@@ -61,7 +49,7 @@ Would schedule:
 
 (
   $tasks
-  | select id description schedule duration urgency
+  | select id description schedule duration urgency impact
   | table --expand --index false
 )
 Add `--commit` if you want to make these changes.
@@ -73,6 +61,33 @@ Add `--commit` if you want to make these changes.
 # if the UDA isn't defined, a default will be chosen.
 def get-duration [default: duration]: record -> duration {
   get --optional duration | default $default | into duration
+}
+
+def sort-tasks []: list<record> -> list<record> {
+  let fields_to_sort_by = [
+    { name: urgency  order: desc }
+    { name: impact   order: desc }
+    { name: duration order: desc }
+    { name: uuid     order: asc  }
+  ]
+  $in | sort-by --custom {|a,b|
+    let first_nonequal_field = (
+      $fields_to_sort_by
+      | each {|f|
+        merge {
+          a_val: ($a | get --optional $f.name)
+          b_val: ($b | get --optional $f.name)
+        }
+      }
+      | where { $in.a_val != $in.b_val }
+      | first
+    )
+    if $first_nonequal_field.order == desc {
+      $first_nonequal_field.a_val > $first_nonequal_field.b_val
+    } else {
+      $first_nonequal_field.a_val < $first_nonequal_field.b_val
+    }
+  }
 }
 
 def schedule-tasks [
