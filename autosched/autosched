@@ -8,16 +8,21 @@ def main [
   --default-duration = "30min" # duration to use if task has none
   --commit                     # don't just show changes; make them
 ] {
-  # we could require a `duration` type instead of `string` for the `default_duration`
-  # parameter, however Nushell's automatic parsing of CLI args isn't as robust as us
-  # manually parsing ourselves :'(
+  # Nushell's parsing of CLI arguments is not quite the same as when you do it
+  # explicitly. Ex: Defaulting to UTC datetimes instead of local. So we opt to keep some
+  # of our arguments plain strings and manually parse instead:
+  let begin_time = match $begin_timestamp {
+    "now" => { date now }
+    $val => { $val | into datetime }
+  }
+  let window_duration = $duration | into duration
   let default_duration = $default_duration | into duration
+
   let tasks = (
     ^task -BLOCKED status:pending ...$filter_args export
     | from json
     | each {|t|
       merge {
-        urgency: ($t | get-urgency)
         duration: ($t | get-duration $default_duration)
         schedule: null  # reset task scheduled time if it already exists
       }
@@ -38,22 +43,13 @@ def main [
     }
   )
 
-  # we could pass a datetime directly in as a parameter, however when we do that, for
-  # some reason Nushell always interprets it as a UTC timestamp if you don't explicitly
-  # specify the time zone offset yourself. explicitly calling `into datetime` assumes
-  # local time zone, which is more what we want.
-  let begin_time = ($begin_timestamp | into datetime)
-  let duration = ($duration | into duration)
-
-  # TODO: use simple FFD to schedule tasks in the time window
-  # <https://kagi.com/assistant/46830a18-f190-4cd7-a060-fd173f532781>
-  let scheduled_tasks = (
-    $tasks | schedule-tasks {begin: $begin_time, duration: $duration}
+  let tasks = (
+    $tasks | schedule-tasks {begin: $begin_time, duration: $window_duration}
   )
 
   if ($commit) {
     (
-      $scheduled_tasks
+      $tasks
       | each {
         let sched = ($in.schedule | default "")
         ^task $in.uuid modify $"schedule:($sched)"
@@ -64,24 +60,13 @@ def main [
 Would schedule:
 
 (
-  $scheduled_tasks
+  $tasks
   | select id description schedule duration urgency
   | table --expand --index false
 )
 Add `--commit` if you want to make these changes.
 " | print
   }
-}
-
-# retrieve the calculated urgency of a task and parse it.
-def get-urgency []: record -> float {
-  (
-    ^task $in.uuid _urgency
-    | parse 'task {id} urgency {urgency}'
-    | get urgency
-    | into float
-    | first
-  )
 }
 
 # retrieve the `duration` UDA of a task and parse it.
