@@ -1,0 +1,9 @@
+# Changes here will be overwritten by Copier
+# Don't edit manually!
+# <https://copier.readthedocs.io/en/stable/updating/>
+_src_path: _templates/github-release
+artifact_name: ouch-x86_64-unknown-linux-musl.tar.gz
+artifact_type: tar.gz
+binary_name: ouch
+github_org: ouch-org
+github_repo: ouch
