@@ -21,6 +21,8 @@ if [ ! -d "${keys_dir}" ]; then
   panic "Expected ${keys_dir} to exist, but it doesn't."
 fi
 
+# key retrieved from <https://apt.fury.io/nushell/gpg.key> on 2026-01-03 and stored in
+# this repository. if the key ever needs to be updated, we can do the same thing again.
 as_root cp fury-nushell.gpg "${keys_dir}"
 
 echo "deb [signed-by=${keys_dir}/fury-nushell.gpg] https://apt.fury.io/nushell/ /" \
