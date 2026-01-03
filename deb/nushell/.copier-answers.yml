@@ -1,0 +1,5 @@
+# Changes here will be overwritten by Copier
+# Don't edit manually!
+# <https://copier.readthedocs.io/en/stable/updating/>
+_src_path: _templates/basic
+description: Setup Nushell .deb repo on your machine and install it

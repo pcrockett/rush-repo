@@ -1,0 +1,30 @@
+#!/usr/bin/env bash
+
+# shellcheck source=lib.sh
+source "${REPO_PATH}/lib.sh"
+
+is_deb_system() {
+  command -v dpkg && command -v apt-get
+}
+
+if ! is_deb_system &>/dev/null; then
+  panic "This package only makes sense for Debian / Ubuntu-based systems."
+fi
+
+sources_dir="/etc/apt/sources.list.d"
+if [ ! -d "${sources_dir}" ]; then
+  panic "Expected ${sources_dir} to exist, but it doesn't."
+fi
+
+keys_dir="/etc/apt/keyrings"
+if [ ! -d "${keys_dir}" ]; then
+  panic "Expected ${keys_dir} to exist, but it doesn't."
+fi
+
+as_root cp fury-nushell.gpg "${keys_dir}"
+
+echo "deb [signed-by=${keys_dir}/fury-nushell.gpg] https://apt.fury.io/nushell/ /" \
+  | as_root dd of="${sources_dir}/fury.list" status=none
+
+as_root apt-get update
+as_root apt-get install --yes nushell
