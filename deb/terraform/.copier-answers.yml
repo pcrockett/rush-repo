@@ -1,0 +1,9 @@
+# Changes here will be overwritten by Copier
+# Don't edit manually!
+# <https://copier.readthedocs.io/en/stable/updating/>
+_src_path: _templates/deb-repo
+apt_list_filename: hashicorp.list
+needs_dearmor: true
+package_name: terraform
+signing_key_filename: hashicorp-archive-keyring.gpg
+signing_key_url: https://apt.releases.hashicorp.com/gpg

@@ -1,0 +1,33 @@
+#!/usr/bin/env bash
+
+# shellcheck source=lib.sh
+source "${REPO_PATH}/lib.sh"
+
+is_deb_system() {
+  command -v dpkg && command -v apt-get
+}
+
+if ! is_deb_system &>/dev/null; then
+  panic "This package only makes sense for Debian / Ubuntu-based systems."
+fi
+
+sources_dir="/etc/apt/sources.list.d"
+if [ ! -d "${sources_dir}" ]; then
+  panic "Expected ${sources_dir} to exist, but it doesn't."
+fi
+
+keys_dir="/etc/apt/keyrings"
+if [ ! -d "${keys_dir}" ]; then
+  panic "Expected ${keys_dir} to exist, but it doesn't."
+fi
+
+# key retrieved from <https://apt.releases.hashicorp.com/gpg>
+key_filename="hashicorp-archive-keyring.gpg"
+as_root cp "${key_filename}" "${keys_dir}"
+
+# using instructions from <https://developer.hashicorp.com/terraform/install#linux>
+echo "deb [arch=$(dpkg --print-architecture) signed-by=${keys_dir}/${key_filename}] https://apt.releases.hashicorp.com $(grep -oP '(?<=UBUNTU_CODENAME=).*' /etc/os-release || lsb_release -cs) main" \
+  | as_root dd of="${sources_dir}/hashicorp.list" status=none
+
+as_root apt-get update
+as_root apt-get install --yes "terraform"

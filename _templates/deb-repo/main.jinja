@@ -1,0 +1,32 @@
+#!/usr/bin/env bash
+
+# shellcheck source=lib.sh
+source "${REPO_PATH}/lib.sh"
+
+is_deb_system() {
+  command -v dpkg && command -v apt-get
+}
+
+if ! is_deb_system &>/dev/null; then
+  panic "This package only makes sense for Debian / Ubuntu-based systems."
+fi
+
+sources_dir="/etc/apt/sources.list.d"
+if [ ! -d "${sources_dir}" ]; then
+  panic "Expected ${sources_dir} to exist, but it doesn't."
+fi
+
+keys_dir="/etc/apt/keyrings"
+if [ ! -d "${keys_dir}" ]; then
+  panic "Expected ${keys_dir} to exist, but it doesn't."
+fi
+
+# key retrieved from <{{signing_key_url|trim}}>
+key_filename="{{signing_key_filename}}"
+as_root cp "${key_filename}" "${keys_dir}"
+
+echo "deb [signed-by=${keys_dir}/${key_filename}] TODO: Fill in according to package instructions" \
+  | as_root dd of="${sources_dir}/{{apt_list_filename}}" status=none
+
+as_root apt-get update
+as_root apt-get install --yes "{{package_name}}"

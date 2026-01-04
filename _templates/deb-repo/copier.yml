@@ -1,0 +1,24 @@
+package_name:
+  type: str
+  help: "Enter the package name:"
+
+signing_key_filename:
+  type: str
+  help: "Enter the name of the signing key file:"
+
+signing_key_url:
+  type: str
+  help: "Enter the URL from where the signing key can be downloaded:"
+
+needs_dearmor:
+  type: bool
+  help: "Does the signing key need to be dearmored before installing?"
+  default: true
+
+apt_list_filename:
+  type: str
+  help: "Enter the name of the .list file where APT repo config will be stored:"
+
+_tasks:
+  - command: ['tasks/download-key.sh', '{{signing_key_url}}', '{{signing_key_filename}}', '{{needs_dearmor}}']
+  - command: ['rm', '-r', 'tasks']
