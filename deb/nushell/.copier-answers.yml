@@ -1,5 +1,9 @@
 # Changes here will be overwritten by Copier
 # Don't edit manually!
 # <https://copier.readthedocs.io/en/stable/updating/>
-_src_path: _templates/basic
-description: Setup Nushell .deb repo on your machine and install it
+_src_path: _templates/deb-repo
+apt_list_filename: fury-nushell.list
+needs_dearmor: true
+package_name: nushell
+signing_key_filename: fury-nushell.gpg
+signing_key_url: https://apt.fury.io/nushell/gpg.key

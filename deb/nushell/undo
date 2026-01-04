@@ -6,5 +6,5 @@ source "${REPO_PATH}/lib.sh"
 sources_dir="/etc/apt/sources.list.d"
 keys_dir="/etc/apt/keyrings"
 
-as_root apt-get remove --yes nushell
-as_root rm -f "${keys_dir}/fury-nushell.gpg" "${sources_dir}/fury.list"
+as_root apt-get remove --yes "nushell"
+as_root rm -f "${keys_dir}/fury-nushell.gpg" "${sources_dir}/fury-nushell.list"
