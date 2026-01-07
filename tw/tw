@@ -1,0 +1,53 @@
+#!/usr/bin/env nu
+
+# Taskwarrior wrapper that adds my own custom functionality
+def main [
+  ...args: string       # args to pass directly to `task`
+] {
+  ^task ...$args
+}
+
+# Interactively edit task notes with your $EDITOR
+def "main notes" [
+  task: string      # Task ID
+] {
+  edit $task "notes"
+}
+
+# Interactively edit task attributes with your $EDITOR
+def edit [
+  task: string       # Task ID
+  attribute: string  # Name of the attribute to edit
+] {
+  let temp_dir = mktemp --directory
+  let cleanup = {
+    cd -;
+    rm --recursive --force $temp_dir;
+  }
+  cd $temp_dir
+
+  try {
+    safe-exec [task _get $"($task).($attribute)"] | save attribute.md
+    ^$env.EDITOR attribute.md
+    safe-exec [task $task modify $"($attribute):(open attribute.md | str trim)"]
+  } catch {|err|
+    do $cleanup
+    error make $err
+  }
+
+  do $cleanup
+}
+
+def safe-exec [$args: list<string>]: nothing -> string {
+  do { ^$args }
+  | complete
+  | match $in {
+    {exit_code: 0} => { $in.stdout }
+    {exit_code: $x} => {
+      let result = $in
+      error make {
+        msg: $"Exited with code ($x): ($args | str join ' ')\n\n($result | table)"
+      }
+    }
+  }
+}
