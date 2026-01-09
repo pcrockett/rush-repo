@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -Eeuo pipefail
+set -euo pipefail
 
 # wrap `git blame` so that it will automatically run with the parameters:
 #
@@ -22,8 +22,8 @@ main() {
   if [ -f "${full_path}" ]; then
     command+=(--ignore-revs-file "${full_path}")
   fi
-  command+=("${@}")
+  command+=("$@")
   "${command[@]}"
 }
 
-main "${@}"
+main "$@"
