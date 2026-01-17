@@ -3,6 +3,7 @@
 # TODO: support xdg standard env variables
 let STATE_DIR = $"($env.HOME)/.local/state/tw"
 let TEMPLATE_FILE = "template.toml"
+let TEMPLATE_FILE_PATH = $"($STATE_DIR)/($TEMPLATE_FILE)"
 
 # Taskwarrior wrapper that adds my own custom functionality
 def main [
@@ -31,23 +32,29 @@ def "main notes" [
 
 # Define a parameter template to include in all `add` commands
 def "main template add" [
-  --expire(-e) = 10min   # how long the template should remain in effect
-  --clear                # clear the current template
-  ...args: string
+  --ttl(-t) = 10min   # how long the template should remain in effect
+  --clear(-c)         # clear the current template
+  ...args: string     # the `task` parameters you want to add to the template
 ] {
   if $clear {
-    error make (not-implemented)
+    rm --force $TEMPLATE_FILE_PATH
+    return
   }
 
-  let now = ((date now) + $expire) | date to-timezone UTC
-  let config = {
-    add: {
-      expire: ($now | format date %+)
-      args: $args
+  let now = date now | date to-timezone UTC
+  let config = (
+    get-template $now
+    | update add.expire ($now + $ttl)
+    | if ($args | length) > 0 {
+      update add.args $args
+    } else {
+      # no args were specified. leave the existing config args (if any) alone, and just
+      # update the ttl.
+      $in
     }
-  }
+  )
   mkdir $STATE_DIR
-  $config | save --force $"($STATE_DIR)/($TEMPLATE_FILE)"
+  $config | save --force $TEMPLATE_FILE_PATH
   ignore
 }
 
@@ -90,9 +97,8 @@ def safe-exec [$args: list<string>]: nothing -> string {
 }
 
 def get-template [now: datetime]: nothing -> record {
-  let template_file_path = $"($STATE_DIR)/($TEMPLATE_FILE)"
-  if ($template_file_path | path exists) {
-    let raw_template = open $template_file_path
+  if ($TEMPLATE_FILE_PATH | path exists) {
+    let raw_template = open $TEMPLATE_FILE_PATH
     # convert expiration string to a datetime
     $raw_template | update add.expire ($raw_template.add.expire | into datetime)
   } else {
