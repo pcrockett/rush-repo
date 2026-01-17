@@ -1,0 +1,9 @@
+# Changes here will be overwritten by Copier
+# Don't edit manually!
+# <https://copier.readthedocs.io/en/stable/updating/>
+_src_path: _templates/github-release
+artifact_name: bkt.$(latest_version).x86_64-unknown-linux-musl.zip
+artifact_type: zip
+binary_name: bkt
+github_org: dimo414
+github_repo: bkt
