@@ -1,5 +1,8 @@
 #!/usr/bin/env nu
 
+# TODO: support xdg standard env variables
+let STATE_DIR = $"($env.HOME)/.local/state/tw"
+
 # Taskwarrior wrapper that adds my own custom functionality
 def main [
   ...args: string       # args to pass directly to `task`
@@ -12,6 +15,15 @@ def "main notes" [
   task: string      # Task ID
 ] {
   edit $task "notes"
+}
+
+# Define a parameter template to include in all `add` commands
+def "main template add" [
+  --expire(-e) = 10min   # how long the template should remain in effect
+  --clear                # clear the current template
+  ...args: string
+] {
+  error make (not-implemented)
 }
 
 # Interactively edit task attributes with your $EDITOR
@@ -50,4 +62,8 @@ def safe-exec [$args: list<string>]: nothing -> string {
       }
     }
   }
+}
+
+def not-implemented []: nothing -> record {
+  { msg: "Work in progress. Not implemented yet." }
 }
