@@ -2,12 +2,24 @@
 
 # TODO: support xdg standard env variables
 let STATE_DIR = $"($env.HOME)/.local/state/tw"
+let TEMPLATE_FILE = "template.toml"
 
 # Taskwarrior wrapper that adds my own custom functionality
 def main [
   ...args: string       # args to pass directly to `task`
 ] {
   ^task ...$args
+}
+
+# Add a task
+def "main add" [...args: string] {
+  let now = date now | date to-timezone UTC
+  let template = (get-template $now)
+  if ($template.add.expire > $now) {
+    ^task add ...$template.add.args ...$args
+  } else {
+    ^task add ...$args
+  }
 }
 
 # Interactively edit task notes with your $EDITOR
@@ -23,7 +35,20 @@ def "main template add" [
   --clear                # clear the current template
   ...args: string
 ] {
-  error make (not-implemented)
+  if $clear {
+    error make (not-implemented)
+  }
+
+  let now = ((date now) + $expire) | date to-timezone UTC
+  let config = {
+    add: {
+      expire: ($now | format date %+)
+      args: $args
+    }
+  }
+  mkdir $STATE_DIR
+  $config | save --force $"($STATE_DIR)/($TEMPLATE_FILE)"
+  ignore
 }
 
 # Interactively edit task attributes with your $EDITOR
@@ -59,6 +84,22 @@ def safe-exec [$args: list<string>]: nothing -> string {
       let result = $in
       error make {
         msg: $"Exited with code ($x): ($args | str join ' ')\n\n($result | table)"
+      }
+    }
+  }
+}
+
+def get-template [now: datetime]: nothing -> record {
+  let template_file_path = $"($STATE_DIR)/($TEMPLATE_FILE)"
+  if ($template_file_path | path exists) {
+    let raw_template = open $template_file_path
+    # convert expiration string to a datetime
+    $raw_template | update add.expire ($raw_template.add.expire | into datetime)
+  } else {
+    {
+      add: {
+        expire: $now
+        args: []
       }
     }
   }
