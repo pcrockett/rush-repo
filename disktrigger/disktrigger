@@ -2,40 +2,143 @@
 
 const ME = path self
 
+# Configure your system to run a script when a disk is attached
 def main [] {
   ^$ME --help
+  "To use this tool:
+
+1. use subcommand `list devices` to discover disks you can use to trigger scripts
+2. use subcommand `list ids` to decide how you will uniquely identify your disk
+3. use subcommand `service print` to see the contents of the systemd trigger service
+4. use subcommand `service install` to install the trigger service
+
+Each subcommand takes a `--help` parameter, which can show specific syntax.
+" | print
 }
 
-# List currently connected devices that could be used to trigger a script
-def "main list-devices" [] {
+# List currently attached disks that could trigger a script
+def "main list devices" [] {
   (
     lsblk --json --list
     | from json
     | get blockdevices
-    | where { $in.type == "disk" }
+    | where { $in.type in [disk part] }
     | upsert name { $"/dev/($in)" }
     | select name size mountpoints rm ro
   )
 }
 
-# List device paths that can be used to uniquely identify a device
-def "main list-paths" [
+# List disk paths that can be used to uniquely identify a device
+def "main list ids" [
   device_name: string   # system device path, ex: /dev/sda
 ] {
   (
     udevadm info $device_name --json pretty
     | from json
+    | default { DEVLINKS: "" }
     | get DEVLINKS
     | str replace --all " " "\n"
     | lines
     | where { str starts-with "/dev/disk/by-id/" }
+    | each { print }
+    | ignore
   )
 }
 
-# Setup a script trigger when a uniquely-identified device is plugged in
-def "main setup-trigger" [
-  device_path: string
-  script_path: string
+# Show a systemd service to trigger a script when a disk is attached
+def "main service print" [
+  device_id: string      # device ID as listed in `list ids`
+  script_path: string    # path to the script you want to execute
+  --service-id: string   # name of the systemd service unit (default: script basename without ext)
+  --description: string  # description of the service
+  --root(-r)             # whether to install this system-wide, or just for the current user
 ] {
-  error make {msg: "Not implemented yet"}
+  (
+    render-unit-file $device_id $script_path $service_id $description $root
+    | get contents
+    | print
+  )
+}
+
+# Create a systemd service to trigger a script when a disk is attached
+def "main service install" [
+  device_id: string      # device ID as listed in `list ids`
+  script_path: string    # path to the script you want to execute
+  --service-id: string   # name of the systemd service unit (default: script basename without ext)
+  --description: string  # description of the service
+] {
+  let root = (is-admin)
+  let result = render-unit-file $device_id $script_path $service_id $description $root
+  if ($result.path | path exists) {
+    error make { msg: $"Already exists: ($result.path)" }
+  }
+
+  $result.contents | save --raw $result.path
+  if $root {
+    ^systemctl daemon-reload
+    $"Installed! To enable the service, run `systemctl enable ($result.service_id).service`"
+  } else {
+    ^systemctl --user daemon-reload
+    $"Installed! To enable the service, run `systemctl --user enable ($result.service_id).service`"
+  }
+}
+
+def render-unit-file [
+  device_id: string      # device ID as listed in `list ids`
+  script_path: string    # path to the script you want to execute
+  service_id?: string    # name of the systemd service unit (default: script basename without ext)
+  description?: string   # description of the service
+  root?: bool            # whether to install this system-wide, or just for the current user
+] {
+  let systemd_device_id = (
+    $device_id
+    | str replace --all "-" '\x2d'
+    | str replace --all "/" '-'
+    | str trim --left --char '-'
+  )
+
+  let script_path = ($script_path | path expand)
+  if not ($script_path | path exists) {
+    error make { msg: $"Does not exist: ($script_path)" }
+  }
+
+  let script_basename = ($script_path | path basename)
+
+  let service_id = if ($service_id | is-empty) {
+    # use script name without extension as service ID
+    ($script_basename | path parse).stem
+  } else {
+    $service_id
+  }
+
+  let unit_file = if ($root) {
+    $"/etc/systemd/system/($service_id).service"
+  } else {
+    $"($env.HOME)/.config/systemd/user/($service_id).service"
+  }
+
+  let description = if ($description | is-empty) {
+    $"Execute ($script_basename) when a disk is added"
+  } else {
+    $description
+  }
+
+  let contents = $"# ($unit_file)
+[Unit]
+Description=($description)
+DefaultDependencies=false
+
+[Install]
+WantedBy=($systemd_device_id).device
+
+[Service]
+Type=simple
+ExecStart=($script_path)
+"
+
+  {
+    contents: $contents
+    path: $unit_file
+    service_id: $service_id
+  }
 }
