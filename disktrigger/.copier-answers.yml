@@ -1,0 +1,6 @@
+# Changes here will be overwritten by Copier
+# Don't edit manually!
+# <https://copier.readthedocs.io/en/stable/updating/>
+_src_path: _templates/script
+description: Trigger a script to run when a disk is added to your Linux system (i.e. via USB)
+script_name: disktrigger

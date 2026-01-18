@@ -1,0 +1,41 @@
+#!/usr/bin/env nu
+
+const ME = path self
+
+def main [] {
+  ^$ME --help
+}
+
+# List currently connected devices that could be used to trigger a script
+def "main list-devices" [] {
+  (
+    lsblk --json --list
+    | from json
+    | get blockdevices
+    | where { $in.type == "disk" }
+    | upsert name { $"/dev/($in)" }
+    | select name size mountpoints rm ro
+  )
+}
+
+# List device paths that can be used to uniquely identify a device
+def "main list-paths" [
+  device_name: string   # system device path, ex: /dev/sda
+] {
+  (
+    udevadm info $device_name --json pretty
+    | from json
+    | get DEVLINKS
+    | str replace --all " " "\n"
+    | lines
+    | where { str starts-with "/dev/disk/by-id/" }
+  )
+}
+
+# Setup a script trigger when a uniquely-identified device is plugged in
+def "main setup-trigger" [
+  device_path: string
+  script_path: string
+] {
+  error make {msg: "Not implemented yet"}
+}
