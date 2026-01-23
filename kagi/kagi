@@ -149,7 +149,7 @@ def "main assist" [
 def "main translate" [
   query?: string     # set your initial query
   --from = "auto"    # from language
-  --to: string       # to language
+  --to: string       # to language (ex: en_us, de)
   --stdin            # read query from stdin
   --write            # open $EDITOR to write your query
 ] {
