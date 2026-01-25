@@ -1,6 +1,6 @@
 [Unit]
 Description=occasional.d ${TASK_NAME} service
-Wants=network.target
+Wants=network-online.target
 After=network-online.target
 
 # rate limit settings, related to Restart* settings below
