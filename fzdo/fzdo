@@ -1,0 +1,37 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# fzf interface for `todo` cli
+#
+# Usage: fzdo [TODO_ARGS]
+#
+# Example usage:
+#
+#     # fuzzy search tasks and mark selected ones as "done"
+#     fzdo done
+#
+# Dependencies:
+#
+# * fzf
+# * todo
+# * awk
+#
+
+main() {
+  # sample output from `todo`:
+  #
+  #     [ ] 51  2026-01-26 12:00 ⟳Something
+  #     [ ] 30  2026-01-26 20:00 ⟳Something else
+  #     [ ] 35  2026-01-26 20:00 Whatever
+  #
+  ids="$(
+    todo --color always \
+      | cut --characters 5- \
+      | fzf --ansi --multi --reverse --tac --height 20 \
+      | awk '{print $1}'
+  )"
+  echo "${ids}" | xargs todo "$@"
+  exit $?
+}
+
+main "$@"
