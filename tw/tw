@@ -62,6 +62,23 @@ def "main template add" [
   ignore
 }
 
+def "main sync" [...args: string]: nothing -> nothing {
+  let tw_sync_id = enqueue-cmd --group tw-sync --parallel 2 task sync ...$args
+  let cal_sync_id = if (which vdirsyncer | is-not-empty) {
+    enqueue-cmd --group tw-sync --parallel 2 vdirsyncer sync
+  } else {
+    null
+  }
+
+  let sync_job_ids = (
+    [$tw_sync_id $cal_sync_id] | where { $in != null }
+  )
+
+  if ($sync_job_ids | is-not-empty) {
+    $"Sync jobs enqueued: run `pueue log ($sync_job_ids | str join ' ')` for details." | print
+  }
+}
+
 # Interactively edit task attributes with your $EDITOR
 def edit [
   task: string       # Task ID
@@ -113,6 +130,46 @@ def get-template [now: datetime]: nothing -> record {
       }
     }
   }
+}
+
+# Enqueue a command with `pueue`, if installed. If not, just run the command.
+def enqueue-cmd [
+  --group: string
+  --parallel: int = 1
+  --wait
+  ...args: string
+]: nothing -> int {
+
+  if (which pueue | is-empty) {
+    # Pueue not installed. Just run the command directly.
+    if  ($args | is-not-empty) {
+      ^$args | print
+    }
+    return null
+  }
+
+  let group_exists = (
+    ^pueue group --json
+    | from json
+    | columns
+    | find $group
+    | is-not-empty
+  )
+  if (not $group_exists) {
+    ^pueue group add --parallel $parallel $group
+  }
+
+  let task_id = if ($args | is-not-empty) {
+    ^pueue add --group $group --print-task-id -- ...$args | into int
+  } else {
+    null
+  }
+
+  if $wait {
+    ^pueue wait --group $group
+  }
+
+  $task_id
 }
 
 def not-implemented []: nothing -> record {
