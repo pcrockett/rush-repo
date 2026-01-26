@@ -27,7 +27,7 @@ def "main add" [...args: string] {
   }
 }
 
-# Interactively edit task notes with your $EDITOR
+# Interactively edit task notes with your `$EDITOR`
 def "main notes" [
   task: string      # Task ID
 ] {
@@ -62,6 +62,7 @@ def "main template add" [
   ignore
 }
 
+# Taskwarrior sync, with optional `vdirsyncer` and `pueue` integration
 def "main sync" [...args: string]: nothing -> nothing {
   let tw_sync_id = enqueue-cmd --group tw-sync --parallel 2 task sync ...$args
   let cal_sync_id = if (which vdirsyncer | is-not-empty) {
@@ -79,7 +80,7 @@ def "main sync" [...args: string]: nothing -> nothing {
   }
 }
 
-# Interactively edit task attributes with your $EDITOR
+# Interactively edit task attributes with your `$EDITOR`
 def edit [
   task: string       # Task ID
   attribute: string  # Name of the attribute to edit
