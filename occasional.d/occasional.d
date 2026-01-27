@@ -32,6 +32,11 @@ panic() {
   exit 1
 }
 
+# shellcheck disable=SC2329  # this function is doch called below, just via a dynamically-called function
+unbuffer_output() {
+  stdbuf --output L --error L "$@"
+}
+
 init() {
   TIME_INTERVAL="${1:-}"
   shift 1
@@ -94,20 +99,39 @@ operation:disable() {
 
 # shellcheck disable=SC2329  # function invoked indirectly
 operation:run() {
-  while read -r script; do
-    echo "Starting: ${script}"
-    if "${SCRIPT_DIR}/${script}"; then
-      echo "SUCCESS: exited with code $?: ${script}"
-    else
-      echo "ERROR: exited with code $?: ${script}"
-      return 1
-    fi
-  done < <(
-    find "${SCRIPT_DIR}" -maxdepth 1 -mindepth 1 -print0 -executable -type f \
+  export OCCASIONAL_EXIT_SUCCESS=0
+  export OCCASIONAL_EXIT_ERROR_FATAL=1
+  export OCCASIONAL_EXIT_ERROR_NONFATAL=2
+  EXIT_CODE=${OCCASIONAL_EXIT_SUCCESS}
+
+  scripts_to_run="$(
+    find "${SCRIPT_DIR}" -maxdepth 1 -mindepth 1 -executable -type f -print0 \
       | xargs -0 -L 1 basename \
       | sort
-  )
+  )"
+
+  echo "Will run the following scripts:"
+  # shellcheck disable=SC2016  # dollar sign intentionally in single quotes
+  echo "${scripts_to_run}" | unbuffer_output awk '{print "-> " $0}'
+
+  while read -r script; do
+    echo "Starting: ${script}"
+    if unbuffer_output "${SCRIPT_DIR}/${script}"; then
+      echo "SUCCESS: exited with code $?: ${script}"
+    else
+      result=$?
+      if [ "${result}" -eq "${OCCASIONAL_EXIT_ERROR_NONFATAL}" ]; then
+        echo "ERROR (nonfatal): exited with code ${result}: ${script}"
+        EXIT_CODE="${OCCASIONAL_EXIT_ERROR_NONFATAL}"
+      else
+        echo "ERROR: exited with code ${result}: ${script}"
+        return "${result}"
+      fi
+    fi
+  done < <(echo "${scripts_to_run}")
+
   echo "Finished executing scripts."
+  return "${EXIT_CODE}"
 }
 
 main() {
