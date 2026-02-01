@@ -1,0 +1,6 @@
+# Changes here will be overwritten by Copier
+# Don't edit manually!
+# <https://copier.readthedocs.io/en/stable/updating/>
+_src_path: _templates/script
+description: poll a ntfy.sh topic for messages
+script_name: ntfy-poll

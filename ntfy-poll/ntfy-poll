@@ -1,0 +1,51 @@
+#!/usr/bin/env nu
+
+# poll a ntfy.sh topic for messages
+def main [
+  topic: string
+  --json
+] {
+  let state_dir = (
+    $env
+    | get --optional XDG_STATE_HOME
+    | default ($env.HOME | path join ".local/state")
+    | path join "ntfy-poll"
+  )
+  mkdir $state_dir
+  let state_file = $state_dir | path join $"($topic).toml"
+  let current_state = if ($state_file | path exists) {
+    open $state_file
+  } else {
+    {
+      since: all
+    }
+  }
+
+  let query = {
+    poll: 1
+    since: $current_state.since
+  } | url build-query
+
+  let messages = (
+    http get $"https://ntfy.sh/($topic)/json?($query)"
+    | lines
+    | each { from json }
+  )
+
+  let last_message = $messages | last
+  if ($last_message | is-not-empty) {
+    (
+      $current_state
+      | update since $last_message.id
+      | to toml
+      | save --force $"($state_file).tmp"
+    )
+    mv $"($state_file).tmp" $state_file
+  }
+
+  if $json {
+    $messages | to json | print
+  } else {
+    $messages | each { table --expand }
+  }
+}
