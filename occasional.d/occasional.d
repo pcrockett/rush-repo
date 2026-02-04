@@ -34,7 +34,53 @@ panic() {
 
 # shellcheck disable=SC2329  # this function is doch called below, just via a dynamically-called function
 unbuffer_output() {
+  # TODO: Learn more about output buffering. However it seems that because lots of
+  # programs like awk etc. have buffered stdout, some of that output MIGHT SOMETIMES not
+  # make it into the systemd journal, at least not until this service is done executing.
+  # In which case `journalctl -u occasional.d-week.service` won't show the output.
+  #
+  # It's mind-boggling to me that the output wouldn't be flushed before this script is
+  # finished executing. This is why I need to learn more about the topic. In any case,
+  # this seems to work.
   stdbuf --output L --error L "$@"
+}
+
+# shellcheck disable=SC2329  # this function is doch called below, just via a dynamically-called function
+load_env() {
+  test -f "${OCCASIONAL_ENV_FILE}" && {
+    echo "Sourcing ${OCCASIONAL_ENV_FILE}..."
+    # shellcheck disable=SC1090  # don't lint env file
+    source "${OCCASIONAL_ENV_FILE}"
+  }
+  test -f "${HOME}/.profile" && {
+    echo "Sourcing ${HOME}/.profile..."
+    # shellcheck disable=SC1091  # don't lint .profile
+    source "${HOME}/.profile"
+  }
+}
+
+# shellcheck disable=SC2329  # this function is doch called below, just via a dynamically-called function
+populate_env() {
+  test -f "${OCCASIONAL_ENV_FILE}" || {
+    cat >"${OCCASIONAL_ENV_FILE}" <<EOF
+# Will be loaded by occasional.d before running anything
+# ~/.profile will also be loaded after that if it exists
+export HOME=${HOME}
+export PATH=${PATH}
+export USER=${USER:-}
+export LANG=${LANG:-}
+export DISPLAY=${DISPLAY:-}
+export XAUTHORITY=${XAUTHORITY:-}
+export DBUS_SESSION_BUS_ADDRESS=${DBUS_SESSION_BUS_ADDRESS:-}
+export XDG_STATE_HOME=${XDG_STATE_HOME:-"${HOME}/.local/state"}
+export XDG_DATA_HOME=${XDG_DATA_HOME:-"${HOME}/.local/share"}
+export XDG_CONFIG_HOME=${XDG_CONFIG_HOME:-"${HOME}/.config"}
+export XDG_CACHE_HOME=${XDG_CACHE_HOME:-"${HOME}/.cache"}
+export XDG_DATA_DIRS=${XDG_DATA_DIRS:-}
+export XDG_RUNTIME_DIR=${XDG_RUNTIME_DIR:-}
+export XDG_VTNR=${XDG_VTNR:-}
+EOF
+  }
 }
 
 init() {
@@ -79,6 +125,7 @@ init() {
   fi
 
   OCCASIONAL_CONFIG_DIR="${XDG_CONFIG_HOME}/occasional.d"
+  OCCASIONAL_ENV_FILE="${OCCASIONAL_CONFIG_DIR}/environment"
 
   if [ "$(id --user)" -eq 0 ]; then
     SYSTEMCTL_CMD=(systemctl)
@@ -89,6 +136,7 @@ init() {
 
 # shellcheck disable=SC2329  # function invoked indirectly
 operation:enable() {
+  populate_env
   "${SYSTEMCTL_CMD[@]}" enable --now "occasional.d-${TIME_INTERVAL}.timer"
 }
 
@@ -99,11 +147,6 @@ operation:disable() {
 
 # shellcheck disable=SC2329  # function invoked indirectly
 operation:run() {
-  export OCCASIONAL_EXIT_SUCCESS=0
-  export OCCASIONAL_EXIT_ERROR_FATAL=1
-  export OCCASIONAL_EXIT_ERROR_NONFATAL=2
-  EXIT_CODE=${OCCASIONAL_EXIT_SUCCESS}
-
   scripts_to_run="$(
     find "${SCRIPT_DIR}" -maxdepth 1 -mindepth 1 -executable -type f -print0 \
       | xargs -0 -L 1 basename \
@@ -113,6 +156,12 @@ operation:run() {
   echo "Will run the following scripts:"
   # shellcheck disable=SC2016  # dollar sign intentionally in single quotes
   echo "${scripts_to_run}" | unbuffer_output awk '{print "-> " $0}'
+
+  load_env
+  export OCCASIONAL_EXIT_SUCCESS=0
+  export OCCASIONAL_EXIT_ERROR_FATAL=1
+  export OCCASIONAL_EXIT_ERROR_NONFATAL=2
+  EXIT_CODE=${OCCASIONAL_EXIT_SUCCESS}
 
   while read -r script; do
     echo "Starting: ${script}"
