@@ -27,7 +27,7 @@ main() {
   ids="$(
     todo --color always \
       | cut --characters 5- \
-      | fzf --ansi --multi --reverse --tac --height 20 \
+      | fzf --ansi --multi --reverse --tac --height ~15 \
       | awk '{print $1}'
   )"
   echo "${ids}" | xargs todo "$@"
