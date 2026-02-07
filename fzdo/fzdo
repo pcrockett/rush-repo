@@ -24,13 +24,19 @@ main() {
   #     [ ] 30  2026-01-26 20:00 ⟳Something else
   #     [ ] 35  2026-01-26 20:00 Whatever
   #
+  if [ "$#" -eq 0 ]; then
+    CLI_ARGS=("done")
+  else
+    CLI_ARGS=("$@")
+  fi
+
   ids="$(
     todo --color always \
       | cut --characters 5- \
       | fzf --ansi --multi --reverse --tac --height ~15 \
       | awk '{print $1}'
   )"
-  echo "${ids}" | xargs todo "$@"
+  echo "${ids}" | xargs todo "${CLI_ARGS[@]}"
   exit $?
 }
 
