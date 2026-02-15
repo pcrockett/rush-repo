@@ -63,20 +63,33 @@ def "main template add" [
 }
 
 # Taskwarrior sync, with optional `vdirsyncer` and `pueue` integration
-def "main sync" [...args: string]: nothing -> nothing {
-  let tw_sync_id = enqueue-cmd --group tw-sync --parallel 2 task sync ...$args
+def "main sync" [
+  --wait(-w)        # wait for pueue tasks to finish before returning
+  ...args: string   # args to be passed to `task sync`
+]: nothing -> nothing {
+  const PUEUE_GROUP = {
+    name: "tw-sync"
+    parallel: 2
+  }
+  let tw_sync_id = [task sync ...$args] | enqueue-cmd $PUEUE_GROUP
   let cal_sync_id = if (which vdirsyncer | is-not-empty) {
-    enqueue-cmd --group tw-sync --parallel 2 vdirsyncer sync
+    [vdirsyncer sync] | enqueue-cmd $PUEUE_GROUP
   } else {
     null
   }
 
-  let sync_job_ids = (
+  let sync_task_ids = (
     [$tw_sync_id $cal_sync_id] | where { $in != null }
   )
 
-  if ($sync_job_ids | is-not-empty) {
-    $"Sync jobs enqueued: run `pueue log ($sync_job_ids | str join ' ')` for details." | print
+  if ($sync_task_ids | is-not-empty) {
+    if $wait {
+      # can safely assume pueue is installed at this point, since we have task IDs
+      ^pueue wait --group $PUEUE_GROUP.name
+      ^pueue log ...$sync_task_ids
+    } else {
+      $"Sync tasks enqueued: run `pueue log ($sync_task_ids | str join ' ')` for details." | print
+    }
   }
 }
 
@@ -134,17 +147,20 @@ def get-template [now: datetime]: nothing -> record {
 }
 
 # Enqueue a command with `pueue`, if installed. If not, just run the command.
+# Command should be piped in as an array of strings.
+# Returns pueue task ID, or null if pueue isn't installed.
 def enqueue-cmd [
-  --group: string
-  --parallel: int = 1
-  --wait
-  ...args: string
-]: nothing -> int {
+  group: record<name: string, parallel: int>
+]: list<string> -> int {
+
+  let command = $in
+  let group_name = $group.name
+  let parallel = $group | get --optional parallel | default 1
 
   if (which pueue | is-empty) {
     # Pueue not installed. Just run the command directly.
-    if  ($args | is-not-empty) {
-      ^$args | print
+    if ($command | is-not-empty) {
+      ^$command | print
     }
     return null
   }
@@ -153,21 +169,17 @@ def enqueue-cmd [
     ^pueue group --json
     | from json
     | columns
-    | find $group
+    | find $group_name
     | is-not-empty
   )
   if (not $group_exists) {
-    ^pueue group add --parallel $parallel $group
+    ^pueue group add --parallel $parallel $group_name
   }
 
-  let task_id = if ($args | is-not-empty) {
-    ^pueue add --group $group --print-task-id -- ...$args | into int
+  let task_id = if ($command | is-not-empty) {
+    ^pueue add --group $group_name --print-task-id -- ...$command | into int
   } else {
     null
-  }
-
-  if $wait {
-    ^pueue wait --group $group
   }
 
   $task_id
