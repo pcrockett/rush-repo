@@ -1,0 +1,60 @@
+#!/usr/bin/env bash
+
+# shellcheck source=lib.sh
+source "${REPO_PATH}/lib.sh"
+
+require_commands curl tar
+
+# Most of this was taken from <https://sprites.dev/install.sh> and adapted for my own
+# preferences
+
+BASE_URL="${SPRITE_INSTALL_URL:-https://sprites-binaries.t3.storage.dev}"
+
+detect_platform() {
+  os=$(uname -s)
+  arch=$(uname -m)
+
+  case "$arch" in
+    x86_64 | amd64) arch="amd64" ;;
+    aarch64 | arm64) arch="arm64" ;;
+    *) err "Unsupported architecture: $arch" ;;
+  esac
+
+  case "$os" in
+    Linux) PLATFORM="linux" EXT="tar.gz" BIN_NAME="sprite" ;;
+    Darwin) PLATFORM="darwin" EXT="tar.gz" BIN_NAME="sprite" ;;
+    *) err "Unsupported OS: $os (use the PowerShell installer on Windows)" ;;
+  esac
+
+  ARCH="$arch"
+}
+
+main() {
+  detect_platform
+  version="$(curl_download "${BASE_URL}/client/release.txt" 2>/dev/null)" || {
+    version="$(curl_download "${BASE_URL}/client/rc.txt")"
+  }
+
+  if [ "$(installed_package_version)" = "${version}" ]; then
+    log_attention "Already installed and up-to-date."
+    return
+  fi
+
+  echo "Downloading version ${version}...."
+  asset="sprite-${PLATFORM}-${ARCH}.${EXT}"
+  url="${BASE_URL}/client/${version}/${asset}"
+
+  temp_dir="$(mktemp_dir)"
+  cleanup() {
+    rm -rf "${temp_dir}"
+  }
+  trap 'cleanup' EXIT
+
+  cd "${temp_dir}"
+  curl_download "${url}" >"${temp_dir}/${asset}"
+  tar -xzf "${temp_dir}/${asset}" "${BIN_NAME}"
+  install_user_bin "${BIN_NAME}"
+  install_success "${version}"
+}
+
+main
