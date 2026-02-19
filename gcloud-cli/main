@@ -15,4 +15,6 @@ docker build --pull --tag localhost/gcloud \
   .
 
 install_user_bin gcloud
+ln --symbolic --force "${RUSH_USER_BIN}/gcloud" "${RUSH_USER_BIN}/docker-credential-gcloud"
+
 install_success

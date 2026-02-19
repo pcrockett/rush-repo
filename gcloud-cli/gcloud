@@ -15,6 +15,11 @@ init() {
   XDG_CONFIG_HOME="${XDG_CONFIG_HOME:-"${HOME}/.config"}"
   PCROCKETT_GCLOUD_CONFIG_DIR="${PCROCKETT_GCLOUD_CONFIG_DIR:-"${XDG_CONFIG_HOME}/gcloud"}"
   mkdir --parent "${PCROCKETT_GCLOUD_CONFIG_DIR}"
+
+  # as of this writing, this script is called `gcloud`. however there should also be a
+  # symlink to this script called `docker-credential-gcloud`. we use the script name to
+  # figure out what command to actually pass to the container.
+  CONTAINER_COMMAND="$(basename "$0")"
 }
 
 main() {
@@ -27,6 +32,7 @@ main() {
     --volume "${PWD}:/tmp/workdir"
     --workdir "/tmp/workdir"
     --env TERM="${TERM}"
+    --interactive
   )
 
   if [ -d "${HOME}/.docker" ]; then
@@ -34,7 +40,7 @@ main() {
   fi
 
   if tty --quiet; then
-    docker_cmd+=(--interactive --tty)
+    docker_cmd+=(--tty)
   fi
 
   # get all CLOUDSDK_* environment variables and feed them into the docker command
@@ -43,7 +49,7 @@ main() {
   done < <(env | grep --perl-regexp "^CLOUDSDK_")
 
   docker_cmd+=(
-    localhost/gcloud gcloud "${@}"
+    localhost/gcloud "${CONTAINER_COMMAND}" "${@}"
   )
 
   if [ "${PCROCKETT_GCLOUD_DEBUG:-}" != "" ]; then
