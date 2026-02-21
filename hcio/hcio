@@ -11,7 +11,13 @@ def main [] {
   (
     http get --headers [X-Api-Key $api_key] https://healthchecks.io/api/v3/checks/
     | get checks
-    | select name status
+    | each {
+      {
+        name: $in.name
+        status: $in.status
+        last_ping: ($in.last_ping | into datetime)
+      }
+    }
     | table --index false
   )
 }
