@@ -1,0 +1,39 @@
+#!/usr/bin/env nu
+
+# Get status of all your checks
+def main [] {
+  if not (config-file | path exists) {
+    error make {
+      msg: "Not configured yet. Run `set-key` subcommand first."
+    }
+  }
+  let api_key = config-file | open | get api_key
+  (
+    http get --headers [X-Api-Key $api_key] https://healthchecks.io/api/v3/checks/
+    | get checks
+    | select name status
+    | table --index false
+  )
+}
+
+# Set your Healthchecks.io read-only API key
+def "main set-key" [] {
+  let api_key = input --suppress-output "Enter API key: "
+  mkdir (config-dir)
+  {
+    api_key: $api_key
+  } | save (config-file)
+}
+
+def config-file []: nothing -> string {
+  config-dir | path join config.toml
+}
+
+def config-dir []: nothing -> string {
+  (
+    $env
+    | get --optional XDG_CONFIG_HOME
+    | default $"($env.HOME)/.config"
+    | path join hcio
+  )
+}
