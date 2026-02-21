@@ -8,7 +8,7 @@ set -Eeuo pipefail
 #
 # Dependencies:
 #
-# * TODO
+# - TODO
 #
 
 usage() {

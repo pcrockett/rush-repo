@@ -11,7 +11,7 @@ set -Eeuo pipefail
 #
 # Dependencies:
 #
-# * [TODO]
+# - [TODO]
 #
 
 CLI_ARGS=("$@")

@@ -1,0 +1,36 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+usage() {
+  cat <<'EOF'
+Usage: sqrl
+
+Interactively select files to squirrel away into a central directory
+
+Example usage:
+
+  export SQUIRREL_DEST=~/some/dir
+  sqrl
+
+Dependencies:
+
+- fzf
+EOF
+}
+
+init() {
+  test "$#" -eq 0 || {
+    usage
+    exit 0
+  }
+  SQUIRREL_DEST="${SQUIRREL_DEST:?not set}"
+  mkdir -p "${SQUIRREL_DEST}"
+}
+
+main() {
+  init "$@"
+  fzf --multi | xargs mv -t "${SQUIRREL_DEST}"
+  exit $?
+}
+
+main "$@"
