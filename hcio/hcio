@@ -1,15 +1,21 @@
 #!/usr/bin/env nu
 
 # Get status of all your checks
-def main [] {
+def main [--json] {
   if not (config-file | path exists) {
     error make {
       msg: "Not configured yet. Run `set-key` subcommand first."
     }
   }
   let api_key = config-file | open | get api_key
+  let raw_results = http get --headers [X-Api-Key $api_key] https://healthchecks.io/api/v3/checks/
+  if $json {
+    $raw_results | to json | print
+    return
+  }
+
   (
-    http get --headers [X-Api-Key $api_key] https://healthchecks.io/api/v3/checks/
+    $raw_results
     | get checks
     | each {
       {
@@ -18,6 +24,7 @@ def main [] {
         last_ping: ($in.last_ping | into datetime)
       }
     }
+    | sort-by last_ping --reverse
     | table --index false
   )
 }
