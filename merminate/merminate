@@ -1,19 +1,63 @@
 #!/usr/bin/env -S deno run --allow-read
 
-import { renderMermaidAscii } from "npm:beautiful-mermaid@0.1.3";
+import {
+  AsciiRenderOptions,
+  renderMermaidAscii,
+} from "npm:beautiful-mermaid@0.1.3";
 import * as io from "jsr:@std/io@0.225.3";
+import * as cli from "jsr:@std/cli@1.0.28";
 
 async function main() {
-  try {
-    const rawInput = await io.readAll(Deno.stdin);
-    const decoder = new TextDecoder("utf-8");
-    const unicodeInput = decoder.decode(rawInput);
-    const diagram = renderMermaidAscii(unicodeInput);
-    console.log(diagram);
-  } catch (error) {
-    console.error("Error rendering mermaid:", error);
-    Deno.exit(1);
+  const argDefaults = {
+    ascii: false,
+    help: false,
+    "padding-x": 2,
+    "padding-y": 2,
+    "padding-border": 0,
+  };
+  const args = cli.parseArgs(Deno.args, {
+    alias: {
+      a: "ascii",
+      h: "help",
+      x: "padding-x",
+      y: "padding-y",
+      b: "padding-border",
+    },
+    default: argDefaults,
+  });
+
+  if (args.help) {
+    console.log(`
+Usage: merminate [OPTIONS]
+
+Render mermaid diagrams in your terminal.
+
+Takes mermaid syntax via stdin, produces diagrams on stdout.
+
+OPTIONS:
+
+  --ascii, -a           Produce ASCII characters instead of Unicode
+  --padding-x, -x       Horizontal padding (default ${argDefaults["padding-x"]})
+  --padding-y, -y       Vertical padding (default ${argDefaults["padding-y"]})
+  --padding-border, -b  Padding around text in nodes (default ${
+      argDefaults["padding-border"]
+    })
+  --help, -h            Produce this message
+`);
+    return Deno.exit(0);
   }
+
+  const renderOptions: AsciiRenderOptions = {
+    useAscii: args.ascii,
+    paddingX: args["padding-x"],
+    paddingY: args["padding-y"],
+    boxBorderPadding: args["padding-border"],
+  };
+  const rawInput = await io.readAll(Deno.stdin);
+  const decoder = new TextDecoder("utf-8");
+  const unicodeInput = decoder.decode(rawInput);
+  const diagram = renderMermaidAscii(unicodeInput, renderOptions);
+  console.log(diagram);
 }
 
 await main();
