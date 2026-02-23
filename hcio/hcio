@@ -21,7 +21,7 @@ def main [--json] {
       {
         name: $in.name
         status: $in.status
-        last_ping: ($in.last_ping | into datetime)
+        last_ping: ($in.last_ping | into ping-datetime)
       }
     }
     | sort-by last_ping --reverse
@@ -49,4 +49,12 @@ def config-dir []: nothing -> string {
     | default $"($env.HOME)/.config"
     | path join hcio
   )
+}
+
+def "into ping-datetime" []: any -> datetime {
+  if ($in | is-empty) {
+    null
+  } else {
+    $in | into datetime
+  }
 }
