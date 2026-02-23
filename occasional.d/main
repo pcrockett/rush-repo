@@ -3,7 +3,7 @@
 # shellcheck source=lib.sh
 source "${REPO_PATH}/lib.sh"
 
-require_commands envsubst
+require_commands envsubst stdbuf
 install_user_bin occasional.d
 
 if [ "$(id --user)" -eq 0 ]; then
@@ -16,6 +16,9 @@ else
   systemctl_cmd=(systemctl --user)
 fi
 
+stdbuf_executable="$(command -v stdbuf)"
+bash_executable="$(command -v bash)"
+
 mkdir --parent "${install_dir}"
 
 render_template() {
@@ -25,8 +28,9 @@ render_template() {
     envsubst <template.timer \
     >"${install_dir}/occasional.d-${1}.timer"
 
+  # full example command: `stdbuf --output L --error L bash occasional.d week`
   TASK_NAME="${1}" \
-    TASK_EXECUTABLE="${RUSH_USER_BIN}/occasional.d" \
+    TASK_EXECUTABLE="${stdbuf_executable} -oL -eL ${bash_executable} ${RUSH_USER_BIN}/occasional.d" \
     envsubst <template.service \
     >"${install_dir}/occasional.d-${1}.service"
 }

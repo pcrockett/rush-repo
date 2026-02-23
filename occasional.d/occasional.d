@@ -41,7 +41,7 @@ unbuffer_output() {
   #
   # It's mind-boggling to me that the output wouldn't be flushed before this script is
   # finished executing. This is why I need to learn more about the topic. In any case,
-  # this seems to work.
+  # this seems to work.... more often than not.
   stdbuf --output L --error L "$@"
 }
 
@@ -155,7 +155,7 @@ operation:run() {
 
   echo "Will run the following scripts:"
   # shellcheck disable=SC2016  # dollar sign intentionally in single quotes
-  echo "${scripts_to_run}" | unbuffer_output awk '{print "-> " $0}'
+  echo "${scripts_to_run}" | unbuffer_output awk '{print "-> " $0; fflush()}'
 
   load_env
   export OCCASIONAL_EXIT_SUCCESS=0
