@@ -20,7 +20,7 @@ def main [--json] {
     | each {
       {
         name: $in.name
-        status: $in.status
+        status: ($in.status | into ping-status)
         last_ping: ($in.last_ping | into ping-datetime)
       }
     }
@@ -56,5 +56,13 @@ def "into ping-datetime" []: any -> datetime {
     null
   } else {
     $in | into datetime
+  }
+}
+
+def "into ping-status" [] : string -> string {
+  match $in {
+    "up" => { $"🟢 (ansi green)up(ansi reset)" }
+    "down" => { $"🔴 (ansi red)DOWN(ansi reset)" }
+    $x => { $x }
   }
 }
