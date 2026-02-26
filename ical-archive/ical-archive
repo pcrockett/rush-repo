@@ -1,0 +1,61 @@
+#!/usr/bin/env nu
+
+def main [
+  source: string   # directory containing your source vdirsyncer calendar
+  dest: string     # directory containing your archived events
+  max_age: string  # a duration value like "5yr", where any older events get archived
+  --commit         # actually make changes
+] {
+  ls $source | first 20 | get name | path expand | parse-events | explore
+}
+
+def parse-events []: list<string> -> list<record> {
+  each {
+    let path = $in
+    let full_contents = $path | open | lines | each { str trim }
+
+    mut event_contents = []
+    mut keep = false
+    for line in $full_contents {
+      if ($line == "BEGIN:VEVENT") {
+        $keep = true
+      } else if ($line == "END:VEVENT") {
+        $keep = false
+      }
+
+      if $keep {
+        $event_contents ++= [$line]
+      }
+    }
+
+    let begin = (
+      $event_contents
+      | extract-first-value "DTSTART;{value}"
+      | if ($in | is-empty) {
+        $event_contents | extract-first-value "DTSTART:{value}"
+      } else {
+        $in
+      }
+    )
+
+    let end = (
+      $event_contents
+      | extract-first-value "DTEND;{value}"
+      | if ($in | is-empty) {
+        $event_contents | extract-first-value "DTEND:{value}"
+      } else {
+        $in
+      }
+    )
+
+    {
+      file: ($path | path basename)
+      begin: $begin
+      end: $end
+    }
+  }
+}
+
+def extract-first-value [pattern: string] {
+  parse $pattern | get value | first
+}
