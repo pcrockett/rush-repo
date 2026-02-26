@@ -6,7 +6,7 @@ def main [
   max_age: string  # a duration value like "5yr", where any older events get archived
   --commit         # actually make changes
 ] {
-  ls $source | first 20 | get name | path expand | parse-events | explore
+  ls $source | get name | path expand | parse-events | explore
 }
 
 def parse-events []: list<string> -> list<record> {
@@ -19,8 +19,9 @@ def parse-events []: list<string> -> list<record> {
     for line in $full_contents {
       if ($line == "BEGIN:VEVENT") {
         $keep = true
+        continue
       } else if ($line == "END:VEVENT") {
-        $keep = false
+        break
       }
 
       if $keep {
@@ -28,30 +29,27 @@ def parse-events []: list<string> -> list<record> {
       }
     }
 
+    # make immutable
+    let event_contents = $event_contents
+
     let begin = (
       $event_contents
       | extract-first-value "DTSTART;{value}"
-      | if ($in | is-empty) {
-        $event_contents | extract-first-value "DTSTART:{value}"
-      } else {
-        $in
-      }
+      | default { $event_contents | extract-first-value "DTSTART:{value}" }
     )
 
     let end = (
       $event_contents
       | extract-first-value "DTEND;{value}"
-      | if ($in | is-empty) {
-        $event_contents | extract-first-value "DTEND:{value}"
-      } else {
-        $in
-      }
+      | default { $event_contents | extract-first-value "DTEND:{value}" }
+      | default { $event_contents | extract-first-value "RRULE:{discard};UNTIL={value}" }
     )
 
     {
-      file: ($path | path basename)
+      summary: ($event_contents | extract-first-value "SUMMARY:{value}")
       begin: $begin
       end: $end
+      file: ($path | path basename)
     }
   }
 }
