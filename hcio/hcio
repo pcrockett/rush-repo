@@ -63,6 +63,7 @@ def "into ping-status" [] : string -> string {
   match $in {
     "up" => { $"🟢 (ansi green)up(ansi reset)" }
     "down" => { $"🔴 (ansi red)DOWN(ansi reset)" }
+    "grace" => { $"🟡 (ansi yellow)grace(ansi reset)" }
     $x => { $x }
   }
 }
