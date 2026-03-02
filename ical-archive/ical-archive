@@ -1,12 +1,43 @@
 #!/usr/bin/env nu
 
+
+# Move ical / vdirsyncer events to an "archive" calendar
+#
+# Example usage:
+#
+#     # archive anything that's older than 13 years
+#     ical-archive ~/your_calendar ~/archive_calendar 4745day
 def main [
   source: string   # directory containing your source vdirsyncer calendar
   dest: string     # directory containing your archived events
-  max_age: string  # a duration value like "5yr", where any older events get archived
+  max_age: string  # a duration value like "365day", where any older events get archived
   --commit         # actually make changes
 ] {
-  ls $source | get name | path expand | parse-events | explore
+  let max_age = $max_age | into duration
+  let cutoff = (date now) - $max_age
+  let to_archive = (
+    ls $source
+    | get name
+    | where { ($in | path parse).extension == ics }
+    | path expand
+    | parse-events
+    | where { $in.begin < $cutoff }
+    | where { $in.end == null or $in.end < $cutoff }
+    | sort-by begin end
+  )
+
+  $to_archive | select summary begin end | print
+
+  if $commit {
+    mkdir $dest
+    $to_archive | each { mv $in.file $dest }
+    $"Archived ($to_archive | length) events." | print
+  } else {
+    $"Would archive ($to_archive | length) events total." | print
+    "Add `--commit` to make changes." | print
+  }
+
+  ignore
 }
 
 def parse-events []: list<string> -> list<record> {
@@ -36,6 +67,7 @@ def parse-events []: list<string> -> list<record> {
       $event_contents
       | extract-first-value "DTSTART;{value}"
       | default { $event_contents | extract-first-value "DTSTART:{value}" }
+      | parse-date
     )
 
     let end = (
@@ -43,17 +75,44 @@ def parse-events []: list<string> -> list<record> {
       | extract-first-value "DTEND;{value}"
       | default { $event_contents | extract-first-value "DTEND:{value}" }
       | default { $event_contents | extract-first-value "RRULE:{discard};UNTIL={value}" }
+      | parse-date
     )
 
     {
       summary: ($event_contents | extract-first-value "SUMMARY:{value}")
       begin: $begin
       end: $end
-      file: ($path | path basename)
+      file: $path
     }
   }
 }
 
 def extract-first-value [pattern: string] {
   parse $pattern | get value | first
+}
+
+def parse-date []: any -> datetime {
+  # examples to parse:
+  #
+  # - TZID=America/Chicago:20170620T180000
+  # - TZID=Europe/Berlin:20190626T160000
+  # - VALUE=DATE:20201114
+  # - 20091114T000000Z
+  #
+  let raw = $in
+  if ($raw | is-empty) {
+    return null
+  }
+
+  let with_tzid = $raw | parse 'TZID={tzid}:{timestamp}' | first
+  if ($with_tzid | get --optional timestamp | is-not-empty) {
+    return ($with_tzid.timestamp | into datetime)
+  }
+
+  let with_value = $raw | parse 'VALUE=DATE:{timestamp}' | first
+  if ($with_value | get --optional timestamp | is-not-empty) {
+    return ($with_value.timestamp | into datetime)
+  }
+
+  return ($raw | into datetime)
 }
