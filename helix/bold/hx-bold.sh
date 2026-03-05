@@ -17,6 +17,10 @@ set -euo pipefail
 #     [keys.normal]
 #     C-b = ":pipe hx-bold.sh"
 #
+#     # also in select mode
+#     [keys.select]
+#     C-b = ":pipe hx-bold.sh"
+#
 
 main() {
   contents="$(cat)"
