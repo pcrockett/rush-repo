@@ -22,8 +22,13 @@ def main [
     | path expand
     | parse-events
     | where { $in.begin < $cutoff }
-    | where { $in.end == null or $in.end < $cutoff }
+    | where { $in.end | is-not-empty }
+    | where { $in.end < $cutoff }
     | sort-by begin end
+    | each {
+      upsert begin ($in.begin | into yyyy-mm-dd)
+      | upsert end ($in.end | into yyyy-mm-dd)
+    }
   )
 
   $to_archive | select summary begin end | print
@@ -115,4 +120,13 @@ def parse-date []: any -> datetime {
   }
 
   return ($raw | into datetime)
+}
+
+def "into yyyy-mm-dd" []: any -> string {
+  let date = $in
+  if ($date | is-empty) {
+    "NA"
+  } else {
+    $date | format date %Y-%m-%d
+  }
 }
