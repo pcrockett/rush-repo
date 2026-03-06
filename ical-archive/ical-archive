@@ -25,10 +25,8 @@ def main [
     | where { $in.end | is-not-empty }
     | where { $in.end < $cutoff }
     | sort-by begin end
-    | each {
-      upsert begin ($in.begin | into yyyy-mm-dd)
-      | upsert end ($in.end | into yyyy-mm-dd)
-    }
+    | upsert begin { $in.begin | into yyyy-mm-dd }
+    | upsert end { $in.end | into yyyy-mm-dd }
   )
 
   $to_archive | select summary begin end | print
