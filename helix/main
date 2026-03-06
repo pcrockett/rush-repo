@@ -47,7 +47,17 @@ install_artifact() {
     mv "${helix_home}" "${helix_home}.old"
   fi
   mv "helix-${GITHUB_LATEST_TAG}-x86_64-linux" "${helix_home}"
-  install_user_bin "${helix_home}/hx"
+
+  mkdir --parent "${XDG_CONFIG_HOME}/helix"
+  local runtime_dir="${XDG_CONFIG_HOME}/helix/runtime"
+  if [ -d "${runtime_dir}" ]; then
+    rm -rf "${runtime_dir}.old"
+    mv "${runtime_dir}" "${runtime_dir}.old"
+  fi
+  mv "${helix_home}/runtime" "${runtime_dir}"
+
+  mkdir --parent "${RUSH_USER_BIN}"
+  ln --symbolic --force "${helix_home}/hx" "${RUSH_USER_BIN}/hx"
 }
 
 install_from_github
