@@ -165,7 +165,7 @@ operation:run() {
 
   while read -r script; do
     echo "Starting: ${script}"
-    if unbuffer_output "${SCRIPT_DIR}/${script}"; then
+    if unbuffer_output "${SCRIPT_DIR}/${script}" </dev/null; then
       echo "SUCCESS: exited with code $?: ${script}"
     else
       result=$?
