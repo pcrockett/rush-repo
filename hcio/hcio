@@ -64,6 +64,7 @@ def "into ping-status" [] : string -> string {
     "up" => { $"🟢 (ansi green)up(ansi reset)" }
     "down" => { $"🔴 (ansi red)DOWN(ansi reset)" }
     "grace" => { $"🟡 (ansi yellow)grace(ansi reset)" }
+    "paused" => { $"⚫️ (ansi dark_gray)paused(ansi reset)" }
     $x => { $x }
   }
 }
