@@ -8,9 +8,9 @@ If you...
 * DO want some of these packages
 * DO like living dangerously
 
-... then you can use [my YOLO script](https://philcrockett.com/yolo/v1.sh):
+... then you can use [my YOLO script](https://philcrockett.com/yolo/v2.sh):
 
 ```bash
-curl -SsfL https://philcrockett.com/yolo/v1.sh \
+curl -SsfL https://philcrockett.com/yolo/v2.sh \
     | bash -s -- <PACKAGE_NAMES...>
 ```
