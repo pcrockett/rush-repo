@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# MUD Client
+#
+# Usage: tt++
+#
+# Example usage:
+#
+#     tt++
+#
+# Dependencies:
+#
+# - docker
+#
+
+init() {
+  TINTIN_DOCKER_IMAGE="${TINTIN_DOCKER_IMAGE:-tintin}"
+}
+
+main() {
+  init "$@"
+  docker run --rm -it "${TINTIN_DOCKER_IMAGE}"
+  exit $?
+}
+
+main "$@"
