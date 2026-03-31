@@ -16,11 +16,16 @@ set -euo pipefail
 
 init() {
   TINTIN_DOCKER_IMAGE="${TINTIN_DOCKER_IMAGE:-tintin}"
+  XDG_STATE_HOME="${XDG_STATE_HOME:-"${HOME}"/.local/state}"
+  TINTIN_STATE_DIR="${TINTIN_STATE_DIR:-"${XDG_STATE_HOME}"/tintin}"
+  mkdir --parent "${TINTIN_STATE_DIR}"
 }
 
 main() {
   init "$@"
-  docker run --rm -it "${TINTIN_DOCKER_IMAGE}"
+  docker run --rm -it \
+    --volume "${TINTIN_STATE_DIR}:/home/user" \
+    "${TINTIN_DOCKER_IMAGE}"
   exit $?
 }
 
