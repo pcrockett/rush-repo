@@ -25,6 +25,7 @@ main() {
   init "$@"
   docker run --rm -it \
     --volume "${TINTIN_STATE_DIR}:/home/user" \
+    --network host \
     "${TINTIN_DOCKER_IMAGE}"
   exit $?
 }
