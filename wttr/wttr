@@ -1,0 +1,11 @@
+#!/usr/bin/env nu
+
+# Get weather for a location using wttr.in
+def main [
+  location?: string    # The location for the weather report
+  --units: string = "m"  # u: USCS, m: metric, M: metric with wind in m/s
+] {
+  let location = $location | default ""
+  let forecast = http get $"https://wttr.in/($location | url encode)?($units)"
+  $forecast | bat
+}
