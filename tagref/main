@@ -8,8 +8,7 @@ GITHUB_REPO="tagref"
 BIN_NAME="tagref"
 
 latest_version() {
-  # strip the leading `v` from the tag name
-  echo "${GITHUB_LATEST_TAG}" | cut --characters 2-
+  echo "${GITHUB_LATEST_TAG}"
 }
 
 installed_version() {
@@ -18,12 +17,7 @@ installed_version() {
     return 0
   fi
 
-  if ! [[ "$("${BIN_NAME}" --version)" =~ ^Tagref\ ([[:digit:]]+\.[[:digit:]]+\.[[:digit:]]+) ]]; then
-    panic "Unable to determine currently installed version!"
-    exit 1 # redundant, but useful to shellcheck
-  fi
-
-  echo "${BASH_REMATCH[1]}"
+  installed_package_version
 }
 
 artifact_name() {
@@ -41,4 +35,4 @@ install_artifact() {
 }
 
 install_from_github
-install_success
+install_success "$(latest_version)"
