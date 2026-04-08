@@ -24,7 +24,7 @@ repos:
     rev: 99470f5e12208ff0fb17ab81c3c494f7620a1d8d  # frozen: v0.11.0
     hooks:
       - id: shellcheck
-        exclude: "(template.bash|example.bats)"
+        exclude: '(template.bash|example.bats|ollama/install\.sh)'
   - repo: https://github.com/adrienverge/yamllint
     rev: 79a6b2b1392eaf49cdd32ac4f14be1a809bbd8f7  # frozen: v1.37.1
     hooks:
@@ -39,7 +39,7 @@ repos:
         language: system
         types:
           - shell
-        exclude: deno/install\.sh
+        exclude: '(deno/install\.sh|ollama/install\.sh)'
       - id: yamlfmt
         name: yamlfmt
         entry: yamlfmt

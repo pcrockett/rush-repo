@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+
+# shellcheck source=lib.sh
+source "${REPO_PATH}/lib.sh"
+
+# copy / pasted from install.sh
+for BINDIR in /usr/local/bin /usr/bin /bin; do
+  # i'd like this to be more explicitly correct, however i want to make sure the
+  # behavior here is exactly the same as in install.sh
+  #
+  # shellcheck disable=SC2015
+  echo "${PATH}" | grep -q "${BINDIR}" && break || continue
+done
+OLLAMA_INSTALL_DIR="$(dirname "${BINDIR}")"
+
+rm -rf "${BINDIR}/ollama" "${OLLAMA_INSTALL_DIR}/lib/ollama"
