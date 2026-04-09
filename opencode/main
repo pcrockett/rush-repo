@@ -1,0 +1,47 @@
+#!/usr/bin/env bash
+
+# shellcheck source=lib.sh
+source "${REPO_PATH}/lib.sh"
+
+require_commands tar
+
+# shellcheck disable=SC2034  # variables used in `install_from_github()`
+{
+  GITHUB_ORG="anomalyco"
+  GITHUB_REPO="opencode"
+}
+BIN_NAME="opencode"
+
+latest_version() {
+  echo "${GITHUB_LATEST_TAG}"
+}
+
+installed_version() {
+  if ! command_exists "${BIN_NAME}"; then
+    echo ""
+    return 0
+  fi
+
+  installed_package_version
+}
+
+artifact_name() {
+  # stolen from install script at <https://opencode.ai/install>
+  if ! grep -qwi avx2 /proc/cpuinfo 2>/dev/null; then
+    echo "opencode-linux-x64-baseline.tar.gz"
+  else
+    echo "opencode-linux-x64.tar.gz"
+  fi
+}
+
+download_url() {
+  echo "https://github.com/${GITHUB_ORG}/${GITHUB_REPO}/releases/download/${GITHUB_LATEST_TAG}/$(artifact_name)"
+}
+
+install_artifact() {
+  tar -xzf "${ARTIFACT_PATH}"
+  install_user_bin "${BIN_NAME}"
+}
+
+install_from_github
+install_success "$(latest_version)"
