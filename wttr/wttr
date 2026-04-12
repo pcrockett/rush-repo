@@ -2,10 +2,28 @@
 
 # Get weather for a location using wttr.in
 def main [
-  location?: string    # The location for the weather report
+  location?: string      # The location for the weather report
   --units: string = "m"  # u: USCS, m: metric, M: metric with wind in m/s
+  --format: string       # format string to use (see <https://github.com/chubin/wttr.in#one-line-output>)
 ] {
   let location = $location | default ""
-  let forecast = http get $"https://wttr.in/($location | url encode)?($units)"
-  $forecast | bat
+  let path = $location | url encode
+  let url = $"https://wttr.in/($path)?($units)"
+  let url = if ($format | is-empty) {
+    $url
+  } else {
+    [
+      $url
+      "&"
+      ({format: $format} | url build-query)
+    ] | str join
+  }
+  let forecast = http get $url
+
+  if ($format | is-empty) {
+    # full screen baby
+    $forecast | bat
+  } else {
+    $forecast | print
+  }
 }
