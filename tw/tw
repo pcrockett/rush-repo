@@ -108,7 +108,7 @@ def edit [
   try {
     safe-exec [task _get $"($task).($attribute)"] | save attribute.md
     ^$env.EDITOR attribute.md
-    safe-exec [task $task modify $"($attribute):(open attribute.md | str trim)"]
+    safe-exec [task $task modify $"($attribute):(open --raw attribute.md | str trim)"]
   } catch {|err|
     do $cleanup
     error make $err
