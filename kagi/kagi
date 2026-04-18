@@ -141,7 +141,12 @@ def "main assist" [
     | insert-if { $lens | is-not-empty } "lens" $lens
     | insert-if { $query | is-not-empty } "q" $query
   )
-  let query_string = $query_params | url build-query
+  let query_string = try {
+    $query_params | url build-query
+  } catch {
+    $query_params | table | print
+    exit 1
+  }
   browser open $"https://kagi.com/assistant/?($query_string)"
 }
 
@@ -261,7 +266,7 @@ def long_form_input [] {
     (
       $temp_file
       | if ($in | path exists) {
-        open $in | str trim
+        open --raw $in | str trim
       } else {
         error make { msg: "Aborted" }
       }
