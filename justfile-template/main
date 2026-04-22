@@ -9,7 +9,7 @@ if [ ! -e "${dest}" ] || force_please; then
   cat >"${dest}" <<'EOF'
 [private]
 _default:
-    @just --list --list-submodules
+    @just --list
 
 # Run pre-commit on all files
 lint:

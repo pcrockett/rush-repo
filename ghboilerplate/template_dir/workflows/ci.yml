@@ -27,7 +27,7 @@ jobs:
         with:
           fetch-depth: 0
 
-      - uses: taiki-e/install-action@06203676c62f0d3c765be3f2fcfbebbcb02d09f5  # v2.69.6
+      - uses: taiki-e/install-action@5f57d6cb7cd20b14a8a27f522884c4bc8a187458  # v2.75.19
         with:
           tool: just@1.47.1,shfmt@3.13.0
 
@@ -44,7 +44,7 @@ jobs:
       # borrowed /modified the following from <https://github.com/pre-commit/action/blob/main/action.yml>
       - run: python -m pip install pre-commit
       - run: python -m pip freeze --local
-      - uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7  # v5.0.4
+      - uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae  # v5.0.5
         with:
           path: ~/.cache/pre-commit
           key: pre-commit-3|${{ env.pythonLocation }}|${{ hashFiles('.pre-commit-config.yaml') }}
