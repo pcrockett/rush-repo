@@ -32,12 +32,12 @@ if [ ! -f "${dst_shellcheckrc}" ]; then
   log_attention "Created new .shellcheckrc file"
 fi
 
-src_makefile="${template_repo}/Makefile"
-dst_makefile="${USER_CWD}/Makefile"
-if [ -f "${dst_makefile}" ]; then
-  log_attention "Tip: Add the following to Makefile:"
-  cat "${src_makefile}"
+src_justfile="${template_repo}/justfile"
+dst_justfile="${USER_CWD}/justfile"
+if [ -f "${dst_justfile}" ]; then
+  log_attention "Tip: Add the following to justfile:"
+  cat "${src_justfile}"
 else
-  cp "${src_makefile}" "${dst_makefile}"
-  log_attention "Created new Makefile"
+  cp "${src_justfile}" "${dst_justfile}"
+  log_attention "Created new justfile"
 fi
