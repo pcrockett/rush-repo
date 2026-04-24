@@ -27,7 +27,7 @@ installed_version() {
 }
 
 artifact_name() {
-  echo "signal-cli-$(latest_version)-Linux-native.tar.gz"
+  echo "signal-cli-$(latest_version).tar.gz"
 }
 
 download_url() {
@@ -36,7 +36,12 @@ download_url() {
 
 install_artifact() {
   tar -xzf "${ARTIFACT_PATH}"
-  install_user_bin "${BIN_NAME}"
+  extracted_dir="$(basename "${ARTIFACT_PATH}" .tar.gz)"
+  install_dir="${XDG_DATA_HOME}/signal-cli"
+  rm -rf "${install_dir}.old"
+  test ! -d "${install_dir}" || mv "${install_dir}" "${install_dir}.old"
+  mv "${extracted_dir}" "${install_dir}"
+  ln --symbolic --force "${install_dir}/bin/signal-cli" "${RUSH_USER_BIN}/signal-cli"
 }
 
 install_from_github
