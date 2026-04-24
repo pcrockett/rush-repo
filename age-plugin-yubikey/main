@@ -2,17 +2,24 @@
 
 # shellcheck source=lib.sh
 source "${REPO_PATH}/lib.sh"
-require_commands age
 
-# https://github.com/str4d/age-plugin-yubikey
+require_commands tar
 
-GITHUB_ORG="str4d"
-GITHUB_REPO="age-plugin-yubikey"
+# shellcheck disable=SC2034  # variables used in `install_from_github()`
+{
+  GITHUB_ORG="str4d"
+  GITHUB_REPO="age-plugin-yubikey"
+}
 BIN_NAME="age-plugin-yubikey"
 
 latest_version() {
-  # strip the leading `v` from the tag name
-  echo "${GITHUB_LATEST_TAG}" | cut --characters 2-
+  if [ "${GITHUB_LATEST_TAG}" == "v0.5.1" ]; then
+    # this release is broken for linux, see <https://github.com/str4d/age-plugin-yubikey/issues/225>
+    # just fall back to previous release
+    echo "v0.5.0"
+  else
+    echo "${GITHUB_LATEST_TAG}"
+  fi
 }
 
 installed_version() {
@@ -21,28 +28,21 @@ installed_version() {
     return 0
   fi
 
-  if ! [[ "$("${BIN_NAME}" --version)" =~ ^age-plugin-yubikey\ ([[:digit:]]+\.[[:digit:]]+\.[[:digit:]]+)$ ]]; then
-    panic "Unable to determine currently installed version!"
-    exit 1 # redundant, but useful to shellcheck
-  fi
-
-  echo "${BASH_REMATCH[1]}"
+  installed_package_version
 }
 
 artifact_name() {
-  echo "age-plugin-yubikey-${GITHUB_LATEST_TAG}-x86_64-linux.tar.gz"
+  echo "age-plugin-yubikey-$(latest_version)-x86_64-linux.tar.gz"
 }
 
 download_url() {
-  echo "https://github.com/${GITHUB_ORG}/${GITHUB_REPO}/releases/download/${GITHUB_LATEST_TAG}/$(artifact_name)"
+  echo "https://github.com/${GITHUB_ORG}/${GITHUB_REPO}/releases/download/$(latest_version)/$(artifact_name)"
 }
 
 install_artifact() {
-  tar --extract --gzip --to-stdout --file "${ARTIFACT_PATH}" \
-    "age-plugin-yubikey/age-plugin-yubikey" >"${BIN_NAME}"
-  chmod +x "${BIN_NAME}"
-  install_user_bin "${BIN_NAME}"
+  tar -xzf "${ARTIFACT_PATH}"
+  install_user_bin "age-plugin-yubikey/${BIN_NAME}"
 }
 
 install_from_github
-install_success
+install_success "$(latest_version)"
