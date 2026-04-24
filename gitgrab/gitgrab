@@ -1,0 +1,24 @@
+#!/usr/bin/env nu
+
+# Grab files from a Git repository
+def main [
+  repo: string       # ex: `https://github.com/pcrockett/rush-repo.git`
+  src_path: string   # path inside the repo you want to grab, ex: `gitgrab/info`
+  dst_path = "."     # destination path to copy to ex: `./some/local/dir`
+] {
+  let temp_dir = mktemp --directory
+
+  try {
+    grab $temp_dir $repo $src_path $dst_path
+  } catch {|err|
+    rm --recursive --force $temp_dir
+    error make $err
+  }
+  rm --recursive --force $temp_dir
+}
+
+def grab [temp_dir: string, repo: string, src: string, dst: string] {
+  ^git -C $temp_dir clone --depth 1 $repo local_copy
+  let full_src_path = [ $temp_dir local_copy $src ] | path join
+  cp --recursive $full_src_path $dst
+}
