@@ -1,0 +1,9 @@
+# Changes here will be overwritten by Copier
+# Don't edit manually!
+# <https://copier.readthedocs.io/en/stable/updating/>
+_src_path: _templates/github-release
+artifact_name: qq-$(latest_version)-linux-amd64.tar.gz
+artifact_type: tar.gz
+binary_name: qq
+github_org: JFryy
+github_repo: qq

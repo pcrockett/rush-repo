@@ -1,1 +1,1 @@
-interoperable config format transcoder with interactive querying
+jq, but with many interoperable configuration format transcodings and interactive querying.
