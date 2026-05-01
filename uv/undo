@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+
+# shellcheck source=lib.sh
+source "${REPO_PATH}/lib.sh"
+rm -f "${RUSH_USER_BIN}/uv" "${RUSH_USER_BIN}/uvx"
+# TODO: figure out what other paths (like a lib dir) might need to be removed
+uninstall_success
