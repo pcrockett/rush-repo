@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+
+source "${REPO_PATH}/lib.sh"
+require_commands python3
+
+GENERATE_COMMAND='python3 -c "import secrets; print(secrets.token_urlsafe(16))"'
+log_info "Running \`${GENERATE_COMMAND}\`..."
+bash -c "${GENERATE_COMMAND}"
