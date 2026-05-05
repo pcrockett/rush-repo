@@ -1,0 +1,45 @@
+#!/usr/bin/env bash
+
+# shellcheck source=lib.sh
+source "${REPO_PATH}/lib.sh"
+
+# require_commands "TODO: does this package have any dependencies?"
+
+# shellcheck disable=SC2034  # variables used in `install_from_github()`
+{
+  GITHUB_ORG="oven-sh"
+  GITHUB_REPO="bun"
+}
+BIN_NAME="bun"
+
+latest_version() {
+  echo "${GITHUB_LATEST_TAG}"
+}
+
+installed_version() {
+  if ! command_exists "${BIN_NAME}"; then
+    echo ""
+    return 0
+  fi
+
+  installed_package_version
+}
+
+artifact_name() {
+  echo "SHASUMS256.txt"
+}
+
+download_url() {
+  echo "https://github.com/${GITHUB_ORG}/${GITHUB_REPO}/releases/download/${GITHUB_LATEST_TAG}/$(artifact_name)"
+}
+
+install_artifact() {
+  if [ "${BUN_INSTALL:-}" == "" ]; then
+    export BUN_INSTALL="${XDG_DATA_HOME}/bun"
+    log_warning "\$BUN_INSTALL isn't set. Defaulting to ${BUN_INSTALL}."
+  fi
+  "${REPO_PATH}/bun/install.sh"
+}
+
+install_from_github
+install_success "$(latest_version)"

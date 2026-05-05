@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+
+# shellcheck source=lib.sh
+source "${REPO_PATH}/lib.sh"
+rm -rf "${BUN_INSTALL:-${XDG_DATA_HOME}/bun}"
+uninstall_success
