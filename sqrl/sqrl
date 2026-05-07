@@ -29,7 +29,7 @@ init() {
 
 main() {
   init "$@"
-  fzf --multi | xargs mv -t "${SQUIRREL_DEST}"
+  fzf --multi --print0 | xargs --null mv -t "${SQUIRREL_DEST}"
   exit $?
 }
 
