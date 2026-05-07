@@ -1,0 +1,56 @@
+#!/usr/bin/env bash
+
+# shellcheck source=lib.sh
+source "${REPO_PATH}/lib.sh"
+
+require_commands unzip
+
+# shellcheck disable=SC2034  # variables used in `install_from_github()`
+{
+  GITHUB_ORG="entropia"
+  GITHUB_REPO="tip-toi-reveng"
+}
+BIN_NAME="tttool"
+
+latest_version() {
+  echo "${GITHUB_LATEST_TAG}"
+}
+
+installed_version() {
+  if ! command_exists "${BIN_NAME}"; then
+    echo ""
+    return 0
+  fi
+
+  installed_package_version
+}
+
+artifact_name() {
+  echo "tttool-$(latest_version).zip"
+}
+
+download_url() {
+  echo "https://github.com/${GITHUB_ORG}/${GITHUB_REPO}/releases/download/${GITHUB_LATEST_TAG}/$(artifact_name)"
+}
+
+install_artifact() {
+  unzip "${ARTIFACT_PATH}"
+
+  INSTALL_DIR="${XDG_DATA_HOME}/tttool"
+  SUBDIR="$(basename "${ARTIFACT_PATH}" .zip)"
+
+  if [ -d "${INSTALL_DIR}.old" ]; then
+    rm -rf "${INSTALL_DIR}.old"
+  fi
+
+  if [ -d "${INSTALL_DIR}" ]; then
+    mv "${INSTALL_DIR}" "${INSTALL_DIR}.old"
+  fi
+
+  mkdir --parent "${XDG_DATA_HOME}"
+  mv "${SUBDIR}" "${INSTALL_DIR}"
+  ln --symbolic --force "${INSTALL_DIR}/linux/tttool" "${RUSH_USER_BIN}/${BIN_NAME}"
+}
+
+install_from_github
+install_success "$(latest_version)"

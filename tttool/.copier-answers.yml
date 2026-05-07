@@ -1,0 +1,9 @@
+# Changes here will be overwritten by Copier
+# Don't edit manually!
+# <https://copier.readthedocs.io/en/stable/updating/>
+_src_path: _templates/github-release
+artifact_name: tttool-$(latest_version).zip
+artifact_type: zip
+binary_name: tttool
+github_org: entropia
+github_repo: tip-toi-reveng
