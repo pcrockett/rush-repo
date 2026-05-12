@@ -41,22 +41,18 @@ consume these packages without installing Rush itself.
 ## Daily commands
 
 ```bash
-make all       # lint + tagref + test (mirrors CI)
-make lint      # pre-commit on all files
-make tagref    # ref-integrity check
-make test      # bats ./_tests
+just                    # list recipes
+just all                # lint + tagref + test (mirrors CI)
+just lint               # pre-commit on all files
+just tagref             # ref-integrity check
+just test               # bats ./_tests
 bats _tests/install_success.bats               # single test file
-bats --filter-tags some_tag _tests/foo.bats    # subset
 _bin/newpackage <name> [template]              # scaffold a new package
 ```
 
-A `justfile` exists but only wraps `lint`; CI and most workflows use the
-`Makefile`. New top-level task runners should still default to `just` per
-user preference, but don't churn the existing `Makefile` just for that —
-CI depends on it.
-
-`.tool-versions` pins `bats` and `shfmt` via asdf. `pre-commit` is required
-locally; CI installs it via `actions/setup-python` + `pre-commit/action`.
+`.tool-versions` pins `bats`, `just`, and `shfmt` via asdf. `pre-commit` is
+required locally; CI installs it via `actions/setup-python` +
+`pre-commit/action`.
 
 ## Writing a package
 
@@ -140,6 +136,7 @@ earlier on `$PATH`.
 ## CI
 
 `.github/workflows/ci.yml` runs on pushes to `main` and all PRs:
-installs `tagref asdf rush yamlfmt` via the YOLO script, adds the `bats`
-and `shfmt` asdf plugins, then runs `pre-commit`, `make tagref`, `make test`.
-Dependabot only updates GitHub Actions (`.github/dependabot.yml`).
+installs `tagref asdf rush yamlfmt` via the YOLO script, adds the `bats`,
+`just`, and `shfmt` asdf plugins, then runs `pre-commit`, `just tagref`,
+`just test`. Dependabot only updates GitHub Actions
+(`.github/dependabot.yml`).
