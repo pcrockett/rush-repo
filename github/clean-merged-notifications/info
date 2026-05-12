@@ -1,0 +1,1 @@
+Mark all GitHub notifications as "read" where the notification reason is `review_requested` and PR state is `merged`
