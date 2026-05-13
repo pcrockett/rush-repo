@@ -56,8 +56,36 @@ required locally; CI installs it via `actions/setup-python` +
 
 ## Writing a package
 
-Use `_bin/newpackage <name> [template]` to scaffold. The template menu
-(fzf if omitted) covers every shape currently in use:
+Always scaffold via copier — never hand-write the package files. Copier
+drops a `.copier-answers.yml` so the maintainer can `copier update` the
+package when templates change; a hand-written package falls outside that
+upgrade path.
+
+The normal entry point is `_bin/newpackage <name> [template]`, which runs
+`copier copy` after an fzf template picker. If you cannot drive the
+interactive picker (e.g. you are an agent), invoke copier directly with
+all answers pre-filled:
+
+```bash
+copier copy "_templates/<template>" <name> --trust --defaults \
+  -d github_org=<org> -d github_repo=<repo> -d binary_name=<bin> \
+  -d 'artifact_name=<name>' -d artifact_type=tar.gz
+```
+
+(Single-quote the `artifact_name` so `${GITHUB_LATEST_TAG}` reaches the
+rendered file instead of expanding in your shell.)
+
+Copier renders a generic skeleton — polish it before committing:
+
+- Strip the `tree  # TODO: remove me` debug line and the `subdir=...`
+  scaffolding from `install_artifact` if the tarball puts the binary at
+  the root.
+- Drop the commented-out "strip leading `v`" hint in `latest_version` (or
+  enable it) — pick one, don't leave both.
+- Trim `info` to a short single-line description; `populate-info.sh`
+  copies the entire GitHub repo blurb verbatim, which is often too long.
+
+The template menu (fzf if omitted) covers every shape currently in use:
 
 - `basic` — empty skeleton; fill in whatever `main`/`undo` should do.
 - `script-bash` / `script-nushell` — package wraps a single committed
