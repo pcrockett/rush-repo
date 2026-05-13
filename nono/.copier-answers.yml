@@ -1,0 +1,9 @@
+# Changes here will be overwritten by Copier
+# Don't edit manually!
+# <https://copier.readthedocs.io/en/stable/updating/>
+_src_path: _templates/github-release
+artifact_name: nono-${GITHUB_LATEST_TAG}-x86_64-unknown-linux-gnu.tar.gz
+artifact_type: tar.gz
+binary_name: nono
+github_org: always-further
+github_repo: nono
