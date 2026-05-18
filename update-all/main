@@ -86,8 +86,18 @@ main() {
 
   GITHUB_TOKEN="$(github_token)" rush_packages
 
-  run_if flatpak uninstall --unused --assumeyes
+  # flatpak: i think there's an issue with pinning flatpaks (update masking) them.
+  # my theory: your old dependencies for your old packages are erroneously marked as
+  # "unused" and they get uninstalled. then when you do flatpak `update`, it re-installs
+  # them.
+  #
+  # so for now i think i'll remove this uninstall thing. until i have more time to solve
+  # the problem correctly.
+  #
+  # run_if flatpak uninstall --unused --assumeyes
+  #
   run_if flatpak update --assumeyes
+
   run_if pipx upgrade-all --include-injected
   run_if gh extension upgrade --all
   run_if heroku plugins:update
