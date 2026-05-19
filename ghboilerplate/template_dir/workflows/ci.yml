@@ -27,9 +27,9 @@ jobs:
         with:
           fetch-depth: 0
 
-      - uses: taiki-e/install-action@5f57d6cb7cd20b14a8a27f522884c4bc8a187458  # v2.75.19
+      - uses: taiki-e/install-action@184183c2401be73c3bf42c2e61268aa5855379c1  # v2.78.1
         with:
-          tool: just@1.47.1,shfmt@3.13.0
+          tool: just@1.51.0,shfmt@3.13.1
 
       - name: Setup Python
         uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405  # v6.2.0
