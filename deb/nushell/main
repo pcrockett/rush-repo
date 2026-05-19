@@ -3,11 +3,7 @@
 # shellcheck source=lib.sh
 source "${REPO_PATH}/lib.sh"
 
-is_deb_system() {
-  command -v dpkg && command -v apt-get
-}
-
-if ! is_deb_system &>/dev/null; then
+if ! is_deb_system; then
   panic "This package only makes sense for Debian / Ubuntu-based systems."
 fi
 
