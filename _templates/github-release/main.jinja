@@ -11,6 +11,10 @@ require_commands tar
 require_commands xz tar
 {%- elif artifact_type == "zip" -%}
 require_commands unzip
+{%- elif artifact_type == "deb" -%}
+if ! is_deb_system; then
+  panic "This package only makes sense for Debian / Ubuntu-based systems."
+fi
 {%- endif %}
 
 # shellcheck disable=SC2034  # variables used in `install_from_github()`
@@ -27,7 +31,11 @@ latest_version() {
 }
 
 installed_version() {
+{%- if artifact_type == "deb" %}
+  if ! dpkg-query --status "${BIN_NAME}" &>/dev/null; then
+{%- else %}
   if ! command_exists "${BIN_NAME}"; then
+{%- endif %}
     echo ""
     return 0
   fi
@@ -62,6 +70,8 @@ install_artifact() {
   unzip "${ARTIFACT_PATH}"
   tree  # TODO: remove me
   install_user_bin "${BIN_NAME}"  # TODO: customize for this package
+{% elif artifact_type == "deb" %}
+  as_root apt-get install --yes "${ARTIFACT_PATH}"
 {% endif -%}
 }
 

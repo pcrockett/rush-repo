@@ -7,7 +7,7 @@ github_repo:
 binary_name:
   type: str
   default: "{{github_repo}}"
-  help: "Enter the name of the main executable:"
+  help: "Enter the name of the main executable (or the .deb package name for `deb` artifacts):"
 artifact_name:
   type: str
   help: "Enter raw download artifact name:"
@@ -17,6 +17,7 @@ artifact_type:
     - tar.xz
     - zip
     - raw_binary
+    - deb
   default: "tar.gz"
   help: "What kind of file is the raw artifact?"
 

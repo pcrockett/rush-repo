@@ -90,7 +90,11 @@ The template menu (fzf if omitted) covers every shape currently in use:
 - `basic` — empty skeleton; fill in whatever `main`/`undo` should do.
 - `script-bash` / `script-nushell` — package wraps a single committed
   script and `install_user_bin`s it.
-- `github-release` — the `install_from_github` flow (see below).
+- `github-release` — the `install_from_github` flow (see below). Supports
+  `tar.gz` / `tar.xz` / `zip` / `raw_binary` / `deb` artifacts; for `deb`,
+  `binary_name` is the dpkg package name, `install_artifact` does
+  `as_root apt-get install --yes "${ARTIFACT_PATH}"`, and `undo` does
+  `apt-get remove`.
 - `deb-repo` — adds a Debian apt source.
 
 The `github-release` template stamps out the standard "download a release
@@ -133,6 +137,8 @@ directly. The `undo` script removes whatever `main` placed in
 - `github_latest_tag <org> <repo>` — populated into `$GITHUB_LATEST_TAG` by
   `install_from_github`.
 - `command_exists`, `require_commands`, `require_packages`.
+- `is_deb_system` — true when both `dpkg` and `apt-get` are on `PATH`; use to
+  guard Debian/Ubuntu-only packages.
 - `curl_download <url>` / `download_artifact <url> <path>`.
 - `mktemp_dir`, `panic`, `as_root`, `force_please`.
 - `log_info` / `log_attention` / `log_warning` / `log_error` — all prefix

@@ -2,5 +2,9 @@
 
 # shellcheck source=lib.sh
 source "${REPO_PATH}/lib.sh"
+{% if artifact_type == "deb" -%}
+as_root apt-get remove --yes "{{binary_name|trim}}"
+{%- else -%}
 rm -f "${RUSH_USER_BIN}/{{binary_name|trim}}"
+{%- endif %}
 uninstall_success
