@@ -1,0 +1,9 @@
+# Changes here will be overwritten by Copier
+# Don't edit manually!
+# <https://copier.readthedocs.io/en/stable/updating/>
+_src_path: _templates/github-release
+artifact_name: archon-${PLATFORM}-${ARCH}
+artifact_type: raw_binary
+binary_name: archon
+github_org: coleam00
+github_repo: Archon
