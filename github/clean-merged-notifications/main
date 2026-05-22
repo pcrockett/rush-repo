@@ -1,0 +1,93 @@
+#!/usr/bin/env bash
+
+# shellcheck source=lib.sh
+source "${REPO_PATH}/lib.sh"
+
+require_commands gh jq
+
+CHUNK_SIZE=100
+
+work=$(mktemp -d)
+trap 'rm -rf "$work"' EXIT
+
+log_info "Fetching review-requested PR notifications..."
+gh api notifications --paginate \
+  --jq '.[] | select(.subject.type=="PullRequest" and .reason=="review_requested") |
+        {id: .id, title: .subject.title, repo: .repository.full_name, url: .subject.url} |
+        . + (.url | capture("/repos/(?<owner>[^/]+)/(?<name>[^/]+)/pulls/(?<num>\\d+)"))' \
+  >"$work/notifs.jsonl"
+
+total=$(wc -l <"$work/notifs.jsonl" | tr -d ' ')
+if [ "$total" -eq 0 ]; then
+  log_attention "No review-requested PR notifications."
+  exit 0
+fi
+log_info "  $total PR notifications."
+
+split -l "$CHUNK_SIZE" -d "$work/notifs.jsonl" "$work/chunk_"
+
+log_info "Querying PR states via GraphQL..."
+: >"$work/all_states.jsonl"
+for chunk in "$work"/chunk_*; do
+  query=$(jq -r -s '
+    to_entries
+    | map("n\(.key): repository(owner:\"\(.value.owner)\", name:\"\(.value.name)\") {
+        pullRequest(number: \(.value.num|tonumber)) { state merged }
+      }")
+    | "query { " + join(" ") + " }"
+  ' "$chunk")
+
+  states="${chunk}.states.json"
+  gh api graphql -f query="$query" >"$states"
+
+  if jq -e '.errors and (.errors | length > 0)' "$states" >/dev/null; then
+    log_error "GraphQL errors in $(basename "$chunk"):"
+    jq '.errors' "$states"
+    exit 1
+  fi
+
+  jq -s --slurpfile states "$states" '
+    to_entries
+    | map({
+        id: .value.id,
+        repo: .value.repo,
+        num: .value.num,
+        title: .value.title,
+        state: ($states[0].data["n\(.key)"].pullRequest.state // "MISSING"),
+        merged: ($states[0].data["n\(.key)"].pullRequest.merged // false)
+      })
+    | .[]
+  ' "$chunk" >>"$work/all_states.jsonl"
+done
+
+merged=$(jq -c 'select(.merged)' "$work/all_states.jsonl")
+merged_count=$(printf '%s\n' "$merged" | grep -c . || true)
+open_count=$(jq 'select(.state=="OPEN")' "$work/all_states.jsonl" | jq -s 'length')
+closed_count=$(jq 'select(.state=="CLOSED" and .merged==false)' "$work/all_states.jsonl" | jq -s 'length')
+
+log_info
+log_info "Summary:"
+log_info "  MERGED: $merged_count (would mark as read)"
+log_info "  OPEN:   $open_count (kept)"
+log_info "  CLOSED unmerged: $closed_count (kept)"
+
+if ! force_please; then
+  log_info
+  log_attention "Dry run. Sample of merged PRs that would be marked as read:"
+  printf '%s\n' "$merged" | jq -r '"  \(.repo)#\(.num) — \(.title)"' | head -10
+  [ "$merged_count" -gt 10 ] && log_info "  ... ($((merged_count - 10)) more)"
+  log_info
+  log_attention "Re-run with --force to mark them as read."
+  exit 0
+fi
+
+log_info
+log_attention "Marking $merged_count threads as read..."
+i=0
+printf '%s\n' "$merged" | jq -r '.id' | while read -r id; do
+  i=$((i + 1))
+  gh api -X PATCH "/notifications/threads/$id" --silent
+  printf '\r  %d/%d' "$i" "$merged_count"
+done
+log_info
+log_attention "Done."
