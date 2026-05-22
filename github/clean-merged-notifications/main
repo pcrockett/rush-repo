@@ -67,13 +67,13 @@ closed_count=$(jq 'select(.state=="CLOSED" and .merged==false)' "$work/all_state
 
 log_info
 log_info "Summary:"
-log_info "  MERGED: $merged_count (would dismiss)"
+log_info "  MERGED: $merged_count (would mark as read)"
 log_info "  OPEN:   $open_count (kept)"
 log_info "  CLOSED unmerged: $closed_count (kept)"
 
-if force_please; then
+if ! force_please; then
   log_info
-  log_attention "Dry run. Sample of merged PRs that would be dismissed:"
+  log_attention "Dry run. Sample of merged PRs that would be marked as read:"
   printf '%s\n' "$merged" | jq -r '"  \(.repo)#\(.num) — \(.title)"' | head -10
   [ "$merged_count" -gt 10 ] && log_info "  ... ($((merged_count - 10)) more)"
   log_info
