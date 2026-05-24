@@ -1,0 +1,56 @@
+#!/usr/bin/env bash
+
+# shellcheck source=lib.sh
+source "${REPO_PATH}/lib.sh"
+
+require_commands tar zstd
+
+# shellcheck disable=SC2034  # variables used in `install_from_github()`
+{
+  GITHUB_ORG="kata-containers"
+  GITHUB_REPO="kata-containers"
+}
+BIN_NAME="kata-runtime"
+
+latest_version() {
+  echo "${GITHUB_LATEST_TAG}"
+}
+
+installed_version() {
+  if ! command_exists "${BIN_NAME}"; then
+    echo ""
+    return 0
+  fi
+
+  installed_package_version
+}
+
+artifact_name() {
+  echo "kata-static-$(latest_version)-amd64.tar.zst"
+}
+
+download_url() {
+  echo "https://github.com/${GITHUB_ORG}/${GITHUB_REPO}/releases/download/${GITHUB_LATEST_TAG}/$(artifact_name)"
+}
+
+install_artifact() {
+  # This is a big honkin' artifact we've downloaded from GitHub. Don't unpack it in the
+  # tmpfs. Unpack it close to its intended destination.
+  unpack_dir="/opt/kata_$(latest_version)"
+  as_root rm -rf "${unpack_dir}"
+  as_root mkdir --parent "${unpack_dir}"
+  as_root tar -x --zstd -f "${ARTIFACT_PATH}" -C "${unpack_dir}"
+  test -d "${unpack_dir}/opt/kata" || panic "Expected ${unpack_dir}/opt/kata to exist."
+
+  as_root rm -rf "/opt/kata.old"
+  test ! -d "/opt/kata" || as_root mv "/opt/kata" "/opt/kata.old"
+  as_root mv "${unpack_dir}/opt/kata" "/opt"
+  as_root rm -rf "${unpack_dir}"
+
+  for bin_name in "${BIN_NAME}" containerd-shim-kata-v2; do
+    as_root ln --symbolic --force "/opt/kata/bin/${bin_name}" "${RUSH_GLOBAL_BIN}/${bin_name}"
+  done
+}
+
+install_from_github
+install_success "$(latest_version)"

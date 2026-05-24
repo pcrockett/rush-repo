@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+
+# shellcheck source=lib.sh
+source "${REPO_PATH}/lib.sh"
+
+as_root rm -rf \
+  "${RUSH_GLOBAL_BIN}/kata-runtime" \
+  "${RUSH_GLOBAL_BIN}/containerd-shim-kata-v2" \
+  /opt/kata
+
+uninstall_success
