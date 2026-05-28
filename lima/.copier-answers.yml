@@ -1,0 +1,9 @@
+# Changes here will be overwritten by Copier
+# Don't edit manually!
+# <https://copier.readthedocs.io/en/stable/updating/>
+_src_path: _templates/github-release
+artifact_name: lima-$(latest_version)-Linux-x86_64.tar.gz
+artifact_type: tar.gz
+binary_name: limactl
+github_org: lima-vm
+github_repo: lima

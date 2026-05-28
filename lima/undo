@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+
+# shellcheck source=lib.sh
+source "${REPO_PATH}/lib.sh"
+
+# should match [ref:lima-install-dir]
+LIMA_INSTALL_DIR="${XDG_DATA_HOME}/lima"
+
+rm -f "${RUSH_USER_BIN}/lima" "${RUSH_USER_BIN}/limactl"
+rm -rf "${LIMA_INSTALL_DIR}"
+
+uninstall_success

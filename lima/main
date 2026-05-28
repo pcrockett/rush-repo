@@ -1,0 +1,56 @@
+#!/usr/bin/env bash
+
+# shellcheck source=lib.sh
+source "${REPO_PATH}/lib.sh"
+
+require_commands tar
+
+# shellcheck disable=SC2034  # variables used in `install_from_github()`
+{
+  GITHUB_ORG="lima-vm"
+  GITHUB_REPO="lima"
+}
+BIN_NAME="limactl"
+
+# [tag:lima-install-dir]
+LIMA_INSTALL_DIR="${XDG_DATA_HOME}/lima"
+
+latest_version() {
+  # strip the leading `v` — the artifact filename uses the bare version
+  echo "${GITHUB_LATEST_TAG}" | cut --characters 2-
+}
+
+installed_version() {
+  if ! command_exists "${BIN_NAME}"; then
+    echo ""
+    return 0
+  fi
+
+  installed_package_version
+}
+
+artifact_name() {
+  echo "lima-$(latest_version)-Linux-x86_64.tar.gz"
+}
+
+download_url() {
+  echo "https://github.com/${GITHUB_ORG}/${GITHUB_REPO}/releases/download/${GITHUB_LATEST_TAG}/$(artifact_name)"
+}
+
+install_artifact() {
+  # lima's tarball lays down bin/, libexec/, share/ at the root. limactl
+  # locates its libexec/ helpers relative to its install dir, so keep the
+  # whole tree together and symlink the binaries onto PATH.
+  tar -xzf "${ARTIFACT_PATH}"
+
+  rm -rf "${LIMA_INSTALL_DIR}.old"
+  test ! -d "${LIMA_INSTALL_DIR}" || mv "${LIMA_INSTALL_DIR}" "${LIMA_INSTALL_DIR}.old"
+  mkdir --parent "${LIMA_INSTALL_DIR}"
+  mv bin libexec share "${LIMA_INSTALL_DIR}/"
+
+  ln --symbolic --force "${LIMA_INSTALL_DIR}/bin/lima" "${RUSH_USER_BIN}/lima"
+  ln --symbolic --force "${LIMA_INSTALL_DIR}/bin/limactl" "${RUSH_USER_BIN}/limactl"
+}
+
+install_from_github
+install_success "$(latest_version)"
