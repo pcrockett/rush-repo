@@ -9,7 +9,12 @@ inputs:
 runs:
   using: "composite"
   steps:
-    - name: Set Greeting
+
+    # TODO: setup github actions caching for downloaded artifacts. adjust `mktemp_dir`
+    #       to go to a cacheable location. also centralize temp dir cleanup so we can
+    #       clean up temp dirs under normal operations, and cache them in GHA.
+
+    - name: 'Run YOLO script'
       shell: bash
       env:
         PACKAGES: ${{ inputs.packages }}
