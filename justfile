@@ -16,3 +16,7 @@ tagref:
 # Run bats tests
 test:
     bats ./_tests
+
+# Draft a GitHub release for the action
+release:
+    gh release create --generate-notes --draft

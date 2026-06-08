@@ -22,6 +22,7 @@ main() {
 
   tmp_dir="$(mktemp_dir)"
 
+  log_info "Downloading from <${flyctl_uri}>..."
   curl_download "${flyctl_uri}" >"${tmp_dir}/flyctl.tar.gz"
   tar -C "${tmp_dir}" -xzf "${tmp_dir}/flyctl.tar.gz"
   chmod +x "${tmp_dir}/flyctl"
