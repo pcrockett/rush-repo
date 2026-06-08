@@ -1,0 +1,18 @@
+# yaml-language-server: $schema=https://www.schemastore.org/github-action.json
+
+name: 'YOLO'
+description: "Run <https://philcrockett.com/yolo/v2.sh> with a list of package names"
+inputs:
+  packages:
+    description: 'Space-delimited package names'
+    required: true
+runs:
+  using: "composite"
+  steps:
+    - name: Set Greeting
+      shell: bash
+      env:
+        PACKAGES: ${{ inputs.packages }}
+      run: |
+        curl -SsfL https://philcrockett.com/yolo/v2.sh \
+            | bash -s -- $PACKAGES
