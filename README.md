@@ -24,6 +24,8 @@ jobs:
     steps:
     - name: Install Rush packages
       uses: pcrockett/rush-repo
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # for packages that touch the GitHub API
       with:
         packages: space delimited package names
 ```
