@@ -93,6 +93,61 @@ def "main sync" [
   }
 }
 
+# Recompute task `decay_coeff` UDA using the `decay` date
+def "main decay" [
+  --verbose(-v)
+] {
+  let now = date now
+  let decay_updates = (
+    ^task rc.gc=0 status:pending decay.any: export
+    | from json
+    | each {|task|
+      {
+        uuid: $task.uuid
+        decay: {
+          begin: ($task.entry | into datetime)
+          end: ($task.decay | into datetime)
+          coeff: ($task.decay_coeff? | default "0" | into int)
+        }
+      }
+    }
+    | each {|task|
+      let total_duration = $task.decay.end - $task.decay.begin
+      if (($total_duration | into int) < 0) {
+        error make { msg: $"task ($task.uuid) has decay end date before creation date." }
+      }
+      let time_passed = $now - $task.decay.begin
+      if (($time_passed | into int) < 0) {
+        error make { msg: $"task ($task.uuid) begins AFTER the current time." }
+      }
+      let decay_ratio = ($time_passed / $total_duration)
+      let decay = [($decay_ratio * 10 | into int) 10] | math min
+
+      {
+        uuid: $task.uuid
+        decay_coeff: {
+          old: $task.decay.coeff
+          new: $decay
+        }
+      }
+    }
+    | where { $in.decay_coeff.old != $in.decay_coeff.new }
+  )
+
+  (
+    $decay_updates
+    | each {|t|
+      ^task $t.uuid modify $"decay_coeff:($t.decay_coeff.new)"
+    }
+  )
+
+  print $"Updated ($decay_updates | length) tasks."
+
+  if $verbose {
+    $decay_updates
+  }
+}
+
 # Interactively edit task attributes with your `$EDITOR`
 def edit [
   task: string       # Task ID
