@@ -244,10 +244,19 @@ def enqueue-cmd [
 }
 
 # ensure `tw decay` gets executed occasionally
-def auto-decay [
-  --interval = 12hr
-]: nothing -> nothing {
+def auto-decay []: nothing -> nothing {
   let now = date now | date to-timezone UTC
+  let interval = (
+    $env.TW_AUTO_DECAY_INTERVAL_MIN?
+    | default "720"  # 12 hours
+    | into duration --unit min
+  )
+  if (($interval | into int) < 0) {
+    error make {
+      msg: "$TW_AUTO_DECAY_INTERVAL_MIN must be greater than 0."
+    }
+  }
+
   let decay_state = (
     $DECAY_STATE_FILE
     | open-or-default { last_decay: null }
