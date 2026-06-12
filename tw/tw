@@ -6,8 +6,8 @@ let XDG_STATE_HOME = (
   | default $"($env.HOME)/.local/state"
 )
 let STATE_DIR = $"($XDG_STATE_HOME)/tw"
-let TEMPLATE_FILE = "template.toml"
-let TEMPLATE_FILE_PATH = $"($STATE_DIR)/($TEMPLATE_FILE)"
+let TEMPLATE_FILE_PATH = $"($STATE_DIR)/template.toml"
+let DECAY_STATE_FILE = $"($STATE_DIR)/decay.toml"
 
 # Taskwarrior wrapper that adds my own custom functionality
 def main [
@@ -99,7 +99,7 @@ def "main sync" [
 def "main decay" [
   --verbose(-v)
 ] {
-  let now = date now
+  let now = date now | date to-timezone UTC
   let decay_updates = (
     ^task rc.gc=0 status:pending decay.any: export
     | from json
@@ -142,6 +142,8 @@ def "main decay" [
       ^task $t.uuid modify $"decay_coeff:($t.decay_coeff.new)"
     }
   )
+
+  $now | update-decay-timestamp
 
   print --stderr $"Updated ($decay_updates | length) tasks."
 
@@ -246,34 +248,31 @@ def auto-decay [
   --interval = 12hr
 ]: nothing -> nothing {
   let now = date now | date to-timezone UTC
-  let autodecay_conf_file = $STATE_DIR | path join "autodecay.toml"
-  let autodecay_conf = (
-    $autodecay_conf_file
+  let decay_state = (
+    $DECAY_STATE_FILE
     | open-or-default { last_decay: null }
   )
   let last_decay = (
     try {
-      $autodecay_conf.last_decay | into datetime
+      $decay_state.last_decay | into datetime
     } catch {
       $now - $interval  # will trigger an auto-decay below
     }
   )
   if (($now - $last_decay) >= $interval) {
     print --stderr "Computing decay..."
-    main decay
-
-    mkdir $STATE_DIR
-    (
-      $autodecay_conf
-      | update last_decay ($now | serialize-date)
-      | save --force $autodecay_conf_file
-    )
+    main decay  # will update decay timestamp
   }
   ignore
 }
 
-def not-implemented []: nothing -> record {
-  { msg: "Work in progress. Not implemented yet." }
+def update-decay-timestamp []: datetime -> nothing {
+  let instant = $in
+  mkdir $STATE_DIR
+  (
+    { last_decay: ($instant | serialize-date ) }
+    | save --force $DECAY_STATE_FILE
+  )
 }
 
 # read a file, and if it doesn't exist, return a default value
