@@ -252,9 +252,7 @@ def auto-decay []: nothing -> nothing {
     | into duration --unit min
   )
   if (($interval | into int) < 0) {
-    error make {
-      msg: "$TW_AUTO_DECAY_INTERVAL_MIN must be greater than 0."
-    }
+    return  # auto-decay disabled
   }
 
   let decay_state = (
