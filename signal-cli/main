@@ -36,8 +36,24 @@ download_url() {
 
 install_artifact() {
   tar -xzf "${ARTIFACT_PATH}"
+  local extracted_dir
   extracted_dir="$(basename "${ARTIFACT_PATH}" .tar.gz)"
-  install_dir="${XDG_DATA_HOME}/signal-cli"
+  local install_dir="${XDG_DATA_HOME}/signal-cli"
+  local config_file="${XDG_CONFIG_HOME}/signal-cli/config.json"
+
+  if [ ! -f "${config_file}" ]; then
+    # signal-cli's default data location is bundled with all the static assets. create
+    # a default config file that places data in another directory so we don't blow away
+    # all our data on every new release.
+    local signal_cli_data_dir="${XDG_DATA_HOME}/signal-cli-data"
+    mkdir --parent "${signal_cli_data_dir}"
+    cat >"${config_file}" <<EOF
+{
+  "dataDir": "${signal_cli_data_dir}"
+}
+EOF
+  fi
+
   rm -rf "${install_dir}.old"
   test ! -d "${install_dir}" || mv "${install_dir}" "${install_dir}.old"
   mv "${extracted_dir}" "${install_dir}"
