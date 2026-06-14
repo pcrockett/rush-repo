@@ -1,7 +1,7 @@
 #!/usr/bin/env nu
 
-const IMAGE_CONTAINER_CUTOFF = 30day
-let IMAGE_CONTAINER_CUTOFF_HOURS = ($IMAGE_CONTAINER_CUTOFF | into hours)
+const IMAGE_CONTAINER_CUTOFF_HOURS = 720  # about 1 month
+let IMAGE_CONTAINER_CUTOFF = ($"($IMAGE_CONTAINER_CUTOFF_HOURS)hr" | into duration)
 let NOW = (date now)
 
 def main [] {
@@ -36,18 +36,18 @@ def purge-dead-containers [] {
   # filter there works on container _creation_ date. this function is designed to look
   # at when a container was last used, not when it was created.
 
-  let unused_ids = (
+  let exited_ids = (
     ^docker ps --filter status=exited --filter status=dead --format "{{.ID}}"
     | lines
   )
 
-  if ($unused_ids | length) == 0 {
+  if ($exited_ids | length) == 0 {
     print "No dead / exited containers found."
     return
   }
 
   let to_purge = (
-    ^docker inspect ...$unused_ids
+    ^docker inspect ...$exited_ids
     | from json
     | each {
       {
@@ -99,8 +99,4 @@ def purge-unused-containers [] {
     ^docker container rm --volumes ...$to_purge
   }
   print $"Purged ($purge_count) unused containers."
-}
-
-def "into hours" []: duration -> float {
-  ($in | into int) / 1_000_000_000 / 60 / 60
 }
