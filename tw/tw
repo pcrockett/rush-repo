@@ -234,6 +234,22 @@ def enqueue-cmd [
     ^pueue group add --parallel $parallel $group_name
   }
 
+  let badger = which badger | each { $in.path } | first
+  let command = if ($badger | is-empty) {
+    $command
+  } else {
+    (
+      $command
+      | append [
+        "|| {\n"
+          $"badger publish '`($command | str join ' ')` failed'"
+          "&&"
+          "exit 1"
+        "\n};"
+      ]
+    )
+  }
+
   let task_id = if ($command | is-not-empty) {
     ^pueue add --group $group_name --print-task-id -- ...$command | into int
   } else {
