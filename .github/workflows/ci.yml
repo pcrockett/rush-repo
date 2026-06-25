@@ -13,14 +13,14 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd  # v6.0.2
-
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0  # v7.0.0
+      - uses: pcrockett/setup-yamlfmt@4f68eace6cc92df3cc768a8c3a63a230cc29a3c2  # v0.1.0
       - name: Install tools
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           curl -SsfL http://philcrockett.com/yolo/v1.sh \
-            | bash -s -- tagref asdf rush yamlfmt
+            | bash -s -- tagref asdf rush
           asdf plugin add bats "https://github.com/pcrockett/asdf-bats.git"
           asdf plugin add just "https://github.com/olofvndrhr/asdf-just.git"
           asdf plugin add shfmt "https://github.com/pcrockett/asdf-shfmt.git"
@@ -28,7 +28,7 @@ jobs:
           echo "${HOME}/.asdf/shims" >> "${GITHUB_PATH}"
 
       - name: Setup Python
-        uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405  # v6.2.0
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1  # v6.3.0
 
       - name: pre-commit
         uses: pre-commit/action@2c7b3805fd2a0fd8c1884dcaebf91fc102a13ecd  # v3.0.1
