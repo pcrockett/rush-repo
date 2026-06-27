@@ -30,13 +30,12 @@ jobs:
       - name: Setup Python
         uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1  # v6.3.0
 
-      - name: pre-commit
-        uses: pre-commit/action@2c7b3805fd2a0fd8c1884dcaebf91fc102a13ecd  # v3.0.1
+      # borrowed /modified the following from <https://github.com/pre-commit/action/blob/main/action.yml>
+      - run: python -m pip install pre-commit
+      - run: python -m pip freeze --local
+      - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9  # v6.1.0
         with:
-          extra_args: --show-diff-on-failure --color=always --all-files
+          path: ~/.cache/pre-commit
+          key: pre-commit-3|${{ env.pythonLocation }}|${{ hashFiles('.pre-commit-config.yaml') }}
 
-      - name: tagref
-        run: just tagref
-
-      - name: test
-        run: just test
+      - run: just all
