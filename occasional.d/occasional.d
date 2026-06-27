@@ -33,6 +33,7 @@ panic() {
 }
 
 # shellcheck disable=SC2329  # this function is doch called below, just via a dynamically-called function
+# shellcheck disable=SC2317  # this function is doch called below, just via a dynamically-called function
 unbuffer_output() {
   # TODO: Learn more about output buffering. However it seems that because lots of
   # programs like awk etc. have buffered stdout, some of that output MIGHT SOMETIMES not
@@ -46,6 +47,7 @@ unbuffer_output() {
 }
 
 # shellcheck disable=SC2329  # this function is doch called below, just via a dynamically-called function
+# shellcheck disable=SC2317  # this function is doch called below, just via a dynamically-called function
 load_env() {
   test -f "${OCCASIONAL_ENV_FILE}" && {
     echo "Sourcing ${OCCASIONAL_ENV_FILE}..."
@@ -60,6 +62,7 @@ load_env() {
 }
 
 # shellcheck disable=SC2329  # this function is doch called below, just via a dynamically-called function
+# shellcheck disable=SC2317  # this function is doch called below, just via a dynamically-called function
 populate_env() {
   test -f "${OCCASIONAL_ENV_FILE}" || {
     cat >"${OCCASIONAL_ENV_FILE}" <<EOF
@@ -135,17 +138,20 @@ init() {
 }
 
 # shellcheck disable=SC2329  # function invoked indirectly
+# shellcheck disable=SC2317  # function invoked indirectly
 operation:enable() {
   populate_env
   "${SYSTEMCTL_CMD[@]}" enable --now "occasional.d-${TIME_INTERVAL}.timer"
 }
 
 # shellcheck disable=SC2329  # function invoked indirectly
+# shellcheck disable=SC2317  # function invoked indirectly
 operation:disable() {
   "${SYSTEMCTL_CMD[@]}" disable --now "occasional.d-${TIME_INTERVAL}.timer"
 }
 
 # shellcheck disable=SC2329  # function invoked indirectly
+# shellcheck disable=SC2317  # function invoked indirectly
 operation:run() {
   scripts_to_run="$(
     find "${SCRIPT_DIR}" -maxdepth 1 -mindepth 1 -executable -type f -print0 \
