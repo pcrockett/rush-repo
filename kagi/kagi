@@ -147,7 +147,7 @@ def "main assist" [
     $query_params | table | print
     exit 1
   }
-  browser open $"https://kagi.com/assistant/?($query_string)"
+  browser open $"https://assistant.kagi.com/?($query_string)"
 }
 
 # Use Kagi Translate (opens your browser)
