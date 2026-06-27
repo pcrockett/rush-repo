@@ -20,11 +20,6 @@ repos:
     rev: 39fdb480a06768cc41a84ef86959c07ff33091c4  # frozen: v8.28.0
     hooks:
       - id: gitleaks
-  - repo: https://github.com/koalaman/shellcheck-precommit
-    rev: 99470f5e12208ff0fb17ab81c3c494f7620a1d8d  # frozen: v0.11.0
-    hooks:
-      - id: shellcheck
-        exclude: '(template.bash|example.bats|ollama/install\.sh|bun/install\.sh)'
   - repo: https://github.com/adrienverge/yamllint
     rev: 79a6b2b1392eaf49cdd32ac4f14be1a809bbd8f7  # frozen: v1.37.1
     hooks:
@@ -46,3 +41,10 @@ repos:
         language: system
         types:
           - yaml
+      - id: shellcheck
+        name: shellcheck
+        entry: shellcheck
+        language: system
+        types:
+          - shell
+        exclude: '(template.bash|example.bats|ollama/install\.sh|bun/install\.sh)'
