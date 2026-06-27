@@ -1,0 +1,49 @@
+#!/usr/bin/env bash
+
+# shellcheck source=lib.sh
+source "${REPO_PATH}/lib.sh"
+
+# shellcheck disable=SC2034  # variables used in `install_from_github()`
+{
+  GITHUB_ORG="sinelaw"
+  GITHUB_REPO="fresh"
+}
+BIN_NAME="fresh"
+
+latest_version() {
+  # strip the leading `v` from the tag name:
+  echo "${GITHUB_LATEST_TAG}" | cut --characters 2-
+}
+
+installed_version() {
+  if ! command_exists "${BIN_NAME}"; then
+    echo ""
+    return 0
+  fi
+
+  installed_package_version
+}
+
+artifact_name() {
+  echo "fresh-editor-$(latest_version)-x86_64.AppImage"
+}
+
+download_url() {
+  echo "https://github.com/${GITHUB_ORG}/${GITHUB_REPO}/releases/download/${GITHUB_LATEST_TAG}/$(artifact_name)"
+}
+
+install_artifact() {
+  install_path="${XDG_DATA_HOME}/fresh-editor"
+  rm -rf "${install_path}.old"
+  chmod +x "${ARTIFACT_PATH}"
+  "${ARTIFACT_PATH}" --appimage-extract
+  if [ -d "${install_path}" ]; then
+    mv "${install_path}" "${install_path}.old"
+  fi
+  mkdir -p "${install_path}"
+  mv squashfs-root/* "${install_path}"
+  ln -sf "${install_path}/usr/bin/fresh" "${RUSH_USER_BIN}/fresh"
+}
+
+install_from_github
+install_success "$(latest_version)"
