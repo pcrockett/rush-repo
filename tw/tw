@@ -13,6 +13,7 @@ let DECAY_STATE_FILE = $"($STATE_DIR)/decay.toml"
 def main [
   ...args: string       # args to pass directly to `task`
 ] {
+  $args | error-if-modify-today
   auto-decay
   ^task ...$args
 }
@@ -314,4 +315,23 @@ def open-or-default [default: any]: string -> any {
 
 def serialize-date []: datetime -> string {
   date to-timezone UTC | format date "%+"
+}
+
+def error-if-modify-today []: list<any> -> nothing {
+  # it's VERY common for me to try to schedule a task for today via:
+  #
+  #     tw ID modify schedule:today
+  #
+  # however what i often write is:
+  #
+  #     tw ID modify today
+  #
+  # this is a valid command and it doesn't error out. but it does NOT do what i want and
+  # i don't realize it until much later.
+  let args = $in
+  if (($args | window 2) | any {$in == [modify today]}) {
+    error make {
+      msg: "The terms `modify today` are rarely what you intend. Did you mean `modify schedule:today`?"
+    }
+  }
 }
