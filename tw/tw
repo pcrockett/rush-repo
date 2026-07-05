@@ -239,16 +239,7 @@ def enqueue-cmd [
   let command = if ($badger | is-empty) {
     $command
   } else {
-    (
-      $command
-      | append [
-        "|| {\n"
-          $"badger publish '`($command | str join ' ')` failed'"
-          "&&"
-          "exit 1"
-        "\n};"
-      ]
-    )
+    [$badger run "--"] | append $command
   }
 
   let task_id = if ($command | is-not-empty) {
