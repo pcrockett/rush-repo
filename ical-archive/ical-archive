@@ -100,7 +100,7 @@ def extract-first-value [pattern: string] {
   parse $pattern | get value | first
 }
 
-def parse-date []: any -> datetime {
+def parse-date []: any -> oneof<datetime, nothing> {
   # examples to parse:
   #
   # - TZID=America/Chicago:20170620T180000
