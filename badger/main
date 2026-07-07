@@ -24,7 +24,7 @@ installed_version() {
 }
 
 artifact_name() {
-  echo "badger-x86_64-unknown-linux-gnu"
+  echo "badger-x86_64-unknown-linux-musl"
 }
 
 download_url() {

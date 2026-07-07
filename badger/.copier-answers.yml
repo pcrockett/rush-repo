@@ -2,7 +2,7 @@
 # Don't edit manually!
 # <https://copier.readthedocs.io/en/stable/updating/>
 _src_path: _templates/github-release
-artifact_name: badger-x86_64-unknown-linux-gnu
+artifact_name: badger-x86_64-unknown-linux-musl
 artifact_type: raw_binary
 binary_name: badger
 github_org: pcrockett
