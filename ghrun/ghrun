@@ -117,9 +117,14 @@ main() {
   run_id="$(select_run)"
   gh run watch "${run_id}"
 
-  # make sure opening the browser isn't blocking
-  nohup gh run view --web "${run_id}" &>/dev/null &
-  disown
+  if [ "${GHRUN_BADGER_NOTIFY:-}" == "" ]; then
+    # make sure opening the browser isn't blocking
+    nohup gh run view --web "${run_id}" &>/dev/null &
+    disown
+  else
+    url="$(gh run view "${run_id}" --json url --jq '.url')"
+    badger publish "Run finished: <${url}>"
+  fi
 }
 
 main
