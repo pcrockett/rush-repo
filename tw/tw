@@ -105,10 +105,17 @@ def "main decay" [
     ^task rc.gc=0 status:pending decay.any: export
     | from json
     | each {|task|
+      let begin = (
+        [$task.entry $task.wait?]
+        | compact
+        | each { into datetime }
+        | math max
+      )
+
       {
         uuid: $task.uuid
         decay: {
-          begin: ($task.entry | into datetime)
+          begin: $begin
           end: ($task.decay | into datetime)
           coeff: ($task.decay_coeff? | default "0" | into int)
         }
@@ -117,11 +124,11 @@ def "main decay" [
     | each {|task|
       let total_duration = $task.decay.end - $task.decay.begin
       if (($total_duration | into int) < 0) {
-        error make { msg: $"task ($task.uuid) has decay end date before creation date." }
+        error make { msg: $"task ($task.uuid) has decay end date before creation / wait date." }
       }
       let time_passed = $now - $task.decay.begin
       if (($time_passed | into int) < 0) {
-        error make { msg: $"task ($task.uuid) begins AFTER the current time." }
+        error make { msg: $"task ($task.uuid) begins after the current time." }
       }
       let decay_ratio = ($time_passed / $total_duration)
       let decay = [($decay_ratio * 10 | into int) 10] | math min
