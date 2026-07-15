@@ -20,15 +20,13 @@ jobs:
       - uses: pcrockett/setup-bats@4d1e65e0e5e054a6264804f875e3e9dbd217542b  # v0.1.1
       - uses: pcrockett/setup-just@bfd0f2be2991d96e39d8d4c3bba4018d44857339  # v0.1.0
       - uses: pcrockett/setup-tagref@07bd73221956463c377add842cee0e7fcf967d43  # v0.1.1
+      - uses: pcrockett/setup-shfmt@d8d8c3e8826447cc32357cd9436c6b90d1a01aa3  # v0.1.0
       - name: Install tools
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          curl -SsfL http://philcrockett.com/yolo/v1.sh \
-            | bash -s -- asdf rush
-          asdf plugin add shfmt "https://github.com/pcrockett/asdf-shfmt.git"
-          asdf install
-          echo "${HOME}/.asdf/shims" >> "${GITHUB_PATH}"
+          curl -SsfL http://philcrockett.com/yolo/v2.sh \
+            | bash -s -- rush
 
       - name: Setup Python
         uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1  # v6.3.0
