@@ -19,7 +19,7 @@ jobs:
       - uses: pcrockett/setup-yamlfmt@2949e59bb1f6d24f519d0dfa2560a0dbcd563fcc  # v0.1.1
       - uses: pcrockett/setup-bats@4d1e65e0e5e054a6264804f875e3e9dbd217542b  # v0.1.1
       - uses: pcrockett/setup-just@bfd0f2be2991d96e39d8d4c3bba4018d44857339  # v0.1.0
-      - uses: pcrockett/setup-tagref@76f05b06211bb1f0c3f201c2ac5876d81d03319d  # v0.1.0
+      - uses: pcrockett/setup-tagref@07bd73221956463c377add842cee0e7fcf967d43  # v0.1.1
       - name: Install tools
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
