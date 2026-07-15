@@ -17,7 +17,7 @@ jobs:
         with:
           persist-credentials: false
       - uses: pcrockett/setup-yamlfmt@2949e59bb1f6d24f519d0dfa2560a0dbcd563fcc  # v0.1.1
-      - uses: pcrockett/setup-bats@b791173505d0a1947d46793e9aae33a962cfd949  # v0.1.0
+      - uses: pcrockett/setup-bats@4d1e65e0e5e054a6264804f875e3e9dbd217542b  # v0.1.1
       - uses: pcrockett/setup-just@bfd0f2be2991d96e39d8d4c3bba4018d44857339  # v0.1.0
       - uses: pcrockett/setup-tagref@76f05b06211bb1f0c3f201c2ac5876d81d03319d  # v0.1.0
       - name: Install tools
