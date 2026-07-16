@@ -30,17 +30,7 @@ jobs:
       - uses: pcrockett/setup-just@bfd0f2be2991d96e39d8d4c3bba4018d44857339  # v0.1.0
       - uses: pcrockett/setup-shfmt@d8d8c3e8826447cc32357cd9436c6b90d1a01aa3  # v0.1.0
       - uses: pcrockett/setup-yamlfmt@2949e59bb1f6d24f519d0dfa2560a0dbcd563fcc  # v0.1.1
-
-      - name: Setup Python
-        uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405  # v6.2.0
-
-      # borrowed /modified the following from <https://github.com/pre-commit/action/blob/main/action.yml>
-      - run: python -m pip install pre-commit
-      - run: python -m pip freeze --local
-      - uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae  # v5.0.5
-        with:
-          path: ~/.cache/pre-commit
-          key: pre-commit-3|${{ env.pythonLocation }}|${{ hashFiles('.pre-commit-config.yaml') }}
+      - uses: pcrockett/setup-pre-commit@19ef06ee4c041b82a9ad48337154bd4429158560  # v0.1.0
 
       - run: just lint
 
