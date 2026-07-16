@@ -51,8 +51,7 @@ _bin/newpackage <name> [template]              # scaffold a new package
 ```
 
 `.tool-versions` pins `bats`, `just`, and `shfmt` via asdf. `pre-commit` is
-required locally; CI installs it via `actions/setup-python` +
-`pre-commit/action`.
+required locally; CI installs it to run the same quality gates as local.
 
 ## Writing a package
 
