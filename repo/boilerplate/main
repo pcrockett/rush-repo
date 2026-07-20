@@ -16,6 +16,7 @@ packages_to_run=(
   shellcheckrc
   yamlfmt-config
   yamllint-config
+  mise-toml
 )
 
 rush_cmd=(rush get)

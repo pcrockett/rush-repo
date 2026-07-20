@@ -12,42 +12,46 @@ repos:
       - id: check-yaml
       - id: end-of-file-fixer
       - id: trailing-whitespace
-  - repo: https://github.com/rhysd/actionlint
-    rev: 914e7df21a07ef503a81201c76d2b11c789d3fca  # frozen: v1.7.12
-    hooks:
-      - id: actionlint
-  - repo: https://github.com/adrienverge/yamllint
-    rev: cba56bcde1fdd01c1deb3f945e69764c291a6530  # frozen: v1.38.0
-    hooks:
-      - id: yamllint
-  # - repo: https://github.com/thermondo/pre-commit-hooks
-  #   rev: 6b0a643c5b27285da3a932a0cd8c1a93900358c4  # frozen: v1.0.2
-  #   hooks:
-  #     - id: check-terraform-lock
-  #     - id: terraform-fmt
-  # - repo: https://github.com/hadolint/hadolint
-  #   rev: 4e697ba704fd23b2409b947a319c19c3ee54d24f  # frozen: v2.14.0
-  #   hooks:
-  #     - id: hadolint-docker
+
+  # local tools assumed to be installed with mise, see mise.toml
   - repo: local
     hooks:
+      - id: actionlint
+        name: lint github actions files
+        language: system
+        entry: actionlint
+        types:
+          - yaml
+        files: ^\.github/workflows/
       - id: shellcheck
-        name: shellcheck
+        name: lint shell scripts
         entry: shellcheck
         language: system
         types:
           - shell
       - id: shfmt
-        name: shfmt
+        name: autoformat shell scripts
         entry: shfmt
         args:
           - --write
         language: system
         types:
           - shell
+      - id: yamllint
+        name: lint yaml files
+        entry: yamllint
+        language: system
+        types:
+          - yaml
       - id: yamlfmt
-        name: yamlfmt
+        name: autoformat yaml files
         entry: yamlfmt
         language: system
         types:
           - yaml
+      - id: hadolint
+        name: lint dockerfiles
+        entry: hadolint
+        language: system
+        types:
+          - dockerfile

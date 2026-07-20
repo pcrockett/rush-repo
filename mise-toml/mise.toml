@@ -1,0 +1,11 @@
+[tools]
+"github:stepchowfun/tagref" = "latest"
+actionlint = "latest"
+bats = "latest"
+hadolint = "latest"
+just = "latest"
+pre-commit = "latest"
+shellcheck = "latest"
+shfmt = "latest"
+yamlfmt = "latest"
+yamllint = "latest"

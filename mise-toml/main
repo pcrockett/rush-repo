@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+
+# shellcheck source=lib.sh
+source "${REPO_PATH}/lib.sh"
+
+dest="${USER_CWD}/mise.toml"
+
+if [ ! -e "${dest}" ] || force_please; then
+  cp mise.toml "${dest}"
+  log_attention "Edit mise.toml and run \`mise lock\` when ready."
+else
+  panic "mise.toml already exists in this directory. Use --force to overwrite."
+fi

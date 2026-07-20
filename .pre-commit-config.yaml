@@ -12,17 +12,26 @@ repos:
       - id: check-yaml
       - id: end-of-file-fixer
       - id: trailing-whitespace
+
+  # local tools assumed to be installed with mise, see mise.toml
   - repo: local
     hooks:
       - id: actionlint
-        name: actionlint
+        name: lint github actions files
         language: system
         entry: actionlint
         types:
           - yaml
         files: ^\.github/workflows/
+      - id: shellcheck
+        name: lint shell scripts
+        entry: shellcheck
+        language: system
+        types:
+          - shell
+        exclude: '(template.bash|example.bats|ollama/install\.sh|bun/install\.sh)'
       - id: shfmt
-        name: shfmt
+        name: autoformat shell scripts
         entry: shfmt
         args:
           - --write
@@ -31,26 +40,19 @@ repos:
           - shell
         exclude: '(deno/install\.sh|ollama/install\.sh|bun/install\.sh)'
       - id: yamllint
-        name: yamllint
+        name: lint yaml files
         entry: yamllint
         language: system
         types:
           - yaml
       - id: yamlfmt
-        name: yamlfmt
+        name: autoformat yaml files
         entry: yamlfmt
         language: system
         types:
           - yaml
-      - id: shellcheck
-        name: shellcheck
-        entry: shellcheck
-        language: system
-        types:
-          - shell
-        exclude: '(template.bash|example.bats|ollama/install\.sh|bun/install\.sh)'
       - id: hadolint
-        name: hadolint
+        name: lint dockerfiles
         entry: hadolint
         language: system
         types:
