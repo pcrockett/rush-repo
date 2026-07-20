@@ -12,20 +12,15 @@ repos:
       - id: check-yaml
       - id: end-of-file-fixer
       - id: trailing-whitespace
-  - repo: https://github.com/rhysd/actionlint
-    rev: e7d448ef7507c20fc4c88a95d0c448b848cd6127  # frozen: v1.7.8
-    hooks:
-      - id: actionlint
-  - repo: https://github.com/gitleaks/gitleaks
-    rev: 39fdb480a06768cc41a84ef86959c07ff33091c4  # frozen: v8.28.0
-    hooks:
-      - id: gitleaks
-  - repo: https://github.com/adrienverge/yamllint
-    rev: 79a6b2b1392eaf49cdd32ac4f14be1a809bbd8f7  # frozen: v1.37.1
-    hooks:
-      - id: yamllint
   - repo: local
     hooks:
+      - id: actionlint
+        name: actionlint
+        language: system
+        entry: actionlint
+        types:
+          - yaml
+        files: ^\.github/workflows/
       - id: shfmt
         name: shfmt
         entry: shfmt
@@ -35,6 +30,12 @@ repos:
         types:
           - shell
         exclude: '(deno/install\.sh|ollama/install\.sh|bun/install\.sh)'
+      - id: yamllint
+        name: yamllint
+        entry: yamllint
+        language: system
+        types:
+          - yaml
       - id: yamlfmt
         name: yamlfmt
         entry: yamlfmt

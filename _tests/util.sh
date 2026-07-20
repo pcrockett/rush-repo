@@ -19,7 +19,7 @@ setup() {
   echo "default = ${RUSH_REPO_DIR}" >"${RUSH_CONFIG}"
 
   TEST_CWD="$(mktemp --directory --tmpdir=/tmp bats-test.XXXXXX)"
-  cp .tool-versions "${TEST_CWD}"
+  cp mise.toml mise.lock "${TEST_CWD}"
   cd "${TEST_CWD}"
 }
 
