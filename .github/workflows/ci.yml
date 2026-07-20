@@ -16,12 +16,7 @@ jobs:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0  # v7.0.0
         with:
           persist-credentials: false
-      - uses: pcrockett/setup-yamlfmt@2949e59bb1f6d24f519d0dfa2560a0dbcd563fcc  # v0.1.1
-      - uses: pcrockett/setup-bats@4d1e65e0e5e054a6264804f875e3e9dbd217542b  # v0.1.1
-      - uses: pcrockett/setup-just@bfd0f2be2991d96e39d8d4c3bba4018d44857339  # v0.1.0
-      - uses: pcrockett/setup-tagref@07bd73221956463c377add842cee0e7fcf967d43  # v0.1.1
-      - uses: pcrockett/setup-shfmt@d8d8c3e8826447cc32357cd9436c6b90d1a01aa3  # v0.1.0
-      - uses: pcrockett/setup-pre-commit@19ef06ee4c041b82a9ad48337154bd4429158560  # v0.1.0
+      - uses: jdx/mise-action@dad1bfd3df957f44999b559dd69dc1671cb4e9ea  # v4.2.1
       - name: Install Rush
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
