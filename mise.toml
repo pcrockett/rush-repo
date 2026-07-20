@@ -1,4 +1,6 @@
 [tools]
+"github:DannyBen/rush" = "latest"
+"github:stepchowfun/tagref" = "latest"
 actionlint = "latest"
 bats = "latest"
 just = "latest"
@@ -7,4 +9,3 @@ shellcheck = "latest"
 shfmt = "latest"
 yamlfmt = "latest"
 yamllint = "latest"
-"github:stepchowfun/tagref" = "latest"

@@ -74,6 +74,45 @@ url_api = "https://api.github.com/repos/bats-core/bats-core/tarball/v1.13.0"
 url = "https://github.com/bats-core/bats-core/archive/refs/tags/v1.13.0.tar.gz"
 url_api = "https://api.github.com/repos/bats-core/bats-core/tarball/v1.13.0"
 
+[[tools."github:DannyBen/rush"]]
+version = "1.0.1"
+backend = "github:DannyBen/rush"
+
+[tools."github:DannyBen/rush"."platforms.linux-arm64"]
+checksum = "sha256:f1790619b2cfbf2ee73c36b61ee36c6af1d2f8ab985f7d07a4b7d7fd26456a95"
+url = "https://github.com/DannyBen/rush/releases/download/v1.0.1/rush"
+url_api = "https://api.github.com/repos/DannyBen/rush/releases/assets/466994152"
+
+[tools."github:DannyBen/rush"."platforms.linux-arm64-musl"]
+checksum = "sha256:f1790619b2cfbf2ee73c36b61ee36c6af1d2f8ab985f7d07a4b7d7fd26456a95"
+url = "https://github.com/DannyBen/rush/releases/download/v1.0.1/rush"
+url_api = "https://api.github.com/repos/DannyBen/rush/releases/assets/466994152"
+
+[tools."github:DannyBen/rush"."platforms.linux-x64"]
+checksum = "sha256:f1790619b2cfbf2ee73c36b61ee36c6af1d2f8ab985f7d07a4b7d7fd26456a95"
+url = "https://github.com/DannyBen/rush/releases/download/v1.0.1/rush"
+url_api = "https://api.github.com/repos/DannyBen/rush/releases/assets/466994152"
+
+[tools."github:DannyBen/rush"."platforms.linux-x64-musl"]
+checksum = "sha256:f1790619b2cfbf2ee73c36b61ee36c6af1d2f8ab985f7d07a4b7d7fd26456a95"
+url = "https://github.com/DannyBen/rush/releases/download/v1.0.1/rush"
+url_api = "https://api.github.com/repos/DannyBen/rush/releases/assets/466994152"
+
+[tools."github:DannyBen/rush"."platforms.macos-arm64"]
+checksum = "sha256:f1790619b2cfbf2ee73c36b61ee36c6af1d2f8ab985f7d07a4b7d7fd26456a95"
+url = "https://github.com/DannyBen/rush/releases/download/v1.0.1/rush"
+url_api = "https://api.github.com/repos/DannyBen/rush/releases/assets/466994152"
+
+[tools."github:DannyBen/rush"."platforms.macos-x64"]
+checksum = "sha256:f1790619b2cfbf2ee73c36b61ee36c6af1d2f8ab985f7d07a4b7d7fd26456a95"
+url = "https://github.com/DannyBen/rush/releases/download/v1.0.1/rush"
+url_api = "https://api.github.com/repos/DannyBen/rush/releases/assets/466994152"
+
+[tools."github:DannyBen/rush"."platforms.windows-x64"]
+checksum = "sha256:f1790619b2cfbf2ee73c36b61ee36c6af1d2f8ab985f7d07a4b7d7fd26456a95"
+url = "https://github.com/DannyBen/rush/releases/download/v1.0.1/rush"
+url_api = "https://api.github.com/repos/DannyBen/rush/releases/assets/466994152"
+
 [[tools."github:stepchowfun/tagref"]]
 version = "1.13.0"
 backend = "github:stepchowfun/tagref"

@@ -17,11 +17,4 @@ jobs:
         with:
           persist-credentials: false
       - uses: jdx/mise-action@dad1bfd3df957f44999b559dd69dc1671cb4e9ea  # v4.2.1
-      - name: Install Rush
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          curl -SsfL http://philcrockett.com/yolo/v2.sh \
-            | bash -s -- rush
-
       - run: just all
