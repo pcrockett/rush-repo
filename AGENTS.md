@@ -50,8 +50,8 @@ bats _tests/install_success.bats               # single test file
 _bin/newpackage <name> [template]              # scaffold a new package
 ```
 
-`.tool-versions` pins `bats`, `just`, and `shfmt` via asdf. `pre-commit` is
-required locally; CI installs it to run the same quality gates as local.
+`mise.toml` and `mise.lock` setup all necessary development tools both locally and in
+CI.
 
 ## Writing a package
 
