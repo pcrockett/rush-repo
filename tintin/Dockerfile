@@ -3,8 +3,6 @@ ARG DEBIAN_FRONTEND=noninteractive
 
 # <https://tintin.mudhalla.net/install.php#Debian>
 
-WORKDIR /tmp/tintin
-
 # don't need to pin apt package versions
 # hadolint ignore=DL3008
 RUN \
@@ -14,8 +12,12 @@ apt-get install --yes --no-install-recommends \
 
 ARG TINTIN_VERSION=2.02.61
 
+# intentionally not using WORKDIR or using absolute paths
+# hadolint ignore=DL3003
 RUN \
-wget "https://github.com/scandum/tintin/releases/download/${TINTIN_VERSION}/tintin-${TINTIN_VERSION}.tar.gz" && \
+mkdir --parent /tmp/tintin && \
+cd /tmp/tintin && \
+wget --progress=dot:giga "https://github.com/scandum/tintin/releases/download/${TINTIN_VERSION}/tintin-${TINTIN_VERSION}.tar.gz" && \
 tar -zxvf "tintin-${TINTIN_VERSION}.tar.gz" && \
 cd tt/src && \
 ./configure && \

@@ -49,3 +49,9 @@ repos:
         types:
           - shell
         exclude: '(template.bash|example.bats|ollama/install\.sh|bun/install\.sh)'
+      - id: hadolint
+        name: hadolint
+        entry: hadolint
+        language: system
+        types:
+          - dockerfile
