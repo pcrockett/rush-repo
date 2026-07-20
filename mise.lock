@@ -74,6 +74,45 @@ url_api = "https://api.github.com/repos/bats-core/bats-core/tarball/v1.13.0"
 url = "https://github.com/bats-core/bats-core/archive/refs/tags/v1.13.0.tar.gz"
 url_api = "https://api.github.com/repos/bats-core/bats-core/tarball/v1.13.0"
 
+[[tools."github:stepchowfun/tagref"]]
+version = "1.13.0"
+backend = "github:stepchowfun/tagref"
+
+[tools."github:stepchowfun/tagref"."platforms.linux-arm64"]
+checksum = "sha256:d3ddc055a58f025df786c941afe2a8733b9ad79f7bebf13d227359ff274db664"
+url = "https://github.com/stepchowfun/tagref/releases/download/v1.13.0/tagref-aarch64-unknown-linux-gnu"
+url_api = "https://api.github.com/repos/stepchowfun/tagref/releases/assets/451691893"
+
+[tools."github:stepchowfun/tagref"."platforms.linux-arm64-musl"]
+checksum = "sha256:9da844a49298f3d5bb8467576ef17f504640ed229847f46a7c56ca2865474cf4"
+url = "https://github.com/stepchowfun/tagref/releases/download/v1.13.0/tagref-aarch64-unknown-linux-musl"
+url_api = "https://api.github.com/repos/stepchowfun/tagref/releases/assets/451691888"
+
+[tools."github:stepchowfun/tagref"."platforms.linux-x64"]
+checksum = "sha256:917cb9ea80ee51ca686b876c536a4ec45ad02f08f5379e32cb22bf29632d3155"
+url = "https://github.com/stepchowfun/tagref/releases/download/v1.13.0/tagref-x86_64-unknown-linux-gnu"
+url_api = "https://api.github.com/repos/stepchowfun/tagref/releases/assets/451691890"
+
+[tools."github:stepchowfun/tagref"."platforms.linux-x64-musl"]
+checksum = "sha256:59b62982784ea3f54fa8dd5869ff7bb9cff8adec7b7ab6315ae5110102e3bc7e"
+url = "https://github.com/stepchowfun/tagref/releases/download/v1.13.0/tagref-x86_64-unknown-linux-musl"
+url_api = "https://api.github.com/repos/stepchowfun/tagref/releases/assets/451691887"
+
+[tools."github:stepchowfun/tagref"."platforms.macos-arm64"]
+checksum = "sha256:4a1a0da2d8d429e5c692f78567705638a0424fc8ffa202e3b57707df538d2319"
+url = "https://github.com/stepchowfun/tagref/releases/download/v1.13.0/tagref-aarch64-apple-darwin"
+url_api = "https://api.github.com/repos/stepchowfun/tagref/releases/assets/451691903"
+
+[tools."github:stepchowfun/tagref"."platforms.macos-x64"]
+checksum = "sha256:35dcd8f6eb9ea4a8f1489a8bde104e08df0763936e273e5dfb21a2b2e88aa256"
+url = "https://github.com/stepchowfun/tagref/releases/download/v1.13.0/tagref-x86_64-apple-darwin"
+url_api = "https://api.github.com/repos/stepchowfun/tagref/releases/assets/451691892"
+
+[tools."github:stepchowfun/tagref"."platforms.windows-x64"]
+checksum = "sha256:53ad27f00b4ded544c8b5c72c0f6808fec7c1064d92305ea778e009574cbbcc4"
+url = "https://github.com/stepchowfun/tagref/releases/download/v1.13.0/tagref-x86_64-pc-windows-msvc.exe"
+url_api = "https://api.github.com/repos/stepchowfun/tagref/releases/assets/451691904"
+
 [[tools.just]]
 version = "1.56.0"
 backend = "aqua:casey/just"
