@@ -27,8 +27,9 @@ repos:
         name: lint shell scripts
         entry: shellcheck
         language: system
-        types:
+        types_or:
           - shell
+          - bash
         exclude: '(template.bash|example.bats|ollama/install\.sh|bun/install\.sh)'
       - id: shfmt
         name: autoformat shell scripts

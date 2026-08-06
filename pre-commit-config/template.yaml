@@ -27,8 +27,9 @@ repos:
         name: lint shell scripts
         entry: shellcheck
         language: system
-        types:
+        types_or:
           - shell
+          - bash
       - id: shfmt
         name: autoformat shell scripts
         entry: shfmt
