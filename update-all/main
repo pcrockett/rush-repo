@@ -106,6 +106,7 @@ main() {
   run_if devbox version update
   run_if asdf plugin update --all
   run_if rustup update
+  run_if mise upgrade --minimum-release-age "${RUSH_COOLDOWN:-1wk}"
 
   wait "${job_ostree_update}"
 
