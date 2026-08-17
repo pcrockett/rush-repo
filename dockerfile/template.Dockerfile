@@ -12,7 +12,10 @@ useradd --create-home user && \
 mkdir /app && \
 chown -R user:user /app
 
+# we don't anticipate running inside kubernetes
+# hadolint ignore=DL3066
 USER user
+
 WORKDIR /app
 
 # RUN STUFF HERE

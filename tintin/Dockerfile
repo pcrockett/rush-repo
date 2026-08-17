@@ -26,6 +26,10 @@ make install
 FROM docker.io/library/debian:trixie-slim
 COPY --from=builder /usr/local/bin/tt++ /usr/local/bin/
 RUN useradd --create-home user
+
+# we don't anticipate running inside kubernetes
+# hadolint ignore=DL3066
 USER user
+
 WORKDIR /home/user
 CMD [ "tt++" ]
