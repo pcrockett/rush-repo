@@ -15,7 +15,28 @@ def main [
 ] {
   $args | error-if-modify-today
   auto-decay
-  ^task ...$args
+  (
+    ^task ...$args
+    e>| lines
+      | each {|line|
+        # sometimes i try to add a task, but forget to use the keyword "add". in this
+        # case taskwarrior usually interprets my command as "please display the `next`
+        # report with a really complex filter." This invariably returns an output saying
+        # "No matches."
+        #
+        # My eyes usually glaze over the "No matches" output, so I _thought_ I actually
+        # added a task, when I really just performed a stupid search. And this causes me
+        # to drop and forget tasks.
+        #
+        # solution: highlight "No matches" on stderr with a bright yellow warning so
+        # i can more easily notice that i just performed a search.
+        match $line {
+          "No matches." => { $line | warn }
+          _ => { $line | print --stderr }
+        }
+      }
+  )
+  ignore
 }
 
 # Add a task
@@ -318,4 +339,8 @@ def error-if-modify-today []: list<any> -> nothing {
       msg: "The terms `modify today` are rarely what you intend. Did you mean `modify schedule:today`?"
     }
   }
+}
+
+def warn []: string -> nothing {
+  $"(ansi yellow_reverse)(ansi attr_bold)WARNING:(ansi reset_bold) ($in)(ansi reset)" | print --stderr
 }
