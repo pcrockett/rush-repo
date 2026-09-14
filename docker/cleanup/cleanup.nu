@@ -6,8 +6,8 @@ let IMAGE_CONTAINER_CUTOFF_HOURS = (
   | into int
 )
 
-let BUILD_CACHE_RESERVED_SPACE = (
-  $env.DOCKER_CLEANUP_BUILD_CACHE_RESERVED_SPACE? | default "5G"
+let BUILD_CACHE_MAX_SPACE = (
+  $env.DOCKER_CLEANUP_BUILD_CACHE_MAX_SPACE? | default "5G"
 )
 
 let IMAGE_CONTAINER_CUTOFF = ($"($IMAGE_CONTAINER_CUTOFF_HOURS)hr" | into duration)
@@ -28,7 +28,7 @@ def main [] {
   ^docker image prune --force --all --filter $"until=($IMAGE_CONTAINER_CUTOFF_HOURS)h"
 
   print "Pruning buildx build cache..."
-  ^docker buildx prune --force --all --reserved-space $BUILD_CACHE_RESERVED_SPACE
+  ^docker buildx prune --force --all --max-used-space $BUILD_CACHE_MAX_SPACE
 
   print "============== BEFORE CLEANUP ==============="
   print $before_usage
