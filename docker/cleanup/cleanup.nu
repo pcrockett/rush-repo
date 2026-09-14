@@ -1,6 +1,15 @@
 #!/usr/bin/env nu
 
-const IMAGE_CONTAINER_CUTOFF_HOURS = 720  # about 1 month
+let IMAGE_CONTAINER_CUTOFF_HOURS = (
+  $env.DOCKER_CLEANUP_CUTOFF_HOURS?
+  | default "720"  # about 1 month
+  | into int
+)
+
+let BUILD_CACHE_RESERVED_SPACE = (
+  $env.DOCKER_CLEANUP_BUILD_CACHE_RESERVED_SPACE? | default "5G"
+)
+
 let IMAGE_CONTAINER_CUTOFF = ($"($IMAGE_CONTAINER_CUTOFF_HOURS)hr" | into duration)
 let NOW = (date now)
 
@@ -19,7 +28,7 @@ def main [] {
   ^docker image prune --force --all --filter $"until=($IMAGE_CONTAINER_CUTOFF_HOURS)h"
 
   print "Pruning buildx build cache..."
-  ^docker buildx prune --force --all --reserved-space 5G
+  ^docker buildx prune --force --all --reserved-space $BUILD_CACHE_RESERVED_SPACE
 
   print "============== BEFORE CLEANUP ==============="
   print $before_usage
