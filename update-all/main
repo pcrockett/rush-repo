@@ -3,6 +3,20 @@
 # shellcheck source=lib.sh
 source "${REPO_PATH}/lib.sh"
 
+init() {
+  # some things, like mise, change their behavior depending on your working directory.
+  # let's run in a clean empty directory so mise and friends behave correctly.
+  RUSH_UPDATE_ALL_TEMP_DIR="$(mktemp_dir)"
+  pushd "${RUSH_UPDATE_ALL_TEMP_DIR}" &>/dev/null
+  trap 'cleanup' EXIT ERR
+}
+
+# shellcheck disable=SC2329  # cleanup is called by a trap
+cleanup() {
+  popd &>/dev/null
+  rm -rf "${RUSH_UPDATE_ALL_TEMP_DIR}"
+}
+
 should_skip() {
   # given the name of a command, check if there's a UPDATER_SKIP_{COMMAND} variable
   # defined. if it is a non-empty string, return a zero exit-code.
@@ -72,6 +86,8 @@ github_token() {
 }
 
 main() {
+  init
+
   root_run_if apt-get update
   root_run_if apt-get upgrade --yes --with-new-pkgs
   if check_arch_news; then
