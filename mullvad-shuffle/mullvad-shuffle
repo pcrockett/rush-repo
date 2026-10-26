@@ -57,7 +57,7 @@ main() {
   if [ "${exit_node}" == "" ]; then
     exit 1 # `tailscale` has already printed a good error to stderr, no need to repeat it
   fi
-  tailscale set --exit-node "${exit_node}"
+  tailscale set "$@" --exit-node "${exit_node}"
 }
 
-main
+main "$@"
