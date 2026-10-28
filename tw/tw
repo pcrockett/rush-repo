@@ -57,6 +57,26 @@ def "main notes" [
   edit $task "notes"
 }
 
+# Stop the active task(s), then start this one and tag it `+wip`
+def "main switch" [
+  task: string      # Task ID
+] {
+  let uuid = ^task _get $"($task).uuid" | str trim
+  if ($uuid | is-empty) {
+    error make { msg: $"no task matches `($task)`" }
+  }
+  let others = ^task rc.gc=0 +ACTIVE export | from json | where uuid != $uuid
+  for t in $others {
+    ^task $t.uuid stop
+  }
+  if (^task _get $"($uuid).start" | str trim | is-empty) {
+    ^task $uuid start +wip
+  } else {
+    ^task $uuid modify +wip
+  }
+  ignore
+}
+
 # Define a parameter template to include in all `add` commands
 def "main template add" [
   --ttl(-t) = 10min   # how long the template should remain in effect
