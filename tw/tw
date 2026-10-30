@@ -57,23 +57,28 @@ def "main notes" [
   edit $task "notes"
 }
 
-# Stop the active task(s), then start this one and tag it `+wip`
+# Stop the active task(s), tag them with `+wip`, and start a new task
 def "main switch" [
-  task: string      # Task ID
+  task: string      # Task ID to start
 ] {
-  let uuid = ^task _get $"($task).uuid" | str trim
-  if ($uuid | is-empty) {
-    error make { msg: $"no task matches `($task)`" }
+  # normal case: we're only starting one task.
+  # however the "N tasks" case is possible, so we'll write our code to support it.
+  let tasks_to_start = ^task $task export | from json
+  if ($tasks_to_start | is-empty) {
+    error make { msg: $"no tasks match `($task)`" }
   }
-  let others = ^task rc.gc=0 +ACTIVE export | from json | where uuid != $uuid
-  for t in $others {
-    ^task $t.uuid stop
-  }
-  if (^task _get $"($uuid).start" | str trim | is-empty) {
-    ^task $uuid start +wip
-  } else {
-    ^task $uuid modify +wip
-  }
+  let uuids_to_start = $tasks_to_start | each { $in.uuid }
+  let tasks_to_stop = (
+    ^task rc.gc=0 +ACTIVE export
+    | from json
+    | where { not ($in.uuid in $uuids_to_start) }
+  )
+  $tasks_to_stop | each { ^task $in.uuid stop +wip | print }
+  (
+    $tasks_to_start
+    | where { ($in.start? | is-empty) }
+    | each { ^task $in.uuid start | print }
+  )
   ignore
 }
 
