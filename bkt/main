@@ -3,13 +3,23 @@
 # shellcheck source=lib.sh
 source "${REPO_PATH}/lib.sh"
 
+GITHUB_ORG="dimo414"
+GITHUB_REPO="bkt"
+
+# migrate to mise
+if command -v mise &>/dev/null; then
+  mise_use_global "github:${GITHUB_ORG}/${GITHUB_REPO}"
+  # we don't need this package anymore
+  rush undo "${RUSH_PACKAGE_NAME}"
+  exit
+fi
+
+#########################################################################
+# the following is LEGACY (for machines I haven't migrated to mise yet) #
+#########################################################################
+
 require_commands unzip
 
-# shellcheck disable=SC2034  # variables used in `install_from_github()`
-{
-  GITHUB_ORG="dimo414"
-  GITHUB_REPO="bkt"
-}
 BIN_NAME="bkt"
 
 latest_version() {
