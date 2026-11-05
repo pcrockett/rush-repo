@@ -16,10 +16,10 @@ repos:
   # local tools assumed to be installed with mise, see mise.toml
   - repo: local
     hooks:
-      - id: actionlint
+      - id: jactionlint
         name: lint github actions files
         language: system
-        entry: actionlint
+        entry: jactionlint
         types:
           - yaml
         files: ^\.github/workflows/
