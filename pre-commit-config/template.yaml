@@ -56,3 +56,10 @@ repos:
         language: system
         types:
           - dockerfile
+      - id: zizmor
+        name: audit workflows
+        entry: zizmor . --fix=all
+        language: system
+        types:
+          - yaml
+        files: ^\.github/workflows/
