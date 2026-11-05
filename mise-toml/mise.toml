@@ -1,8 +1,8 @@
 [tools]
 "github:stepchowfun/tagref" = "latest"
-actionlint = "latest"
 bats = "latest"
 hadolint = "latest"
+jactionlint = "latest"
 just = "latest"
 pre-commit = "latest"
 shellcheck = "latest"
