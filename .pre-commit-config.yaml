@@ -65,3 +65,8 @@ repos:
         types:
           - yaml
         files: ^\.github/workflows/
+      - id: tagref
+        name: validate tags, refs, and files
+        entry: tagref check
+        language: system
+        pass_filenames: false
