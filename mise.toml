@@ -1,9 +1,10 @@
 [tools]
 "github:DannyBen/rush" = "latest"
 "github:stepchowfun/tagref" = "latest"
-jactionlint = "latest"
 bats = "latest"
+dprint = "latest"
 hadolint = "latest"
+jactionlint = "latest"
 just = "latest"
 pre-commit = "latest"
 shellcheck = "latest"

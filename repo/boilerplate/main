@@ -6,7 +6,7 @@ source "${REPO_PATH}/lib.sh"
 test -d "${USER_CWD}/.git" || git init "${USER_CWD}"
 
 packages_to_run=(
-  asdfignore
+  dprint-config
   editorconfig
   envrc
   ghboilerplate

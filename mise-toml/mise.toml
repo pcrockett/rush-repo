@@ -1,6 +1,7 @@
 [tools]
 "github:stepchowfun/tagref" = "latest"
 bats = "latest"
+dprint = "latest"
 hadolint = "latest"
 jactionlint = "latest"
 just = "latest"

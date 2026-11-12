@@ -27,6 +27,35 @@ checksum = "sha256:bb537b70b15b732f6d8827dd6578e3d8ce166636ce1f18ea9a074184fcce9
 url = "https://github.com/bats-core/bats-core/archive/refs/tags/v1.14.0.tar.gz"
 url_api = "https://api.github.com/repos/bats-core/bats-core/tarball/v1.14.0"
 
+[[tools.dprint]]
+version = "0.64.3"
+backend = "aqua:dprint/dprint"
+specifiers = ["latest"]
+
+[tools.dprint."platforms.linux-arm64"]
+checksum = "sha256:c820bfc67b0cd6f5f0fa4d00ecdcb056944c86030859f5e50151c88d9164b30d"
+url = "https://github.com/dprint/dprint/releases/download/0.64.3/dprint-aarch64-unknown-linux-gnu.zip"
+url_api = "https://api.github.com/repos/dprint/dprint/releases/assets/667629157"
+provenance = "github-attestations"
+
+[tools.dprint."platforms.linux-arm64-musl"]
+checksum = "sha256:61c8936368ff4030a615ce43853adc5a0707ff77973743d0a691aee2cbf64723"
+url = "https://github.com/dprint/dprint/releases/download/0.64.3/dprint-aarch64-unknown-linux-musl.zip"
+url_api = "https://api.github.com/repos/dprint/dprint/releases/assets/667629170"
+provenance = "github-attestations"
+
+[tools.dprint."platforms.linux-x64"]
+checksum = "sha256:f71cb7e22d6776439eba168d5cb296092d6413fea7148fe4d70684a2702a4fee"
+url = "https://github.com/dprint/dprint/releases/download/0.64.3/dprint-x86_64-unknown-linux-gnu.zip"
+url_api = "https://api.github.com/repos/dprint/dprint/releases/assets/667629165"
+provenance = "github-attestations"
+
+[tools.dprint."platforms.linux-x64-musl"]
+checksum = "sha256:f105dbc2b0bc0d83c644fcabc3e7bd8779469c0d9faeda48365c58b389d5a443"
+url = "https://github.com/dprint/dprint/releases/download/0.64.3/dprint-x86_64-unknown-linux-musl.zip"
+url_api = "https://api.github.com/repos/dprint/dprint/releases/assets/667629164"
+provenance = "github-attestations"
+
 [[tools."github:DannyBen/rush"]]
 version = "1.0.2"
 backend = "github:DannyBen/rush"
