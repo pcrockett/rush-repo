@@ -15,3 +15,5 @@ zizmor = "latest"
 
 [settings]
 lockfile_platforms = ["linux-x64", "linux-x64-musl"]
+lockfile = true
+minimum_release_age = "1wk"
