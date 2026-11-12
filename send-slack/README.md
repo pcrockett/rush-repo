@@ -28,8 +28,8 @@ oauth_config:
 
 ### install the app into your workspace
 
-after installing the app into your workspace, look for the "Install App" menu on the left. this will
-show you a token.
+after installing the app into your workspace, look for the "Install App" menu on the
+left. this will show you a token.
 
 on your machine,
 
@@ -39,8 +39,8 @@ export SLACK_AUTH_TOKEN="the token you see in your web browser"
 
 ### add your app to a channel
 
-in slack, right-click on a channel and select "View channel details." go to the "Integrations" tab
-and click "Add an app."
+in slack, right-click on a channel and select "View channel details." go to the
+"Integrations" tab and click "Add an app."
 
 on your machine:
 
