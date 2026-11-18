@@ -10,7 +10,8 @@ let TEMPLATE_FILE_PATH = $"($STATE_DIR)/template.toml"
 let DECAY_STATE_FILE = $"($STATE_DIR)/decay.toml"
 
 # Taskwarrior wrapper that adds my own custom functionality
-def main [
+def --wrapped main [
+  --help                # show help output
   ...args: string       # args to pass directly to `task`
 ] {
   $args | error-if-modify-today
